@@ -3,6 +3,7 @@ import random
 import pyautogui
 import threading
 import keyboard
+from PIL import __version__ as PIL__version__
 
 running = True
 
@@ -10,7 +11,8 @@ running = True
 def click_on_screen(screen_number):
     global running
 
-    screenshot_path = f"screenshots/screen{screen_number}.png"
+    screenshot_path = f"/Users/dimaermakov/Downloads/target/screen{screen_number}.png"
+
     target_location = pyautogui.locateOnScreen(screenshot_path)
 
     if target_location is None:
@@ -20,10 +22,12 @@ def click_on_screen(screen_number):
     target_x, target_y, target_width, target_height = target_location
     target_center_x = target_x + target_width // 2
     target_center_y = target_y + target_height // 2
-
-    # Move the mouse to the target location and click
     pyautogui.moveTo(target_center_x, target_center_y)
     pyautogui.click()
+
+    # if screen_number == 3:
+    #     input_text = "Sample Input"
+    #     pyautogui.typewrite(input_text)
 
     if keyboard.is_pressed("esc"):
         print("Escape key pressed. Stopping the program.")

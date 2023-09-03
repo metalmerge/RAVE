@@ -6,6 +6,11 @@ import keyboard
 from PIL import __version__ as PIL__version__
 
 running = True
+pyautogui.FAILSAFE = True
+pyautogui.PAUSE = 0.5
+channel_name = pyautogui.prompt(
+    text="", title="Enter the Channel Name", default="Coding 101 with Steve"
+)
 
 
 def click_on_screen(screen_number):
@@ -13,7 +18,7 @@ def click_on_screen(screen_number):
 
     screenshot_path = f"/Users/dimaermakov/Downloads/target/screen{screen_number}.png"
 
-    target_location = pyautogui.locateOnScreen(screenshot_path)
+    target_location = pyautogui.locateOnScreen(screenshot_path, confidence=0.9)
 
     if target_location is None:
         print(f"Screenshot {screen_number} not found on the screen.")
@@ -23,7 +28,7 @@ def click_on_screen(screen_number):
     target_center_x = target_x + target_width // 2
     target_center_y = target_y + target_height // 2
     pyautogui.moveTo(target_center_x, target_center_y)
-    pyautogui.click()
+    pyautogui.click(duration=0.25)
 
     # if screen_number == 3:
     #     input_text = "Sample Input"

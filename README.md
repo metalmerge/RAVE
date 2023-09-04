@@ -7,7 +7,6 @@ This script automates repetitive tasks on a website using keyboard and mouse con
 ## Requirements
 
 - Python 3.x
-- Required libraries can be installed using the following command:
 
 If you get 'TypeError: '<' not supported between instances of 'str' and 'int' when running pyautogui, use this link to fix it: <https://stackoverflow.com/questions/76361049/how-to-fix-typeerror-not-supported-between-instances-of-str-and-int-wh/76383784#76383784>
 

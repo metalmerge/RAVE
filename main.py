@@ -1,11 +1,12 @@
-import cv2
-import numpy as np
-from PIL import Image
-import time
 import random
-import pyautogui
 import threading
+import time
+
+import cv2
 import keyboard
+import numpy as np
+import pyautogui
+from PIL import Image
 from PIL import __version__ as PIL__version__
 
 running = True
@@ -31,7 +32,7 @@ def find_image_center(image_path):
         return None
 
 
-def clickOnImages(image_path):
+def click_on_images(image_path):
     try:
         # Locate the center of the image on the screen
         image_location = pyautogui.locateCenterOnScreen(image_path, confidence=0.9)
@@ -49,7 +50,31 @@ def clickOnImages(image_path):
         return False
 
 
-def clickAndType(image_path, text):
+def cord_click_type(x, y, text):
+    global running
+
+    pyautogui.moveTo(x, y)
+    pyautogui.click(clicks=2, interval=0.25, duration=1)
+    pyautogui.typewrite(text)
+
+    if keyboard.is_pressed("esc"):
+        print("Escape key pressed. Stopping the program.")
+        running = False
+    return True
+
+
+def cord_click(x, y):
+    global running
+
+    pyautogui.moveTo(x, y)
+    pyautogui.click(clicks=2, interval=0.25, duration=1)
+
+    if keyboard.is_pressed("esc"):
+        print("Escape key pressed. Stopping the program.")
+        running = False
+
+
+def click_and_type(image_path, text):
     try:
         # Locate the center of the image on the screen
         image_location = pyautogui.locateCenterOnScreen(image_path, confidence=0.9)
@@ -87,16 +112,18 @@ def click_on_screen(screen_number):
 
 
 def main():
-    screens_to_automate = [0.2, 0.1, 0]
+    # screens_to_automate = [0.2, 0.1, 0]
     # channel_name = pyautogui.prompt(
     #     text="", title="Enter the Channel Name", default="Coding 101 with Steve"
     # )
-    for screen_number in screens_to_automate:
-        if not running:
-            break
+    # for screen_number in screens_to_automate:
+    #     if not running:
+    #         break
 
-        click_on_screen(screen_number)
-        time.sleep(random.uniform(1, 3))
+    #     click_on_screen(screen_number)
+    #     time.sleep(random.uniform(1, 3))
+    cord_click_type(563, 773, "lorem ipsum")
+    cord_click(1204, 766)
 
 
 if __name__ == "__main__":

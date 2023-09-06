@@ -86,7 +86,6 @@ def click_on_screen(screen_number):
     pyautogui.click(clicks=2, interval=0.25, duration=1)
 
     if keyboard.is_pressed("esc"):
-        print("Escape key pressed. Stopping the program.")
         running = False
         sys.exit()
 
@@ -119,36 +118,40 @@ def cord_click(x, y):
 
 def opt_out_form():
     time.sleep(0.5)
-    pyautogui.write("Im")
+    cord_click(703, 442)
     time.sleep(0.5)
-    cord_click(691, 467)  # select
+    pyautogui.write("Imprimis")
     time.sleep(0.5)
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.write(formatted_date)
+    cord_click(572, 442)  # wait
+    time.sleep(3)
+
+    cord_click(850, 505)
     time.sleep(0.5)
-    cord_click(850, 474)  # tab
-    time.sleep(0.5)
-    cord_click(704, 474)  # opt out
-    time.sleep(0.5)
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    time.sleep(0.5)
-    pyautogui.write("deceased")
-    time.sleep(2)
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("enter")
+    cord_click(748, 686)  # today
+
+    time.sleep(1)
+    cord_click(850, 476)  # tab
+    time.sleep(1)
+    cord_click(733, 515)  # opt out
+    time.sleep(1)
+    # cord_click(698, 642)
+    # time.sleep(1)
+    cord_click(849, 637)
+    time.sleep(1)
+    cord_click(698, 706)
+    time.sleep(1)
+    cord_click(636, 642)
+    time.sleep(1)
+    for _ in range(0, 3):
+        pyautogui.press("down")
+
+    time.sleep(1)
+    cord_click(737, 820)
+    time.sleep(5)
+    cord_click(272, 225)
 
 
 def confirm():
-    # TODO
-    print("confirm")
     cord_click(687, 250)
     time.sleep(0.5)
     cord_click(535, 297)
@@ -161,38 +164,43 @@ def confirm():
     pyautogui.press("enter")
     pyautogui.press("enter")
     pyautogui.write("Note: Not Researched - DE")
+    # cord_click(1015, 825)  # cancel button
+    #  TODO
+    cord_click(912, 828)  # save button
 
 
 def decline(scalar):
-    # TODO
-    print("decline")
-    cord_click(420, (748 + (scalar - 1) * 25))
-    time.sleep(5)
-    cord_click(288, 772 + (scalar - 1) * 25)
-    time.sleep(5)
+    # time.sleep(1)
+    # cord_click(421, (696 + (scalar - 1) * 25))
+    # time.sleep(5)
+    # cord_click(306, 725 + (scalar - 1) * 25)
+    # time.sleep(5)
 
     # form
     cord_click(687, 252)
-    time.sleep(5)
+    time.sleep(0.5)
     cord_click(523, 338)
-    time.sleep(5)
+    time.sleep(0.5)
     cord_click(1023, 338)
-    time.sleep(5)
+    time.sleep(0.5)
     cord_click(924, 526)
-    time.sleep(5)
+    time.sleep(0.5)
     cord_click(988, 581)
     pyautogui.press("enter")
     pyautogui.press("enter")
     pyautogui.write("Note: Duplicate - DE")
-    time.sleep(5)
+    time.sleep(0.5)
     # cord_click(1015, 825)  # cancel button
     cord_click(912, 828)  # save button
-    time.sleep(5)
-    down_command()
+    time.sleep(0.5)
+    end = pyautogui.prompt(
+        text="", title="Duplicates, 1 for yes, 0 for no", default="0"
+    )
+    return end
 
 
 def down_command():
-    for x in range(0, 7):
+    for _ in range(0, 7):
         pyautogui.press("down")
 
 
@@ -207,10 +215,7 @@ def decease_form():
     time.sleep(0.5)
 
 
-def main():
-    job = pyautogui.prompt(text="", title="Enter the Task", default="Dead Removal")
-
-    #     time.sleep(random.uniform(1, 3))
+def get_to_dead_page():
     cord_click(271, 228)  # click on the search bar
     pyautogui.click()
     time.sleep(2)
@@ -219,59 +224,61 @@ def main():
     cord_click(360, 490)  # click on the first constituent
     time.sleep(5)
     cord_click(262, 691)  # interactions
-    pyautogui.click()
-    time.sleep(4)
 
-    down_command()
-    time.sleep(0.5)
-    # prompt
-    num = pyautogui.prompt(
-        text="", title="Enter the number of interactions", default="1"
-    )
-    pyautogui.click(clicks=2, interval=0.25, duration=1)
-    if int(num) == 0:
-        print("Quit")
-        sys.exit()
-    elif int(num) == 1:
+
+def main():
+    job = 0
+    while job != -1:
+        job = pyautogui.prompt(
+            text="", title="Enter the Task, -1 to quit", default="Dead Removal"
+        )
+
+        #     time.sleep(random.uniform(1, 3))
+        # get_to_dead_page()
+        pyautogui.click()
+        pyautogui.click()
+
+        time.sleep(2)
+        down_command()
+        time.sleep(0.5)
+        # prompt
         cord_click(420, 748)  # click on first edit
         time.sleep(2.5)
         cord_click(288, 772)  # click on the edit button
         time.sleep(2.5)
-        confirm()
-    else:
-        # click on first edit
-        cord_click(420, 748)
-        time.sleep(2.5)
-        cord_click(288, 772)  # click on the edit button
-        time.sleep(2.5)
-
-        # Perform 'decline' and 'confirm' actions based on the value of 'num'
-        for _ in range(int(num)):
-            decline(int(num))
 
         confirm()
 
-    # cord_click(1015, 825)  # cancel button
-    #  TODO
-    cord_click(912, 828)  # save button
+        num = pyautogui.prompt(
+            text="", title="Duplicates, if yes, get to duplicates", default="0"
+        )
+        pyautogui.click()
+        pyautogui.click()
+        if int(num) == -1:
+            print("Quit")
+            sys.exit()
+        elif int(num) == 1:
+            duplicates = True
+            while duplicates:
+                if int(decline(int(num))) == 0:
+                    duplicates = False
+        cord_click(286, 546)  # personal info
+        time.sleep(1)
+        cord_click(529, 646)  # mark
 
-    cord_click(286, 546)  # personal info
-    time.sleep(1)
-    cord_click(529, 646)  # mark
-
-    decease_form()
-    cord_click(736, 571)  # save button
-    # cord_click(834, 579)  # cancel button
-
-    cord_click(73, 370)  # consituents
-    time.sleep(1)
-    cord_click(497, 826)  # communications
-    time.sleep(1)
-    down_command()
-    time.sleep(1)
-    cord_click(371, 622)  # click on add
-    opt_out_form()
-    cord_click(271, 228)  # click on the search bar
+        decease_form()
+        cord_click(736, 571)  # save button
+        # cord_click(834, 579)  # cancel button
+        time.sleep(4)
+        cord_click(73, 370)  # consituents
+        time.sleep(3)
+        cord_click(497, 826)  # communications
+        time.sleep(3)
+        down_command()
+        time.sleep(3)
+        cord_click(371, 622)  # click on add
+        opt_out_form()
+        cord_click(271, 228)  # click on the search bar
 
 
 if __name__ == "__main__":

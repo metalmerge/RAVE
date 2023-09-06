@@ -1,7 +1,7 @@
 import random
 import threading
 import time
-
+from datetime import datetime
 import cv2
 import keyboard
 import numpy as np
@@ -13,6 +13,8 @@ import sys
 running = True
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = 0.5
+current_date = datetime.now()
+formatted_date = current_date.strftime("%-m/%Y")
 
 
 def find_image_center(image_path):
@@ -115,17 +117,46 @@ def cord_click(x, y):
         sys.exit()
 
 
+def opt_out_form():
+    time.sleep(0.5)
+    pyautogui.write("Im")
+    time.sleep(0.5)
+    cord_click(691, 467)  # select
+    time.sleep(0.5)
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.write(formatted_date)
+    time.sleep(0.5)
+    cord_click(850, 474)  # tab
+    time.sleep(0.5)
+    cord_click(704, 474)  # opt out
+    time.sleep(0.5)
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    time.sleep(0.5)
+    pyautogui.write("deceased")
+    time.sleep(2)
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.press("enter")
+
+
 def confirm():
     # TODO
     print("confirm")
     cord_click(687, 250)
-    time.sleep(5)
+    time.sleep(0.5)
     cord_click(535, 297)
-    time.sleep(5)
+    time.sleep(0.5)
     cord_click(1022, 337)
-    time.sleep(2)
+    time.sleep(0.5)
     cord_click(924, 526)
-    time.sleep(2)
+    time.sleep(0.5)
     cord_click(1031, 585)
     pyautogui.press("enter")
     pyautogui.press("enter")
@@ -154,8 +185,8 @@ def decline(scalar):
     pyautogui.press("enter")
     pyautogui.write("Note: Duplicate - DE")
     time.sleep(5)
-    cord_click(1015, 825)  # cancel button
-    # cord_click(912, 828) save button
+    # cord_click(1015, 825)  # cancel button
+    cord_click(912, 828)  # save button
     time.sleep(5)
     down_command()
 
@@ -165,77 +196,82 @@ def down_command():
         pyautogui.press("down")
 
 
+def decease_form():
+    cord_click(716, 458)  # date
+    time.sleep(0.5)
+    pyautogui.write(formatted_date)
+    time.sleep(0.5)
+    cord_click(857, 514)
+    time.sleep(0.5)
+    cord_click(772, 562)  # reason
+    time.sleep(0.5)
+
+
 def main():
-    # screens_to_automate = [0.2, 0.1, 0]
     job = pyautogui.prompt(text="", title="Enter the Task", default="Dead Removal")
-    # for screen_number in screens_to_automate:
-    #     if not running:
-    #         break
-    #     click_on_screen(screen_number)
+
     #     time.sleep(random.uniform(1, 3))
     cord_click(271, 228)  # click on the search bar
     pyautogui.click()
-    time.sleep(4)
+    time.sleep(2)
     cord_click(290, 377)  # click on constituents updates
-    time.sleep(4)
+    time.sleep(2)
     cord_click(360, 490)  # click on the first constituent
-    time.sleep(4)
+    time.sleep(5)
     cord_click(262, 691)  # interactions
     pyautogui.click()
     time.sleep(4)
 
     down_command()
-    time.sleep(3)
+    time.sleep(0.5)
     # prompt
     num = pyautogui.prompt(
         text="", title="Enter the number of interactions", default="1"
     )
+    pyautogui.click(clicks=2, interval=0.25, duration=1)
     if int(num) == 0:
         print("Quit")
         sys.exit()
-    if int(num) == 1:
+    elif int(num) == 1:
+        cord_click(420, 748)  # click on first edit
+        time.sleep(2.5)
+        cord_click(288, 772)  # click on the edit button
+        time.sleep(2.5)
+        confirm()
+    else:
         # click on first edit
         cord_click(420, 748)
-        time.sleep(5)
+        time.sleep(2.5)
         cord_click(288, 772)  # click on the edit button
-        time.sleep(5)
-        confirm()
-    if int(num) == 2:
-        decline(int(num))
-        confirm()
-    if int(num) == 3:
-        decline(int(num))
-        decline(int(num))
-        confirm()
-    if int(num) == 4:
-        decline(int(num))
-        decline(int(num))
-        decline(int(num))
-        confirm()
-    if int(num) == 5:
-        decline(int(num))
-        decline(int(num))
-        decline(int(num))
-        decline(int(num))
-        confirm()
-    if int(num) == 6:
-        decline(int(num))
-        decline(int(num))
-        decline(int(num))
-        decline(int(num))
-        decline(int(num))
-        confirm()
-    #  first form
+        time.sleep(2.5)
 
-    cord_click(1015, 825)  # cancel button
+        # Perform 'decline' and 'confirm' actions based on the value of 'num'
+        for _ in range(int(num)):
+            decline(int(num))
 
+        confirm()
+
+    # cord_click(1015, 825)  # cancel button
     #  TODO
-    # cord_click(912, 828) save button
+    cord_click(912, 828)  # save button
 
-    # personal info
-    # cord_click()
+    cord_click(286, 546)  # personal info
+    time.sleep(1)
+    cord_click(529, 646)  # mark
 
-    # cord_click_type(563, 773, "lorem ipsum")
+    decease_form()
+    cord_click(736, 571)  # save button
+    # cord_click(834, 579)  # cancel button
+
+    cord_click(73, 370)  # consituents
+    time.sleep(1)
+    cord_click(497, 826)  # communications
+    time.sleep(1)
+    down_command()
+    time.sleep(1)
+    cord_click(371, 622)  # click on add
+    opt_out_form()
+    cord_click(271, 228)  # click on the search bar
 
 
 if __name__ == "__main__":

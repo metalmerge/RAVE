@@ -1,3 +1,4 @@
+# Author: Dimitry Ermakov, minimum time: 30.85 seconds
 import random
 import sys
 import threading
@@ -172,9 +173,9 @@ def opt_out_form():
         pyautogui.press("down")
 
     time.sleep(0.05)
-    cord_click(737, 820)
+    cord_click(737, 820)  # save
     time.sleep(3)
-    cord_click(272, 225)  # search bar
+    cord_click(272, 225)  # click on the search bar
 
 
 def main():
@@ -238,7 +239,6 @@ def main():
         time.sleep(1.5)
         cord_click(371, 622)  # click on add for communications
         opt_out_form()
-        # cord_click(271, 228)  # click on the search bar
 
 
 if __name__ == "__main__":

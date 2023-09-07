@@ -87,7 +87,7 @@ def confirm():
     pyautogui.press("enter")
     pyautogui.press("enter")
     pyautogui.write("Note: Not Researched - DE")
-    time.sleep(10)
+    time.sleep(5)
     cord_click(912, 828)  # save button
     # cord_click(1015, 825)  # cancel button
 
@@ -112,7 +112,7 @@ def decline():
     pyautogui.press("enter")
     pyautogui.press("enter")
     pyautogui.write("Note: Duplicate - DE")
-    time.sleep(10)
+    time.sleep(5)
     cord_click(912, 828)  # save button
     # cord_click(1015, 825)  # cancel button
     time.sleep(0.5)
@@ -173,8 +173,8 @@ def opt_out_form():
 
     time.sleep(0.05)
     cord_click(737, 820)
-    time.sleep(10)
-    cord_click(272, 225)
+    time.sleep(3)
+    cord_click(272, 225)  # search bar
 
 
 def main():
@@ -203,6 +203,7 @@ def main():
             sys.exit()
         elif int(num) == 0:
             confirm()
+            time.sleep(1)
             cord_click(286, 546)  # personal info click
             time.sleep(1)
             cord_click(529, 646)  # mark deceased button

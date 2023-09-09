@@ -1,13 +1,15 @@
-# Author: Dimitry Ermakov, minimum time: 30.85 seconds
-# TODO, add a way to stop the program
+# @Dimitry Ermakov
+# @09/09/2023
+
 import random
 import sys
 import threading
 import time
 from datetime import datetime
-import pytesseract
+
 import keyboard
 import pyautogui
+import pytesseract
 
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = 0.5
@@ -143,7 +145,7 @@ def move_to_communications():
 def opt_out_form():
     time.sleep(0.25)
     cord_click(703, 442)
-    time.sleep(1)
+    time.sleep(0.5)
     keyboard.write("Imprimis")
     time.sleep(0.5)
     cord_click(572, 442)  # wait
@@ -218,17 +220,17 @@ def main():
         if job == "-1":
             sys.exit()
         cord_click(271, 173)
-        # get_to_dead_page()
-        # time.sleep(3)
-        # if extract_text_from_coordinates(420, 1350, 620, 1400) == "Interactions: 1":
-        #     num = 0
-        # else:
-        #     num = 1
-        # time.sleep(0.25)
-        # cord_click(262, 691)  # interactions button
-        # interactions_section(num)
+        get_to_dead_page()
+        time.sleep(5)
+        if extract_text_from_coordinates(420, 1350, 620, 1400) == "Interactions: 1":
+            num = 0
+        else:
+            num = 1
+        time.sleep(0.25)
+        cord_click(262, 691)  # interactions button
+        interactions_section(num)
         deceased_form()
-        time.sleep(2)
+        time.sleep(3)
         move_to_communications()
 
         for _ in range(0, 2):

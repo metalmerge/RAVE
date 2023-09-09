@@ -22,6 +22,17 @@ def find_image_center(image_path):
         return None
 
 
+def cord_click_type(x, y, text):
+    pyautogui.moveTo(x, y)
+    pyautogui.click()
+    pyautogui.typewrite(text)
+
+    if keyboard.is_pressed("esc"):
+        print("Escape key pressed. Stopping the program.")
+        sys.exit()
+    return True
+
+
 def click_and_type(image_path, text):
     try:
         # Locate the center of the image on the screen

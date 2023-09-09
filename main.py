@@ -1,5 +1,5 @@
 # Author: Dimitry Ermakov, minimum time: 30.85 seconds
-# TODO, fix times, click streamline by having it reconizgize only 1 interaction
+# TODO, add a way to stop the program
 import random
 import sys
 import threading
@@ -16,27 +16,11 @@ formatted_date = current_date.strftime("%-m/%Y")
 noted_date = "1/"
 
 
-def click_on_images(image_path):
-    try:
-        # Locate the center of the image on the screen
-        image_location = pyautogui.locateCenterOnScreen(image_path, confidence=0.75)
-        print(image_location)
-        if image_location is not None:
-            # Move the mouse to the center of the image and click
-            # pyautogui.moveTo(image_location)
-            # pyautogui.click()
+def contains_digits(text):
+    for char in text:
+        if char.isdigit():
             return True
-        else:
-            # print(f"Image '{image_path}' not found on the screen.")
-            return False
-    except Exception as e:
-        print(f"Error: {str(e)}")
-        return False
-
-
-def down_command():
-    for _ in range(0, 7):
-        pyautogui.press("down")
+    return False
 
 
 def cord_click(x, y):
@@ -48,33 +32,18 @@ def cord_click(x, y):
         sys.exit()
 
 
-def cord_click_type(x, y, text):
-    pyautogui.moveTo(x, y)
-    pyautogui.click()
-    pyautogui.typewrite(text)
-
-    if keyboard.is_pressed("esc"):
-        print("Escape key pressed. Stopping the program.")
-        sys.exit()
-    return True
-
-
 def get_to_dead_page():
     cord_click(271, 228)  # click on the search bar
-    pyautogui.click()
     time.sleep(1.25)
     cord_click(290, 377)  # click on constituents updates
     time.sleep(5)
     cord_click(360, 490)  # click on the first constituent
-    time.sleep(5)
-    cord_click(262, 691)  # interactions button
-    click_on_images("target/interactions.png")
 
 
 def click_on_first_interaction():
-    cord_click(420, 748)  # click on first pending
+    cord_click(424, 789)  # click on first pending
     time.sleep(0.5)
-    cord_click(288, 772)  # click on the edit button
+    cord_click(300, 822)  # click on the edit button
     time.sleep(0.75)
 
 
@@ -88,19 +57,20 @@ def confirm():
     time.sleep(0.02)
     cord_click(924, 526)
     time.sleep(0.02)
-    cord_click(1035, 635)
-    click_on_images("target/comments.png")
-    pyautogui.press("enter")
-    pyautogui.press("enter")
-    pyautogui.write("Note: Not Researched - DE")
+    if contains_digits(extract_text_from_coordinates(750, 1050, 2100, 1300)):
+        noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
+
     time.sleep(0.02)
-    newdate = pyautogui.prompt(text="", title="Noted Date?", default="1/")
-    if newdate != "1/":
-        noted_date = newdate
+    cord_click(1035, 635)
+    pyautogui.press("enter")
+    time.sleep(0.02)
+    pyautogui.press("enter")
+    time.sleep(0.02)
+    keyboard.write("Note: Not Researched - DE")
+    time.sleep(1)
     cord_click(857, 826)
     time.sleep(0.02)
     cord_click(912, 828)  # save button
-    return newdate
     # cord_click(1015, 825)  # cancel button
 
 
@@ -123,7 +93,7 @@ def decline():
     cord_click(1035, 635)
     pyautogui.press("enter")
     pyautogui.press("enter")
-    pyautogui.write("Note: Duplicate - DE")
+    keyboard.write("Note: Duplicate - DE")
     time.sleep(0.02)
     cord_click(912, 828)  # save button
     # cord_click(1015, 825)  # cancel button
@@ -140,9 +110,9 @@ def deceased_form():
     cord_click(716, 458)  # date
     time.sleep(0.02)
     if noted_date == "1/":
-        pyautogui.write(formatted_date)
+        keyboard.write(formatted_date)
     elif noted_date != "1/":
-        pyautogui.write(noted_date)
+        keyboard.write(noted_date)
     time.sleep(0.02)
     cord_click(857, 514)
     time.sleep(0.02)
@@ -154,14 +124,12 @@ def deceased_form():
 
 def extract_text_from_coordinates(x1, y1, x2, y2):
     pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
-    # pyautogui.prompt(
-    #     text="Press OK when you are ready to capture the textbox.",
-    #     title="Capture Textbox",
-    # )
     screenshot = pyautogui.screenshot()
     textbox_image = screenshot.crop((x1, y1, x2, y2))
     # textbox_image.show()
+    # textbox_image.save("textbox.png")
     extracted_text = pytesseract.image_to_string(textbox_image)
+    print(extracted_text.strip())
     return extracted_text.strip()
 
 
@@ -176,7 +144,7 @@ def opt_out_form():
     time.sleep(0.25)
     cord_click(703, 442)
     time.sleep(1)
-    pyautogui.write("Imprimis")
+    keyboard.write("Imprimis")
     time.sleep(0.5)
     cord_click(572, 442)  # wait
     time.sleep(0.5)
@@ -207,33 +175,22 @@ def opt_out_form():
     # cord_click(272, 225)  # click on the search bar
 
 
-def interactions_section():
-    time.sleep(3)
-    down_command()
+def interactions_section(num):
+    time.sleep(4)
+    for _ in range(0, 6):
+        pyautogui.press("down")
     time.sleep(0.25)
     click_on_first_interaction()
 
-    num = pyautogui.prompt(
-        text="",
-        title="0 = one interaction, 1 = >1 intereactions, -1 to quit",
-        default="0",
-    )
-
-    cord_click(857, 826)
-
-    if int(num) == -1:
-        print("Quit")
-        sys.exit()
-    elif int(num) == 0:
+    if int(num) == 0:
         confirm()
         time.sleep(1.5)
-        cord_click(286, 546)  # personal info click
+        cord_click(286, 587)  # personal info click
         time.sleep(1)
-        cord_click(529, 646)  # mark deceased button
+        cord_click(531, 685)  # mark deceased button
         time.sleep(1)
     elif int(num) > 0:
         confirm()
-        click_on_images("target/screen17.png")
         time.sleep(1)
         duplicates = True
         while duplicates:
@@ -259,10 +216,17 @@ def main():
     while True:
         job = pyautogui.prompt(text="", title="Enter the Task, -1 to quit", default="0")
         if job == "-1":
-            break
-
-        get_to_dead_page()
-        interactions_section()
+            sys.exit()
+        cord_click(271, 173)
+        # get_to_dead_page()
+        # time.sleep(3)
+        # if extract_text_from_coordinates(420, 1350, 620, 1400) == "Interactions: 1":
+        #     num = 0
+        # else:
+        #     num = 1
+        # time.sleep(0.25)
+        # cord_click(262, 691)  # interactions button
+        # interactions_section(num)
         deceased_form()
         time.sleep(2)
         move_to_communications()

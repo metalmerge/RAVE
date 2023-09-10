@@ -1,7 +1,6 @@
 # @Dimitry Ermakov
 # @09/09/2023
 
-import random
 import sys
 import threading
 import time
@@ -61,9 +60,11 @@ def confirm():
     time.sleep(0.02)
     if contains_digits(extract_text_from_coordinates(750, 1050, 2100, 1300)):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
+        time.sleep(0.02)
+        cord_click(444, 444)
 
-    time.sleep(0.02)
-    cord_click(1035, 635)
+    time.sleep(1)
+    cord_click(1035, 617)
     pyautogui.press("enter")
     time.sleep(0.02)
     pyautogui.press("enter")
@@ -76,14 +77,9 @@ def confirm():
     # cord_click(1015, 825)  # cancel button
 
 
-def decline():
-    # time.sleep(1)
-    # cord_click(421, (696 + (scalar - 1) * 25))
-    # time.sleep(5)
-    # cord_click(306, 725 + (scalar - 1) * 25)
-    # time.sleep(5)
-
+def decline(num):
     # form
+    time.sleep(2)
     cord_click(687, 252)
     time.sleep(0.02)
     cord_click(523, 338)
@@ -97,13 +93,19 @@ def decline():
     pyautogui.press("enter")
     keyboard.write("Note: Duplicate - DE")
     time.sleep(0.02)
+    cord_click(857, 826)
+    time.sleep(1)
     cord_click(912, 828)  # save button
     # cord_click(1015, 825)  # cancel button
-    time.sleep(0.5)
-    end = pyautogui.prompt(
-        text="", title="More duplicates?, 1 = yes, 0 = no", default="0"
-    )
-    cord_click(194, 664)  # safe corner
+    if num == 2:
+        return "0"
+    elif num > 2:
+        time.sleep(0.5)
+        end = pyautogui.prompt(
+            text="", title="More duplicates?, 1 = yes, 0 = no", default="0"
+        )
+        cord_click(194, 664)  # safe corner
+        time.sleep(0.5)
     return end
 
 
@@ -184,14 +186,46 @@ def interactions_section(num):
     time.sleep(0.25)
     click_on_first_interaction()
 
-    if int(num) == 0:
+    if num == 1:
         confirm()
         time.sleep(1.5)
         cord_click(286, 587)  # personal info click
         time.sleep(1)
         cord_click(531, 685)  # mark deceased button
         time.sleep(1)
-    elif int(num) > 0:
+    elif num == 2:
+        confirm()
+        time.sleep(1)
+        cord_click(415, 815)  # click on the second pending
+        time.sleep(1)
+        cord_click(298, 837)  # click on second edit button
+        decline(num)
+        time.sleep(1.5)
+        cord_click(286, 587)  # personal info click
+        time.sleep(1)
+        cord_click(531, 685)  # mark deceased button
+        time.sleep(1)
+    elif num == 3:
+        confirm()
+        time.sleep(1)
+        cord_click(415, 815)  # click on the second pending
+        time.sleep(1)
+        cord_click(298, 837)  # click on second edit button
+        decline(num)
+        time.sleep(1)
+        for _ in range(0, 2):
+            pyautogui.press("down")
+        time.sleep(1)
+        cord_click(418, 756)  # click on the third pending #TODO guessed
+        time.sleep(1)
+        cord_click(291, 780)  # click on the third edit #TODO guessed
+        decline(num)
+        time.sleep(1.5)
+        cord_click(278, 506)  # personal info click
+        time.sleep(1)
+        cord_click(545, 607)  # mark deceased button
+        time.sleep(1)
+    elif num > 3:
         confirm()
         time.sleep(1)
         duplicates = True
@@ -202,7 +236,7 @@ def interactions_section(num):
                 default="0",
             )
             cord_click(857, 826)
-            if decline() == "0":
+            if decline(num) == "0":
                 duplicates = False
             pyautogui.prompt(
                 text="",
@@ -213,6 +247,10 @@ def interactions_section(num):
             time.sleep(1)
 
 
+def extract_digits_from_text(text):
+    return "".join(filter(str.isdigit, text))
+
+
 def main():
     job = 0
     while True:
@@ -220,12 +258,13 @@ def main():
         if job == "-1":
             sys.exit()
         cord_click(271, 173)
-        get_to_dead_page()
+        # get_to_dead_page()
         time.sleep(5)
-        if extract_text_from_coordinates(420, 1350, 620, 1400) == "Interactions: 1":
-            num = 0
-        else:
-            num = 1
+        num = int(
+            extract_digits_from_text(
+                extract_text_from_coordinates(420, 1350, 620, 1400)
+            )
+        )
         time.sleep(0.25)
         cord_click(262, 691)  # interactions button
         interactions_section(num)

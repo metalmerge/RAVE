@@ -1,6 +1,7 @@
 # @Dimitry Ermakov
 # @09/09/2023
 
+import re
 import sys
 import threading
 import time
@@ -11,17 +12,10 @@ import pyautogui
 import pytesseract
 
 pyautogui.FAILSAFE = True
-pyautogui.PAUSE = 0.5
+pyautogui.PAUSE = 0.75
 current_date = datetime.now()
 formatted_date = current_date.strftime("%-m/%Y")
 noted_date = "1/"
-
-
-def contains_digits(text):
-    for char in text:
-        if char.isdigit():
-            return True
-    return False
 
 
 def cord_click(x, y):
@@ -38,18 +32,23 @@ def get_to_dead_page():
     time.sleep(1.25)
     cord_click(290, 377)  # click on constituents updates
     time.sleep(5)
-    cord_click(360, 490)  # click on the first constituent
+    cord_click(320, 490)  # click on the first constituent
 
 
 def click_on_first_interaction():
     cord_click(424, 789)  # click on first pending
     time.sleep(0.5)
     cord_click(300, 822)  # click on the edit button
-    time.sleep(0.75)
+    time.sleep(2)
+
+
+def contains_numbers(text):
+    return any(char.isdigit() for char in text)
 
 
 def confirm():
     global noted_date
+    time.sleep(0.75)
     cord_click(687, 250)
     time.sleep(0.02)
     cord_click(535, 297)
@@ -58,7 +57,8 @@ def confirm():
     time.sleep(0.02)
     cord_click(924, 526)
     time.sleep(0.02)
-    if contains_digits(extract_text_from_coordinates(750, 1050, 2100, 1300)):
+    found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
+    if contains_numbers(found_text) is False and "year" in found_text == False:
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         time.sleep(0.02)
         cord_click(444, 444)
@@ -70,7 +70,7 @@ def confirm():
     pyautogui.press("enter")
     time.sleep(0.02)
     keyboard.write("Note: Not Researched - DE")
-    time.sleep(1)
+    time.sleep(0.25)
     cord_click(857, 826)
     time.sleep(0.02)
     cord_click(912, 828)  # save button
@@ -92,14 +92,14 @@ def decline(num):
     pyautogui.press("enter")
     pyautogui.press("enter")
     keyboard.write("Note: Duplicate - DE")
-    time.sleep(0.02)
+    time.sleep(0.05)
     cord_click(857, 826)
-    time.sleep(1)
+    time.sleep(0.3)
     cord_click(912, 828)  # save button
     # cord_click(1015, 825)  # cancel button
-    if num == 2:
+    if num <= 3:
         return "0"
-    elif num > 2:
+    elif num > 3:
         time.sleep(0.5)
         end = pyautogui.prompt(
             text="", title="More duplicates?, 1 = yes, 0 = no", default="0"
@@ -133,7 +133,7 @@ def extract_text_from_coordinates(x1, y1, x2, y2):
     # textbox_image.show()
     # textbox_image.save("textbox.png")
     extracted_text = pytesseract.image_to_string(textbox_image)
-    print(extracted_text.strip())
+    # print(extracted_text.strip())
     return extracted_text.strip()
 
 
@@ -164,9 +164,9 @@ def opt_out_form():
     time.sleep(0.02)
     # cord_click(698, 642)
     # time.sleep(1)
-    cord_click(849, 637)
-    time.sleep(0.02)
-    cord_click(698, 706)
+    cord_click(849, 637)  # tab
+    time.sleep(0.25)
+    cord_click(698, 706)  # deceased press
     time.sleep(0.02)
     cord_click(636, 642)
     time.sleep(0.02)
@@ -175,12 +175,11 @@ def opt_out_form():
 
     time.sleep(0.02)
     cord_click(737, 820)  # save
-    time.sleep(1.5)
     # cord_click(272, 225)  # click on the search bar
 
 
 def interactions_section(num):
-    time.sleep(4)
+    time.sleep(5)
     for _ in range(0, 6):
         pyautogui.press("down")
     time.sleep(0.25)
@@ -188,26 +187,26 @@ def interactions_section(num):
 
     if num == 1:
         confirm()
-        time.sleep(1.5)
+        time.sleep(1.75)
         cord_click(286, 587)  # personal info click
         time.sleep(1)
         cord_click(531, 685)  # mark deceased button
         time.sleep(1)
     elif num == 2:
         confirm()
-        time.sleep(1)
+        time.sleep(1.5)
         cord_click(415, 815)  # click on the second pending
         time.sleep(1)
         cord_click(298, 837)  # click on second edit button
         decline(num)
-        time.sleep(1.5)
+        time.sleep(1.75)
         cord_click(286, 587)  # personal info click
         time.sleep(1)
         cord_click(531, 685)  # mark deceased button
         time.sleep(1)
     elif num == 3:
         confirm()
-        time.sleep(1)
+        time.sleep(1.5)
         cord_click(415, 815)  # click on the second pending
         time.sleep(1)
         cord_click(298, 837)  # click on second edit button
@@ -216,14 +215,14 @@ def interactions_section(num):
         for _ in range(0, 2):
             pyautogui.press("down")
         time.sleep(1)
-        cord_click(418, 756)  # click on the third pending #TODO guessed
+        cord_click(418, 756)  # click on the third pending
         time.sleep(1)
-        cord_click(291, 780)  # click on the third edit #TODO guessed
+        cord_click(291, 792)  # click on the third edit
         decline(num)
         time.sleep(1.5)
-        cord_click(278, 506)  # personal info click
+        cord_click(278, 387)  # personal info click
         time.sleep(1)
-        cord_click(545, 607)  # mark deceased button
+        cord_click(545, 488)  # mark deceased button
         time.sleep(1)
     elif num > 3:
         confirm()
@@ -251,14 +250,27 @@ def extract_digits_from_text(text):
     return "".join(filter(str.isdigit, text))
 
 
+def find_year(text):
+    # Define a regular expression pattern to match a year (e.g., 4 digits)
+    pattern = r"\b\d{4}\b"
+
+    # Search for the year pattern in the text
+    match = re.search(pattern, text)
+
+    if match:
+        year = match.group()
+        return year
+    else:
+        return None
+
+
 def main():
-    job = 0
-    while True:
-        job = pyautogui.prompt(text="", title="Enter the Task, -1 to quit", default="0")
-        if job == "-1":
-            sys.exit()
-        cord_click(271, 173)
-        # get_to_dead_page()
+    job = pyautogui.prompt(text="", title="Enter the Task, -1 to quit", default="0")
+    if job == "-1":
+        sys.exit()
+    cord_click(271, 173)
+    while job != "-1" and keyboard.is_pressed("esc") is False:
+        get_to_dead_page()
         time.sleep(5)
         num = int(
             extract_digits_from_text(
@@ -277,6 +289,7 @@ def main():
         time.sleep(0.25)
         cord_click(382, 822)  # click on add for communications
         opt_out_form()
+        time.sleep(4)
 
 
 if __name__ == "__main__":

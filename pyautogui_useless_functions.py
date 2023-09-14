@@ -54,6 +54,21 @@ def click_and_type(image_path, text):
         return False
 
 
+def contains_numbers(text):
+    return any(char.isdigit() for char in text)
+
+
+def find_year(text):
+    # Define a regular expression pattern to match a year (e.g., 4 digits)
+    pattern = r"\b\d{4}\b"
+    match = re.search(pattern, text)
+    if match:
+        year = match.group()
+        return year
+    else:
+        return None
+
+
 def click_on_screen(screen_number):
     global running
 

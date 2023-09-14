@@ -15,7 +15,7 @@ EXIT_CODE = "-1"
 DEFAULT_PROMPT = "0"
 ESCAPE_KEY = "esc"
 MEDIUM_DELAY = 0.25
-LONG_DELAY = 0.77
+LONG_DELAY = 1  # 0.77
 
 noted_date = "1/"
 
@@ -47,10 +47,6 @@ def click_on_first_interaction():
     time.sleep(0.5)
     cord_click(300, 822)  # click on the edit button
     time.sleep(2)
-
-
-def contains_numbers(text):
-    return any(char.isdigit() for char in text)
 
 
 def is_text_empty(text):
@@ -254,17 +250,6 @@ def interactions_section(num):
 
 def extract_digits_from_text(text):
     return "".join(filter(str.isdigit, text))
-
-
-def find_year(text):
-    # Define a regular expression pattern to match a year (e.g., 4 digits)
-    pattern = r"\b\d{4}\b"
-    match = re.search(pattern, text)
-    if match:
-        year = match.group()
-        return year
-    else:
-        return None
 
 
 def main():

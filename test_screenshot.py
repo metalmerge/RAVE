@@ -17,5 +17,5 @@ def extract_text_from_coordinates(x1, y1, x2, y2):
 
 
 # Define the screen coordinates you obtained
-x1, y1, x2, y2 = 750, 1050, 2100, 1300  # Replace with the bottom-right coordinates
+x1, y1, x2, y2 = 1600, 640, 2000, 700
 print(extract_text_from_coordinates(x1, y1, x2, y2))

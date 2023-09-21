@@ -31,13 +31,11 @@ def find_and_click_image(image_filename, biasx, biasy):
     time.sleep(0.1)
     try:
         box = None
+        x_scale = 1440 / 2880
+        y_scale = 900 / 1800
         while box is None:
             box = pyautogui.locateOnScreen(image_filename, confidence=0.8)
             time.sleep(0.5)
-
-        # Calculate the scaling factors
-        x_scale = 1500 / 2880
-        y_scale = 900 / 1797
 
         # print(box)
         x, y, width, height = box
@@ -109,16 +107,18 @@ def contains_date(text):
 def confirm():
     global noted_date, initials
     if extract_text_from_coordinates(950, 460, 1300, 540) != "Completed":
-        find_and_click_image("target/tab_down_complete.png", 0, 0)
-        find_and_click_image("target/completed_form.png", 0, 0)
-
+        find_and_click_image(
+            "target/tab_down_complete.png", 0, 0
+        )  # TODO does not work?
+        find_and_click_image("target/completed_form.png", 0, 0)  # TODO does not work?
     if extract_text_from_coordinates(1600, 640, 2000, 700) != current_date.strftime(
         "%-m/%-d/%Y"
     ):
-        find_and_click_image("target/tab_down_date.png", 0, 0)
+        find_and_click_image("target/tab_down_date.png", 0, 0)  # TODO does not work
 
         find_and_click_image("target/today.png", 0, 0)
     found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
+    print(found_text)
     if (
         find_year(found_text) is None
         and contains_date(found_text) is True
@@ -126,17 +126,17 @@ def confirm():
         and "years" in found_text is False
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
-        find_and_click_image("target/sites.png", 0, 0)  # remove?
+        find_and_click_image("target/sites.png", 0, 0)
 
     find_and_click_image("target/comments_form.png", 0, 0)
-    if is_text_empty(found_text) == False:
+    if is_text_empty(found_text) == False:  # TODO does not work
         pyautogui.press("enter")
         pyautogui.press("enter")
     keyboard.write("Note: Not Researched - " + initials)
 
     find_and_click_image("target/sites.png", 0, 0)  # remove?
 
-    # find_and_click_image("target/save.png", 0, 0)  # save button
+    # find_and_click_image("target/save.png", 0, 0)  # save button #TODO untested
     find_and_click_image("target/cancel.png", 0, 0)  # cancel button
 
 

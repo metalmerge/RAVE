@@ -284,7 +284,7 @@ def main():
         duration = end_time - start_time
         log_file = "program_log.txt"
         with open(log_file, "a") as f:
-            f.write(f"Program execution time: {duration:.2f} seconds\n")
+            f.write(f"{duration:.2f}\n")
 
 
 if __name__ == "__main__":

@@ -116,3 +116,16 @@ Program execution time: 115.69 seconds
 Program execution time: 115.82 seconds
 Program execution time: 115.78 seconds
 Program execution time: 116.07 seconds
+Program execution time: 163.53 seconds
+Program execution time: 138.13 seconds
+Program execution time: 157.37 seconds
+Program execution time: 103.62 seconds
+Program execution time: 96.20 seconds
+Program execution time: 98.11 seconds
+Program execution time: 85.21 seconds
+Program execution time: 102.79 seconds
+Program execution time: 83.91 seconds
+Program execution time: 92.15 seconds
+Program execution time: 32.20 seconds
+Program execution time: 116.62 seconds
+Program execution time: 111.93 seconds

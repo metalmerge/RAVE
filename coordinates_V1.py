@@ -7,69 +7,55 @@ import time
 from datetime import datetime
 import keyboard
 import pyautogui
-import curses
-
 import pytesseract
+import os
+from automata import find_and_click_image
 
 # Constants
 EXIT_CODE = "-1"
 DEFAULT_PROMPT = "0"
+ESCAPE_KEY = "esc"
 MEDIUM_DELAY = 0.25
 LONG_DELAY = 0.75
 
+LAST_MOUSE_MOVE_TIME = time.time()
+IDLE_TIMEOUT = 30  # 30 seconds
 initials = "DE"
 noted_date = "1/"
 
 pyautogui.FAILSAFE = True
-pyautogui.PAUSE = 1
+pyautogui.PAUSE = 0.77
 
 current_date = datetime.now()
 formatted_date = current_date.strftime("%-m/%Y")
 
 
-def find_and_click_image(image_filename, biasx, biasy):
-    time.sleep(0.1)
-    try:
-        box = None
-        x_scale = 1440 / 2880
-        y_scale = 900 / 1800
-        while box is None:
-            box = pyautogui.locateOnScreen(image_filename, confidence=0.8)
-            time.sleep(0.5)
-
-        # print(box)
-        x, y, width, height = box
-
-        # screenshot = pyautogui.screenshot()
-        # found_image_screenshot = screenshot.crop((x, y, x + width, y + height))
-        # found_image_screenshot.save("found_image.png")
-        # found_image_screenshot.show()
-
-        x = box.left * x_scale
-        y = box.top * y_scale
-
-        cord_click(x + width / 4 + biasx, y + height / 4 + biasy)
-        # print(x + width / 4 + biasx, y + height / 4 + biasy)
-
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
-
-
 def cord_click(x, y):
     pyautogui.moveTo(x, y)
     pyautogui.click()
+    if keyboard.is_pressed(ESCAPE_KEY):
+        print("Escape key pressed. Stopping the program.")
+        sys.exit()
+
+
+def get_to_mark_deceased():
+    find_and_click_image("target/personal_info.png", 0, 0)
+    find_and_click_image("target/marked_deceased.png", 0, 0)
 
 
 def get_to_dead_page():
-    # cord_click(271, 228)  # click on the search bar
-    find_and_click_image("target/constituents.png", 0, 0)
-    find_and_click_image("target/updates.png", 0, 0)
-    find_and_click_image("target/name.png", 0, 25)
+    cord_click(271, 228)  # click on the search bar
+    time.sleep(1.25)
+    cord_click(290, 377)  # click on constituents updates
+    time.sleep(5)
+    cord_click(320, 490)  # click on the first constituent
 
 
 def click_on_first_interaction():
-    find_and_click_image("target/pending.png", 0, 14)
-    find_and_click_image("target/edit_interaction.png", 0, 0)
+    cord_click(424, 789)  # click on first pending
+    time.sleep(0.5)
+    cord_click(300, 822)  # click on the edit button
+    time.sleep(2)
 
 
 def is_text_empty(text):
@@ -104,40 +90,44 @@ def contains_date(text):
         return False
 
 
+def contains_digits(text):
+    pattern = r"\d"
+    match = re.search(pattern, text)
+    if match:
+        return True
+    else:
+        return False
+
+
 def confirm():
     global noted_date, initials
+    time.sleep(LONG_DELAY)
     if extract_text_from_coordinates(950, 460, 1300, 540) != "Completed":
-        find_and_click_image(
-            "target/tab_down_complete.png", 0, 0
-        )  # TODO does not work?
-        find_and_click_image("target/completed_form.png", 0, 0)  # TODO does not work?
+        cord_click(687, 250)
+        cord_click(535, 297)
+    time.sleep(MEDIUM_DELAY)
+
     if extract_text_from_coordinates(1600, 640, 2000, 700) != current_date.strftime(
         "%-m/%-d/%Y"
     ):
-        find_and_click_image("target/tab_down_date.png", 0, 0)  # TODO does not work
-
-        find_and_click_image("target/today.png", 0, 0)
+        cord_click(1022, 337)
+        time.sleep(MEDIUM_DELAY)
+        cord_click(924, 526)
     found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
-    print(found_text)
-    if (
-        find_year(found_text) is None
-        and contains_date(found_text) is True
-        and "year" in found_text is False
-        and "years" in found_text is False
-    ):
+    if contains_digits(found_text) is True and "year" not in found_text:
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
-        find_and_click_image("target/sites.png", 0, 0)
-
-    find_and_click_image("target/comments_form.png", 0, 0)
-    if is_text_empty(found_text) == False:  # TODO does not work
+        cord_click(444, 444)
+    time.sleep(1)
+    cord_click(1035, 617)
+    if is_text_empty(found_text) == False:
         pyautogui.press("enter")
         pyautogui.press("enter")
     keyboard.write("Note: Not Researched - " + initials)
-
-    find_and_click_image("target/sites.png", 0, 0)  # remove?
-
-    # find_and_click_image("target/save.png", 0, 0)  # save button #TODO untested
-    find_and_click_image("target/cancel.png", 0, 0)  # cancel button
+    time.sleep(MEDIUM_DELAY)
+    cord_click(857, 826)
+    time.sleep(LONG_DELAY)
+    cord_click(912, 828)  # save button
+    # cord_click(1015, 825)  # cancel button
 
 
 def decline(num):
@@ -202,7 +192,7 @@ def move_to_communications():
 
 
 def opt_out_form():
-    time.sleep(0.75)
+    time.sleep(1)
     cord_click(703, 442)
     time.sleep(LONG_DELAY)
     keyboard.write("Imprimis")
@@ -234,18 +224,15 @@ def down_command(num):
 
 
 def interactions_section(num):
-    # time.sleep(3)
-    # down_command(6)
-
-    # click_on_first_interaction()
+    time.sleep(7)
+    down_command(6)
+    time.sleep(MEDIUM_DELAY)
+    click_on_first_interaction()
 
     if num == 1:
         confirm()
         time.sleep(1.75)
-        cord_click(286, 587)  # personal info click
-        time.sleep(1)
-        cord_click(531, 685)  # mark deceased button
-        time.sleep(1)
+        get_to_mark_deceased()
     elif num == 2:
         confirm()
         time.sleep(2)
@@ -254,10 +241,7 @@ def interactions_section(num):
         cord_click(298, 837)  # click on second edit button
         decline(num)
         time.sleep(1.75)
-        cord_click(286, 587)  # personal info click
-        time.sleep(1)
-        cord_click(531, 685)  # mark deceased button
-        time.sleep(1)
+        get_to_mark_deceased()
     elif num == 3:
         confirm()
         time.sleep(1.5)
@@ -273,10 +257,7 @@ def interactions_section(num):
         cord_click(291, 792)  # click on the third edit
         decline(num)
         time.sleep(1.5)
-        cord_click(278, 387)  # personal info click
-        time.sleep(1)
-        cord_click(545, 488)  # mark deceased button
-        time.sleep(1)
+        get_to_mark_deceased()
     elif num > 3:
         confirm()
         time.sleep(1)
@@ -311,42 +292,41 @@ def main():
     if initials == EXIT_CODE:
         sys.exit()
     cord_click(271, 173)
-    while initials != EXIT_CODE:
-        # start_time = time.time()
-
-        # get_to_dead_page()
-
-        # while True:
-        #     try:
-        #         num = int(
-        #             extract_digits_from_text(
-        #                 extract_text_from_coordinates(420, 1350, 620, 1400)
-        #             )
-        #         )
-        #         break
-        #     except ValueError:
-        #         time.sleep(0.5)
-        # continue
-
-        # find_and_click_image("target/interactions.png", 0, 0)
-        num = 1
+    while initials != EXIT_CODE and keyboard.is_pressed(ESCAPE_KEY) is False:
+        start_time = time.time()
+        get_to_dead_page()
+        time.sleep(8)
+        num = int(
+            extract_digits_from_text(
+                extract_text_from_coordinates(420, 1350, 620, 1400)
+            )
+        )
+        time.sleep(MEDIUM_DELAY)
+        cord_click(262, 691)  # interactions button
         interactions_section(num)
-        break
-        # deceased_form()
-        # time.sleep(3)
-        # move_to_communications()
-        # time.sleep(MEDIUM_DELAY)
-        # down_command(2)
-        # time.sleep(MEDIUM_DELAY)
-        # cord_click(382, 822)  # click on add for communications
-        # opt_out_form()
-        # time.sleep(5)
-        # end_time = time.time()
-        # duration = end_time - start_time
-        # log_file = "program_log.txt"
-        # with open(log_file, "a") as f:
-        #     f.write(f"Program execution time: {duration:.2f} seconds\n")
+        deceased_form()
+        time.sleep(3)
+        move_to_communications()
+        time.sleep(MEDIUM_DELAY)
+        down_command(2)
+        time.sleep(MEDIUM_DELAY)
+        cord_click(382, 822)  # click on add for communications
+        opt_out_form()
+        time.sleep(6)
+        end_time = time.time()
+        duration = end_time - start_time
+        log_file = "program_log.txt"
+        with open(log_file, "a") as f:
+            f.write(f"Program execution time: {duration:.2f} seconds\n")
+        current_mouse_pos = pyautogui.position()
+        if current_mouse_pos != LAST_MOUSE_MOVE_TIME:
+            LAST_MOUSE_MOVE_TIME = current_mouse_pos
+        elif time.time() - LAST_MOUSE_MOVE_TIME > IDLE_TIMEOUT:
+            os.system(
+                'osascript -e \'display notification "Is the program working?" with title "Still There?"\''
+            )
 
 
 if __name__ == "__main__":
+    threading.Thread(target=keyboard.wait, args=(ESCAPE_KEY,)).start()
     main()

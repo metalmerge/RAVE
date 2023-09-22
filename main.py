@@ -81,6 +81,15 @@ def contains_date(text):
         return False
 
 
+def contains_digits(text):
+    pattern = r"\d"
+    match = re.search(pattern, text)
+    if match:
+        return True
+    else:
+        return False
+
+
 def confirm():
     global noted_date, initials
     time.sleep(LONG_DELAY)
@@ -96,12 +105,7 @@ def confirm():
         time.sleep(MEDIUM_DELAY)
         cord_click(924, 526)
     found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
-    if (
-        find_year(found_text) is None
-        and contains_date(found_text) is True
-        and "year" in found_text is False
-        and "years" in found_text is False
-    ):
+    if contains_digits(found_text) is True:
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         cord_click(444, 444)
     time.sleep(1)
@@ -179,7 +183,7 @@ def move_to_communications():
 
 
 def opt_out_form():
-    time.sleep(0.75)
+    time.sleep(1)
     cord_click(703, 442)
     time.sleep(LONG_DELAY)
     keyboard.write("Imprimis")
@@ -211,7 +215,7 @@ def down_command(num):
 
 
 def interactions_section(num):
-    time.sleep(6)
+    time.sleep(7)
     down_command(6)
     time.sleep(MEDIUM_DELAY)
     click_on_first_interaction()
@@ -250,9 +254,9 @@ def interactions_section(num):
         cord_click(291, 792)  # click on the third edit
         decline(num)
         time.sleep(1.5)
-        cord_click(278, 387)  # personal info click
+        cord_click(280, 508)  # personal info click
         time.sleep(1)
-        cord_click(545, 488)  # mark deceased button
+        cord_click(545, 607)  # mark deceased button
         time.sleep(1)
     elif num > 3:
         confirm()
@@ -308,7 +312,7 @@ def main():
         time.sleep(MEDIUM_DELAY)
         cord_click(382, 822)  # click on add for communications
         opt_out_form()
-        time.sleep(5)
+        time.sleep(6)
         end_time = time.time()
         duration = end_time - start_time
         log_file = "program_log.txt"

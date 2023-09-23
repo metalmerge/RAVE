@@ -11,7 +11,7 @@ DEFAULT_PROMPT = "0"
 initials = "DE"
 noted_date = "1/"
 pyautogui.FAILSAFE = True
-DELAY = 0.125
+DELAY = 0.05
 pyautogui.PAUSE = DELAY
 
 current_date = datetime.now()
@@ -77,11 +77,6 @@ def is_text_empty(text):
         return False
 
 
-def save_and_cancel():
-    find_and_click_image("target/save.png", 0, 0)  # save button
-    # find_and_click_image("target/cancel.png", 0, 0)  # cancel button
-
-
 def confirm():
     global noted_date, initials, full_date
     if extract_text_from_coordinates(950, 460, 1300, 540) != "Completed":
@@ -102,8 +97,9 @@ def confirm():
         pyautogui.press("enter")
         pyautogui.press("enter")
     keyboard.write("Note: Not Researched - " + initials)
-
-    save_and_cancel()
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.press("enter")
 
 
 def decline(num):
@@ -121,8 +117,9 @@ def decline(num):
     pyautogui.press("enter")
     pyautogui.press("enter")
     keyboard.write("Note: Duplicate - " + initials)
-
-    save_and_cancel()
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.press("enter")
 
     if num <= 3:
         return DEFAULT_PROMPT
@@ -146,7 +143,7 @@ def deceased_form():
 
     find_and_click_image("target/source_tab_down.png", 0, 0)
     find_and_click_image("target/communication_from.png", 0, 0)
-    save_and_cancel()
+    pyautogui.press("enter")
 
 
 def extract_text_from_coordinates(x1, y1, x2, y2):
@@ -155,15 +152,14 @@ def extract_text_from_coordinates(x1, y1, x2, y2):
     textbox_image = screenshot.crop((x1, y1, x2, y2))
     # textbox_image.show()
     extracted_text = pytesseract.image_to_string(textbox_image)
-    # print(extracted_text.strip())
+    print(extracted_text.strip())
     return extracted_text.strip()
 
 
 def move_to_communications():
     find_and_click_image("target/constitute.png", 0, 0)
-    time.sleep(3)
+    find_and_click_image("target/receives_imprimis.png", 0, 0)
     down_command(3)
-    time.sleep(3)
     find_and_click_image("target/communications.png", 0, 0)
     find_and_click_image("target/add.png", 0, 0)
 
@@ -172,16 +168,14 @@ def opt_out_form():
     global full_date
     find_and_click_image("target/solicit_code.png", 0, 0)
     keyboard.write("Imprimis")
-    find_and_click_image("target/end_date.png", 0, 0)
+    find_and_click_image("target/imprimis_three.png", 0, 0)
     find_and_click_image("target/start_date.png", 0, 0)
     keyboard.write(full_date)
     find_and_click_image("target/prefernce_tab_down.png", 0, 0)
     find_and_click_image("target/opt_out.png", 0, 0)
     find_and_click_image("target/imprintis_source.png", 0, 0)
     keyboard.write("Deceased")
-    find_and_click_image("target/source_evidence.png", 0, 0)
-    down_command(3)
-    find_and_click_image("target/save.png", 0, 0)
+    pyautogui.press("enter")
     # find_and_click_image("target/cancel.png", 0, 0)  # cancel button
 
 
@@ -196,9 +190,9 @@ def get_to_mark_deceased():
 
 
 def interactions_section(num):
-    time.sleep(3)
+    find_and_click_image("target/interactions.png", 0, 0)
+    # find_and_click_image("target/receives_imprimis.png", 0, 0)
     down_command(8)
-    time.sleep(3)
     click_on_first_interaction()
 
     if num == 1:
@@ -246,8 +240,36 @@ def interactions_section(num):
         get_to_mark_deceased()
 
 
+def interactions_num_finder():
+    while True:
+        pretext = "Interactions: "
+        try:
+            text = extract_text_from_coordinates(420, 1350, 620, 1400)
+            if pretext in text:
+                # Extract the number following "Interactions:"
+                num_index = text.index(pretext) + len(pretext)
+                num_text = text[num_index:].strip()
+                num = int(extract_digits_from_text(num_text))
+                break
+            else:
+                time.sleep(DELAY)
+                continue
+        except ValueError:
+            time.sleep(DELAY)
+            continue
+    return num
+
+
 def extract_digits_from_text(text):
     return "".join(filter(str.isdigit, text))
+
+
+def end_time_recording(start_time):
+    end_time = time.time()
+    duration = end_time - start_time
+    log_file = "program_log.txt"
+    with open(log_file, "a") as f:
+        f.write(f"{duration:.2f}\n")
 
 
 def main():
@@ -257,34 +279,16 @@ def main():
     )
     cord_click(271, 173)
     while initials != "-1":
-        DELAY /= 2
-        print(DELAY)
         start_time = time.time()
 
         get_to_dead_page()
-
-        while True:
-            try:
-                num = int(
-                    extract_digits_from_text(
-                        extract_text_from_coordinates(420, 1350, 620, 1400)
-                    )
-                )
-                break
-            except ValueError:
-                time.sleep(DELAY)
-                continue
-
-        find_and_click_image("target/interactions.png", 0, 0)
+        num = interactions_num_finder()
         interactions_section(num)
         deceased_form()
         move_to_communications()
         opt_out_form()
-        end_time = time.time()
-        duration = end_time - start_time
-        log_file = "program_log.txt"
-        with open(log_file, "a") as f:
-            f.write(f"{duration:.2f}\n")
+
+        end_time_recording(start_time)
 
 
 if __name__ == "__main__":

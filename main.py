@@ -7,6 +7,7 @@ import keyboard
 import pyautogui
 import pytesseract
 
+# TODO get ride of needing biasX and biasY, remove extract_text_from_coordinates
 DEFAULT_PROMPT = "0"
 initials = "DE"
 noted_date = "1/"
@@ -169,6 +170,7 @@ def opt_out_form():
     find_and_click_image("target/solicit_code.png", 0, 0)
     keyboard.write("Imprimis")
     find_and_click_image("target/imprimis_three.png", 0, 0)
+    find_and_click_image("target/wait_for_load_opt_out.png", 0, 0)
     find_and_click_image("target/start_date.png", 0, 0)
     keyboard.write(full_date)
     find_and_click_image("target/prefernce_tab_down.png", 0, 0)

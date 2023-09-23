@@ -1,5 +1,5 @@
 # @Dimitry Ermakov
-# @09/09/2023
+# @09/23/2023
 import re
 import time
 from datetime import datetime
@@ -7,7 +7,7 @@ import keyboard
 import pyautogui
 import pytesseract
 
-# TODO get ride of needing biasX and biasY, remove extract_text_from_coordinates
+# TODO get ride of needing biasX and biasY, fix extract_text_from_coordinates hard coded coordinates, test if num > 1 works
 DEFAULT_PROMPT = "0"
 initials = "DE"
 noted_date = "1/"
@@ -38,9 +38,12 @@ def find_and_click_image(image_filename, biasx, biasy):
 
         x = box.left * x_scale
         y = box.top * y_scale
-
-        cord_click(x + width / 4 + biasx, y + height / 4 + biasy)
-        # print(x + width / 4 + biasx, y + height / 4 + biasy)
+        if (
+            image_filename != "target/receives_imprimis.png"
+            and image_filename != "target/wait_for_load_opt_out.png"
+        ):
+            cord_click(x + width / 4 + biasx, y + height / 4 + biasy)
+            # print(x + width / 4 + biasx, y + height / 4 + biasy)  # debug
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
@@ -80,13 +83,12 @@ def is_text_empty(text):
 
 def confirm():
     global noted_date, initials, full_date
-    if extract_text_from_coordinates(950, 460, 1300, 540) != "Completed":
-        find_and_click_image("target/tab_down_complete.png", 0, 0)
-        find_and_click_image("target/completed_form.png", 0, 0)
-    if extract_text_from_coordinates(1600, 640, 2000, 700) != full_date:
-        find_and_click_image("target/actual_date.png", 270, 0)
+    find_and_click_image("target/tab_down_complete.png", 0, 0)
+    find_and_click_image("target/completed_form.png", 0, 0)
 
-        find_and_click_image("target/today.png", 0, 0)
+    find_and_click_image("target/actual_date.png", 270, 0)
+
+    find_and_click_image("target/today.png", 0, 0)
     found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
     # print(found_text)
     if contains_digits(found_text) is True and "year" not in found_text:
@@ -105,13 +107,10 @@ def confirm():
 
 def decline(num):
     global initials
-    if extract_text_from_coordinates(950, 460, 1300, 540) != "Declined":
-        find_and_click_image("target/tab_down_complete.png", 0, 0)
-        find_and_click_image("target/declined.png", 0, 0)
-
-    if extract_text_from_coordinates(1600, 640, 2000, 700) != full_date:
-        find_and_click_image("target/actual_date.png", 270, 0)
-        find_and_click_image("target/today.png", 0, 0)
+    find_and_click_image("target/tab_down_complete.png", 0, 0)
+    find_and_click_image("target/declined.png", 0, 0)
+    find_and_click_image("target/actual_date.png", 270, 0)
+    find_and_click_image("target/today.png", 0, 0)
 
     find_and_click_image("target/comments_form.png", 0, 0)
 

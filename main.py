@@ -44,31 +44,50 @@ import time
 def find_and_click_image(image_filename, biasx, biasy):
     try:
         box = None
-
+        attempts = 0
         while box is None:
             box = pyautogui.locateOnScreen(image_filename, confidence=0.9)
             time.sleep(DELAY)
             print("Searching for image: " + image_filename)
 
+            attempts += 1
+            if attempts >= MAX_ATTEMPTS:
+                os.system(
+                    "osascript -e 'display notification \"Image not found after "
+                    + str(MAX_ATTEMPTS)
+                    + ' attempts" with title "Failed to find Image" sound name "Glass"\''
+                )
+
+                break
+
         x, y, width, height = box
-
-        # screenshot = pyautogui.screenshot()
-        # found_image_screenshot = screenshot.crop((x, y, x + width, y + height))
-        # found_image_screenshot.show()
-
-        x = box.left * 0.5
-        y = box.top * 0.5
+        x = box.left * 0.5 + width / 4 + biasx
+        y = box.top * 0.5 + height / 4 + biasy
         if (
             image_filename != PRIMIS
             and image_filename != "target/receives_imprimis.png"
             and image_filename != "target/wait_for_load_opt_out.png"
         ):
-            pyautogui.moveTo(x + width / 4 + biasx, y + height / 4 + biasy)
+            pyautogui.moveTo(x, y)
             pyautogui.click()
-            # print(x + width / 4 + biasx, y + height / 4 + biasy)  # debug
 
     except Exception as e:
         print(f"An error occurred: {str(e)}")
+
+
+def up_command(num):
+    for _ in range(0, num):
+        pyautogui.press("up")
+
+
+def tab_command(num):
+    for _ in range(0, num):
+        pyautogui.press("tab")
+
+
+def down_command(num):
+    for _ in range(0, num):
+        pyautogui.press("down")
 
 
 def contains_digits(text):
@@ -130,7 +149,6 @@ def interactions_section(num):
             if decline(num) == DEFAULT_PROMPT:
                 duplicates = False
     up_command(num * 3)
-    find_and_click_image(PRIMIS, 0, 0)
     get_to_mark_deceased()
 
 
@@ -141,29 +159,14 @@ def is_text_empty(text):
         return False
 
 
-def up_command(num):
-    for _ in range(0, num):
-        pyautogui.press("up")
-
-
 def confirm():
     global noted_date, initials, full_date
 
     find_and_click_image("target/tab_down_complete.png", 0, 0)
     find_and_click_image("target/completed_form.png", 0, 0)
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
+    tab_command(7)
     keyboard.write(full_date)
-    # find_and_click_image("target/actual_date.png", 270, 0)
-    # find_and_click_image("target/today.png", 0, 0)
-
     found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
-    # print(found_text)
     if (
         contains_digits(found_text) is True
         and "year" not in found_text
@@ -171,16 +174,12 @@ def confirm():
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         find_and_click_image("target/sites.png", 0, 0)
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    # find_and_click_image("target/comments_form.png", 0, 0)
+    tab_command(3)
     if is_text_empty(found_text) == False:
         pyautogui.press("enter")
         pyautogui.press("enter")
     keyboard.write("Note: Not Researched - " + initials)
-    pyautogui.press("tab")
-    pyautogui.press("tab")
+    tab_command(2)
     pyautogui.press("enter")
 
 
@@ -188,25 +187,14 @@ def decline(num):
     global initials, CRM
     find_and_click_image("target/tab_down_complete.png", 0, 0)
     find_and_click_image("target/declined.png", 0, 0)
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
+    tab_command(7)
     keyboard.write(full_date)
-
-    # find_and_click_image("target/comments_form.png", 0, 0)
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
+    tab_command(3)
 
     pyautogui.press("enter")
     pyautogui.press("enter")
     keyboard.write("Note: Duplicate - " + initials)
-    pyautogui.press("tab")
-    pyautogui.press("tab")
+    tab_command(2)
     pyautogui.press("enter")
 
     if num <= 3:
@@ -227,8 +215,6 @@ def deceased_form():
         keyboard.write(formatted_date)
     elif noted_date != "1/":
         keyboard.write(noted_date)
-    find_and_click_image("target/confirmation.png", 0, 0)
-
     find_and_click_image("target/source_tab_down.png", 0, 0)
     find_and_click_image("target/communication_from.png", 0, 0)
     pyautogui.press("enter")
@@ -238,7 +224,6 @@ def extract_text_from_coordinates(x1, y1, x2, y2):
     pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
     screenshot = pyautogui.screenshot()
     textbox_image = screenshot.crop((x1, y1, x2, y2))
-    # textbox_image.show()
     extracted_text = pytesseract.image_to_string(textbox_image)
     print(extracted_text.strip())
     return extracted_text.strip()
@@ -261,20 +246,12 @@ def opt_out_form():
     find_and_click_image("target/wait_for_load_opt_out.png", 0, 0)
     find_and_click_image("target/prefernce_tab_down.png", 0, 0)
     find_and_click_image("target/opt_out.png", 0, 0)
-    # find_and_click_image("target/start_date.png", 0, 0)
     pyautogui.press("tab")
     keyboard.write(full_date)
     find_and_click_image("target/imprintis_source.png", 0, 0)
     keyboard.write("Deceased")
     find_and_click_image("target/double_deceased.png", 0, 0)
     pyautogui.press("enter")
-
-    # find_and_click_image("target/cancel.png", 0, 0)  # cancel button
-
-
-def down_command(num):
-    for _ in range(0, num):
-        pyautogui.press("down")
 
 
 def get_to_mark_deceased():

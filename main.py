@@ -7,7 +7,6 @@ import keyboard
 import pyautogui
 import pytesseract
 from mac_notifications import client
-from PIL import ImageGrab
 
 # Interactions: 2 = 79.14 bot; 75.66 no copy pasting, experienced, fast as possible human
 # Interactions: 1 = 60.42 bot; 51.08 no copy pasting, experienced, fast as possible human
@@ -24,7 +23,7 @@ DEFAULT_PROMPT = "0"
 initials = "DE"
 noted_date = "1/"
 pyautogui.FAILSAFE = True
-DELAY = 0.05
+DELAY = 0.01
 pyautogui.PAUSE = DELAY
 MAX_ATTEMPTS = round(1 / DELAY)
 x_scale = 1
@@ -37,7 +36,7 @@ full_date = current_date.strftime("%-m/%-d/%Y")
 PRIMIS = "target/receives_imprimis.png"
 CRM_cords = (0, 0)
 cutOffTopY = 0
-cutOffBottomY = 1800
+cutOffBottomY = 900
 
 
 def find_and_click_image(image_filename, biasx, biasy):
@@ -52,16 +51,16 @@ def find_and_click_image(image_filename, biasx, biasy):
                 0,
                 cutOffTopY,
                 round(2880 * x_scale),
-                cutOffBottomY * 2,  # theocratically this works
+                round(cutOffBottomY * 2 * y_scale),  # theocratically this works
             ),
         )
-        time.sleep(DELAY)
-        print("Searching for image: " + image_filename)
+        time.sleep(DELAY * 5)
+        # print("Searching for image: " + image_filename)
         attempts += 1
         if attempts >= MAX_ATTEMPTS:
             client.create_notification(
                 title="Error",
-                subtitle="Could not find image",
+                subtitle="Could not find " + image_filename,
             )
             break
 
@@ -70,6 +69,7 @@ def find_and_click_image(image_filename, biasx, biasy):
     y = box.top / 2 + height / 4 + biasy
     if (
         image_filename != PRIMIS
+        and image_filename != "target/education.png"
         and image_filename != "target/receives_imprimis.png"
         and image_filename != "target/wait_for_load_opt_out.png"
     ):
@@ -87,8 +87,9 @@ def up_command(num):
         pyautogui.press("up")
 
 
-def tab_command(num):
+def tab_command(num, delay):
     for _ in range(0, num):
+        time.sleep(delay)
         pyautogui.press("tab")
 
 
@@ -119,7 +120,8 @@ def confirm():
 
     find_and_click_image("target/tab_down_complete.png", 0, 0)
     find_and_click_image("target/completed_form.png", 0, 0)
-    tab_command(7)
+    find_and_click_image("target/wait_for_complete.png", 0, 0)
+    tab_command(7, 0)
     keyboard.write(full_date)
     found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
     if (
@@ -141,27 +143,47 @@ def confirm():
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         find_and_click_image("target/sites.png", 0, 0)
-    tab_command(3)
+    tab_command(3, 0)
     if is_text_empty(found_text) == False:
         pyautogui.press("enter")
         pyautogui.press("enter")
     keyboard.write("Note: Not Researched - " + initials)
-    tab_command(2)
+    tab_command(2, 0)
     pyautogui.press("enter")
 
 
 def decline(num):
-    global initials, CRM_cords
+    global initials, CRM_cords, noted_date
     find_and_click_image("target/tab_down_complete.png", 0, 0)
     find_and_click_image("target/declined.png", 0, 0)
-    tab_command(7)
+    tab_command(7, 0)
     keyboard.write(full_date)
-    tab_command(3)
+    found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
+    if (
+        extract_digits_from_text(found_text) != ""
+        or "year" in found_text
+        or "month" in found_text
+        or "January" in found_text
+        or "February" in found_text
+        or "March" in found_text
+        or "April" in found_text
+        or "May" in found_text
+        or "June" in found_text
+        or "July" in found_text
+        or "August" in found_text
+        or "September" in found_text
+        or "October" in found_text
+        or "November" in found_text
+        or "December" in found_text
+    ):
+        noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
+        find_and_click_image("target/sites.png", 0, 0)
+    tab_command(3, 0)
 
     pyautogui.press("enter")
     pyautogui.press("enter")
     keyboard.write("Note: Duplicate - " + initials)
-    tab_command(2)
+    tab_command(2, 0)
     pyautogui.press("enter")
 
     if num <= 3:
@@ -184,16 +206,15 @@ def interactions_section(num):
     global PRIMIS
     OWNER = "target/wait_for_owner.png"
     find_and_click_image("target/interactions.png", 0, 0)
+    find_and_click_image(PRIMIS, 0, 0)
     down_command(num + 8)
     find_and_click_image(PRIMIS, 0, 0)
     click_on_top_interaction(1)
     confirm()
     if num == 2:
         find_and_click_image(OWNER, 0, 0)
-        # down_command(num)
         click_on_top_interaction(num)
         decline(num)
-
     elif num == 3:
         find_and_click_image(OWNER, 0, 0)
         # down_command(num - 1)
@@ -221,12 +242,13 @@ def interactions_section(num):
 
 
 def deceased_form():
-    global noted_date
+    global noted_date, formatted_date
     find_and_click_image("target/deceased_date.png", 0, 0)
     if noted_date == "1/":
         keyboard.write(formatted_date)
     elif noted_date != "1/":
         keyboard.write(noted_date)
+        noted_date = "1/"
     find_and_click_image("target/source_tab_down.png", 0, 0)
     find_and_click_image("target/communication_from.png", 0, 0)
     pyautogui.press("enter")
@@ -244,10 +266,9 @@ def extract_text_from_coordinates(x1, y1, x2, y2):
 def move_to_communications():
     global PRIMIS
     find_and_click_image("target/constitute.png", 0, 0)
-    # find_and_click_image(PRIMIS, 0, 0)
-    down_command(5)
     find_and_click_image(PRIMIS, 0, 0)
     find_and_click_image("target/communications.png", 0, 0)
+    down_command(2)
     find_and_click_image("target/add.png", 0, 0)
 
 
@@ -261,8 +282,7 @@ def opt_out_form():
     find_and_click_image("target/opt_out.png", 0, 0)
     pyautogui.press("tab")
     keyboard.write(full_date)
-    find_and_click_image("target/imprintis_source.png", 0, 0)
-    keyboard.write("Deceased")
+    find_and_click_image("target/source_file_tab_down.png", 0, 0)
     find_and_click_image("target/double_deceased.png", 0, 0)
     pyautogui.press("enter")
 
@@ -274,6 +294,7 @@ def get_to_mark_deceased():
 
 
 def interactions_num_finder():
+    global DELAY
     while True:
         pretext = "Interactions: "
         try:
@@ -311,7 +332,7 @@ def cutoff_section_of_screen(image_filename):
             confidence=0.9,
             region=(0, 0, round(2880 * x_scale), round(1800 * y_scale)),
         )
-        time.sleep(DELAY)
+        time.sleep(DELAY * 5)
         print("Searching for image: " + image_filename)
         attempts += 1
         if attempts >= MAX_ATTEMPTS:
@@ -329,18 +350,19 @@ def cutoff_section_of_screen(image_filename):
 
 
 def main():
-    global initials, DELAY, CRM, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY
+    global initials, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY
     input_str = pyautogui.prompt(
         text="Enter Initials and screen , -1 to quit",
         title="Enter Initials and screen , -1 to quit",
         default="DE, 1440, 900",
     )
     initials, x_scale, y_scale = input_str.strip().split(",")
-    cutOffBottomY = x_scale
     x_scale = int(x_scale.strip()) / 1440
-    y_scale = int(y_scale.strip()) / 900
+    y_scale = int(y_scale.strip())
+    cutOffBottomY = y_scale
+    y_scale /= 900
     cutOffTopY, CRM_cords = cutoff_section_of_screen("target/blackbaud_CRM.png")
-    cutOffBottomY, _ = cutoff_section_of_screen("target/chrome.png")
+    # cutOffBottomY, _ = cutoff_section_of_screen("target/chrome.png")
     cord_click(CRM_cords)
 
     while initials != "-1":
@@ -354,6 +376,7 @@ def main():
         opt_out_form()
 
         end_time_recording(start_time)
+        find_and_click_image("target/education.png", 0, 0)
 
 
 if __name__ == "__main__":

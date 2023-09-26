@@ -2,6 +2,7 @@ import pyautogui
 import time
 import keyboard
 from datetime import datetime
+from PIL import ImageGrab
 
 pyautogui.FAILSAFE = True
 DELAY = 1
@@ -45,18 +46,5 @@ def cord_click(x, y):
     pyautogui.click()
 
 
-global full_date
-find_and_click_image("target/solicit_code.png", 0, 0)
-keyboard.write("Imprimis")
-find_and_click_image("target/opt_out_comments.png", 0, 0)
-find_and_click_image("target/start_date.png", 0, 0)
-# find_and_click_image("target/today.png", 0, 0)
-keyboard.write("9/23/2023")
-find_and_click_image("target/prefernce_tab_down.png", 0, 0)
-find_and_click_image("target/opt_out.png", 0, 0)
-find_and_click_image("target/imprintis_source.png", 0, 0)
-keyboard.write("Deceased")
-find_and_click_image("target/source_evidence.png", 0, 0)
-down_command(3)
-# find_and_click_image("target/save.png", 0, 0)
-find_and_click_image("target/cancel.png", 0, 0)  # cancel button
+screenshot = ImageGrab.grab(bbox=(0, 150, round(2880), 900 - 150))
+screenshot.show()

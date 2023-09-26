@@ -7,15 +7,18 @@ import keyboard
 import pyautogui
 import pytesseract
 from mac_notifications import client
+from PIL import ImageGrab
 
 # Interactions: 2 = 79.14 bot; 75.66 no copy pasting, experienced, fast as possible human
-# Interactions: 1 = 65.64 bot; 51.08 no copy pasting, experienced, fast as possible human
+# Interactions: 1 = 60.42 bot; 51.08 no copy pasting, experienced, fast as possible human
 
 # TODO get ride of needing biasX and biasY, fix extract_text_from_coordinates hard coded coordinates
 # text_comment scanner did not work
+# make notifcation for mac and windows
 # reform num > 3
 # get sound for notifications
 # up and down commands to relate to screen size
+# add x_scale and y_scale to all functions
 
 DEFAULT_PROMPT = "0"
 initials = "DE"
@@ -32,38 +35,51 @@ current_date = datetime.now()
 formatted_date = current_date.strftime("%-m/%Y")
 full_date = current_date.strftime("%-m/%-d/%Y")
 PRIMIS = "target/receives_imprimis.png"
-CRM = "target/blackbaud_CRM.png"
+CRM_cords = (0, 0)
+cutOffTopY = 0
+cutOffBottomY = 1800
 
 
 def find_and_click_image(image_filename, biasx, biasy):
-    try:
-        box = None
-        attempts = 0
-        while box is None:
-            box = pyautogui.locateOnScreen(image_filename, confidence=0.9)
-            time.sleep(DELAY)
-            print("Searching for image: " + image_filename)
-            attempts += 1
-            if attempts >= MAX_ATTEMPTS:
-                client.create_notification(
-                    title="Error",
-                    subtitle="Could not find image",
-                )
-                break
+    global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY
+    box = None
+    attempts = 0
+    while box is None:
+        box = pyautogui.locateOnScreen(
+            image_filename,
+            confidence=0.9,
+            region=(
+                0,
+                cutOffTopY,
+                round(2880 * x_scale),
+                cutOffBottomY * 2,  # theocratically this works
+            ),
+        )
+        time.sleep(DELAY)
+        print("Searching for image: " + image_filename)
+        attempts += 1
+        if attempts >= MAX_ATTEMPTS:
+            client.create_notification(
+                title="Error",
+                subtitle="Could not find image",
+            )
+            break
 
-        x, y, width, height = box
-        x = box.left / 2 + width / 4 + biasx
-        y = box.top / 2 + height / 4 + biasy
-        if (
-            image_filename != PRIMIS
-            and image_filename != "target/receives_imprimis.png"
-            and image_filename != "target/wait_for_load_opt_out.png"
-        ):
-            pyautogui.moveTo(x, y)
-            pyautogui.click()
+    x, y, width, height = box
+    x = box.left / 2 + width / 4 + biasx
+    y = box.top / 2 + height / 4 + biasy
+    if (
+        image_filename != PRIMIS
+        and image_filename != "target/receives_imprimis.png"
+        and image_filename != "target/wait_for_load_opt_out.png"
+    ):
+        pyautogui.moveTo(x, y)
+        pyautogui.click()
 
-    except Exception as e:
-        print(f"An error occurred: {str(e)}")
+
+def cord_click(cords):
+    pyautogui.moveTo(cords[0], cords[1])
+    pyautogui.click()
 
 
 def up_command(num):
@@ -108,8 +124,20 @@ def confirm():
     found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
     if (
         extract_digits_from_text(found_text) != ""
-        and "year" not in found_text
-        and "month" not in found_text
+        or "year" in found_text
+        or "month" in found_text
+        or "January" in found_text
+        or "February" in found_text
+        or "March" in found_text
+        or "April" in found_text
+        or "May" in found_text
+        or "June" in found_text
+        or "July" in found_text
+        or "August" in found_text
+        or "September" in found_text
+        or "October" in found_text
+        or "November" in found_text
+        or "December" in found_text
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         find_and_click_image("target/sites.png", 0, 0)
@@ -123,7 +151,7 @@ def confirm():
 
 
 def decline(num):
-    global initials, CRM
+    global initials, CRM_cords
     find_and_click_image("target/tab_down_complete.png", 0, 0)
     find_and_click_image("target/declined.png", 0, 0)
     tab_command(7)
@@ -142,22 +170,21 @@ def decline(num):
         end = pyautogui.prompt(
             text="", title="More duplicates?, 1 = yes, 0 = no", default=DEFAULT_PROMPT
         )
-        find_and_click_image(CRM, 0, 0)
+        cord_click(CRM_cords)
 
     return end
 
 
 def click_on_top_interaction(num):
-    STATUS = "target/status_alone.png"
-    find_and_click_image(STATUS, 0, (num * 30))
+    find_and_click_image("target/status_alone.png", 0, (num * 30))
     find_and_click_image("target/edit_interaction.png", 0, 0)
 
 
 def interactions_section(num):
-    global CRM, PRIMIS
+    global PRIMIS
     OWNER = "target/wait_for_owner.png"
     find_and_click_image("target/interactions.png", 0, 0)
-    down_command(num * 2 + 8)
+    down_command(num + 8)
     find_and_click_image(PRIMIS, 0, 0)
     click_on_top_interaction(1)
     confirm()
@@ -186,7 +213,7 @@ def interactions_section(num):
                 title="Enter when you are at the decline form",
                 default=DEFAULT_PROMPT,
             )
-            find_and_click_image(CRM, 0, 0)
+            cord_click(CRM_cords)
             if decline(num) == DEFAULT_PROMPT:
                 duplicates = False
     up_command(num * 3)
@@ -210,15 +237,15 @@ def extract_text_from_coordinates(x1, y1, x2, y2):
     screenshot = pyautogui.screenshot()
     textbox_image = screenshot.crop((x1, y1, x2, y2))
     extracted_text = pytesseract.image_to_string(textbox_image)
-    print(extracted_text.strip())
+    # print(extracted_text.strip())
     return extracted_text.strip()
 
 
 def move_to_communications():
     global PRIMIS
     find_and_click_image("target/constitute.png", 0, 0)
-    find_and_click_image(PRIMIS, 0, 0)
-    down_command(3)
+    # find_and_click_image(PRIMIS, 0, 0)
+    down_command(5)
     find_and_click_image(PRIMIS, 0, 0)
     find_and_click_image("target/communications.png", 0, 0)
     find_and_click_image("target/add.png", 0, 0)
@@ -261,7 +288,6 @@ def interactions_num_finder():
                 time.sleep(DELAY)
                 continue
         except ValueError:
-            time.sleep(DELAY)
             continue
     return num
 
@@ -274,18 +300,49 @@ def end_time_recording(start_time):
         f.write(f"{duration:.2f}\n")
 
 
+def cutoff_section_of_screen(image_filename):
+    # find the top y coordinate of the image on the screen
+    global DELAY, MAX_ATTEMPTS, x_scale, y_scale
+    box = None
+    attempts = 0
+    while box is None:
+        box = pyautogui.locateOnScreen(
+            image_filename,
+            confidence=0.9,
+            region=(0, 0, round(2880 * x_scale), round(1800 * y_scale)),
+        )
+        time.sleep(DELAY)
+        print("Searching for image: " + image_filename)
+        attempts += 1
+        if attempts >= MAX_ATTEMPTS:
+            client.create_notification(
+                title="Error",
+                subtitle="Could not find image",
+            )
+            break
+
+    x, y, width, height = box
+    image_cords_x = box.left / 2 + width / 4
+    image_cords_y = box.top / 2 + height / 4
+
+    return round(y / 2), (image_cords_x, image_cords_y)
+
+
 def main():
-    global initials, DELAY, CRM
+    global initials, DELAY, CRM, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY
     input_str = pyautogui.prompt(
         text="Enter Initials and screen , -1 to quit",
         title="Enter Initials and screen , -1 to quit",
         default="DE, 1440, 900",
     )
     initials, x_scale, y_scale = input_str.strip().split(",")
+    cutOffBottomY = x_scale
     x_scale = int(x_scale.strip()) / 1440
     y_scale = int(y_scale.strip()) / 900
+    cutOffTopY, CRM_cords = cutoff_section_of_screen("target/blackbaud_CRM.png")
+    cutOffBottomY, _ = cutoff_section_of_screen("target/chrome.png")
+    cord_click(CRM_cords)
 
-    find_and_click_image(CRM, 0, 0)
     while initials != "-1":
         start_time = time.time()
 

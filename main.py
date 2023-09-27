@@ -6,14 +6,13 @@ from datetime import datetime
 import keyboard
 import pyautogui
 import pytesseract
-from mac_notifications import client
+import os
 
 # Interactions: 2 = 79.14 bot; 75.66 no copy pasting, experienced, fast as possible human
 # Interactions: 1 = 60.42 bot; 51.08 no copy pasting, experienced, fast as possible human
 
 # TODO get ride of needing biasX and biasY, fix extract_text_from_coordinates hard coded coordinates
 # text_comment scanner did not work
-# make notifcation for mac and windows
 # reform num > 3
 # get sound for notifications
 # up and down commands to relate to screen size
@@ -58,10 +57,21 @@ def find_and_click_image(image_filename, biasx, biasy):
         # print("Searching for image: " + image_filename)
         attempts += 1
         if attempts >= MAX_ATTEMPTS:
-            client.create_notification(
-                title="Error",
-                subtitle="Could not find " + image_filename,
-            )
+            if os.name == "posix":  # macOS
+                os.system(
+                    f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error"\''
+                )
+            elif os.name == "nt":  # Windows
+                os.system(
+                    f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
+                    + '"'
+                    + os.getcwd()
+                    + "/target/primis.png"
+                    + ")"
+                    + '"'
+                )
+            else:
+                print("Unsupported operating system")
             break
 
     x, y, width, height = box
@@ -336,10 +346,21 @@ def cutoff_section_of_screen(image_filename):
         print("Searching for image: " + image_filename)
         attempts += 1
         if attempts >= MAX_ATTEMPTS:
-            client.create_notification(
-                title="Error",
-                subtitle="Could not find image",
-            )
+            if os.name == "posix":  # macOS
+                os.system(
+                    f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error"\''
+                )
+            elif os.name == "nt":  # Windows
+                os.system(
+                    f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
+                    + '"'
+                    + os.getcwd()
+                    + "/target/primis.png"
+                    + ")"
+                    + '"'
+                )
+            else:
+                print("Unsupported operating system")
             break
 
     x, y, width, height = box

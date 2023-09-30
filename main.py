@@ -2,7 +2,7 @@
 # @09/23/2023
 import time
 from datetime import datetime
-
+import pyperclip
 import keyboard
 import pyautogui
 import pytesseract
@@ -11,12 +11,23 @@ import os
 # Interactions: 2 = 79.14 bot; 75.66 no copy pasting, experienced, fast as possible human
 # Interactions: 1 = 60.42 bot; 51.08 no copy pasting, experienced, fast as possible human
 
-# TODO get ride of needing biasX and biasY, fix extract_text_from_coordinates hard coded coordinates
+# TODO get ride of needing biasX and biasY
 # text_comment scanner did not work
 # reform num > 3
 # get sound for notifications
 # up and down commands to relate to screen size
 # add x_scale and y_scale to all functions
+# use clipboard_text = pyperclip.paste() ro remove extract from text(Sep 30)
+# add sound alert for prompt waiting too long and notification(Sep 30)
+# if can't find, downcommand?(Sep 30)
+# make sure commands and control are accounted for
+# fix comments scan(Sep 30)
+# time how long it takes for each action, find workaround to recieves imprints or waits(Sep 30)
+# down command proprotional to screen size (Sep 30)
+# Conditions for selling(Sep 30)
+# pythpm mss screenshot(Sep 30)
+# use the x and y scale and fix num > 3(Sep 30)
+# Scalability, need 1 for 3 devices, one time purchase compared to $10.10 an hour, faster than a human, needs some human input (Sep 30)
 
 DEFAULT_PROMPT = "0"
 initials = "DE"
@@ -42,7 +53,7 @@ def find_and_click_image(image_filename, biasx, biasy):
     global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY
     box = None
     attempts = 0
-    print("Searching for image: " + image_filename)
+    # print("Searching for image: " + image_filename)
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
@@ -139,7 +150,12 @@ def interactions_num_finder():
     while True:
         pretext = "Interactions: "
         try:
-            text = extract_text_from_coordinates(420, 1350, 620, 1400)
+            text = extract_text_from_coordinates(
+                round(420 * x_scale),
+                round(1350 * y_scale),
+                round(620 * x_scale),
+                round(1400 * y_scale),
+            )
             if pretext in text:
                 # Extract the number following "Interactions:"
                 num_index = text.index(pretext) + len(pretext)
@@ -208,7 +224,12 @@ def confirm():
     find_and_click_image("target/wait_for_complete.png", 0, 0)
     tab_command(7, 0)
     keyboard.write(full_date)
-    found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
+    tab_command(3, 0)
+    keyboard.press("command+A")
+    time.sleep(0.1)
+    keyboard.press_and_release("command+C")
+    found_text = pyperclip.paste()
+    print(found_text)
     if (
         extract_digits_from_text(found_text) != ""
         or "year" in found_text
@@ -230,8 +251,8 @@ def confirm():
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         find_and_click_image("target/sites.png", 0, 0)
-    tab_command(3, 0)
     if is_text_empty(found_text) == False:
+        pyautogui.press("down")
         pyautogui.press("enter")
         pyautogui.press("enter")
     keyboard.write("Note: Not Researched - " + initials)
@@ -245,7 +266,12 @@ def decline(num):
     find_and_click_image("target/declined.png", 0, 0)
     tab_command(7, 0)
     keyboard.write(full_date)
-    found_text = extract_text_from_coordinates(750, 1050, 2100, 1300)
+    tab_command(3, 0)
+    keyboard.press("command+A")
+    time.sleep(0.1)
+    keyboard.press_and_release("command+C")
+    found_text = pyperclip.paste()
+    print(found_text)
     if (
         extract_digits_from_text(found_text) != ""
         or "year" in found_text
@@ -267,8 +293,7 @@ def decline(num):
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         find_and_click_image("target/sites.png", 0, 0)
-    tab_command(3, 0)
-
+    pyautogui.press("down")
     pyautogui.press("enter")
     pyautogui.press("enter")
     keyboard.write("Note: Duplicate - " + initials)

@@ -11,23 +11,19 @@ import os
 # Interactions: 2 = 79.14 bot; 75.66 no copy pasting, experienced, fast as possible human
 # Interactions: 1 = 60.42 bot; 51.08 no copy pasting, experienced, fast as possible human
 
-# TODO get ride of needing biasX and biasY
-# text_comment scanner did not work
+# TODO
+# x_scale = 1440 / 2880
+# y_scale = 900 / 1800
 # reform num > 3
-# get sound for notifications
 # up and down commands to relate to screen size
-# add x_scale and y_scale to all functions
-# use clipboard_text = pyperclip.paste() ro remove extract from text(Sep 30)
+# remove extract from text(Sep 30)
 # add sound alert for prompt waiting too long and notification(Sep 30)
 # if can't find, downcommand?(Sep 30)
 # make sure commands and control are accounted for
-# fix comments scan(Sep 30)
 # time how long it takes for each action, find workaround to recieves imprints or waits(Sep 30)
-# down command proprotional to screen size (Sep 30)
 # Conditions for selling(Sep 30)
 # pythpm mss screenshot(Sep 30)
-# use the x and y scale and fix num > 3(Sep 30)
-# Scalability, need 1 for 3 devices, one time purchase compared to $10.10 an hour, faster than a human, needs some human input (Sep 30)
+# Scalability, need 1 for 3 devices
 
 DEFAULT_PROMPT = "0"
 initials = "DE"
@@ -39,8 +35,6 @@ x_scale = 1
 y_scale = 1
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = DELAY
-# x_scale = 1440 / 2880
-# y_scale = 900 / 1800
 current_date = datetime.now()
 formatted_date = current_date.strftime("%-m/%Y")
 full_date = current_date.strftime("%-m/%-d/%Y")
@@ -68,22 +62,19 @@ def find_and_click_image(image_filename, biasx, biasy):
         time.sleep(DELAY * 5)
         attempts += 1
         if attempts >= MAX_ATTEMPTS:
-            if os.name == "posix":  # macOS
+            if os.name == "posix":  # macOS # TODO untested
                 os.system(
-                    f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error"\''
+                    f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error" sound name "Glass"\''
                 )
-            elif os.name == "nt":  # Windows
-                os.system(
-                    f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
-                    + '"'
-                    + os.getcwd()
-                    + "/target/primis.png"
-                    + ")"
-                    + '"'
-                )
-            else:
-                print("Unsupported operating system")
-            break
+        elif os.name == "nt":  # Windows # TODO untested
+            os.system(
+                f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
+                + '"'
+                + os.getcwd()
+                + "/target/primis.png"
+                + ")"
+                + '"'
+            )
 
     x, y, width, height = box
     x = box.left / 2 + width / 4 + biasx
@@ -142,7 +133,7 @@ def is_text_empty(text):
 def get_to_dead_page():
     find_and_click_image("target/constituents.png", 0, 0)
     find_and_click_image("target/updates.png", 0, 0)
-    find_and_click_image("target/name.png", 0, 25)
+    find_and_click_image("target/name.png", 0, round(25 * y_scale))
 
 
 def interactions_num_finder():
@@ -171,7 +162,7 @@ def interactions_num_finder():
 
 
 def click_on_top_interaction(num):
-    find_and_click_image("target/status_alone.png", 0, (num * 30))
+    find_and_click_image("target/status_alone.png", 0, round(num * 30 * y_scale))
     find_and_click_image("target/edit_interaction.png", 0, 0)
 
 

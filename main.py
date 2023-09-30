@@ -29,6 +29,9 @@ DEFAULT_PROMPT = "0"
 initials = "DE"
 noted_date = "1/"
 PRIMIS = "target/receives_imprimis.png"
+EDUCATION = "target/education.png"
+LOAD_OPT_OUT_WAIT = "target/wait_for_load_opt_out.png"
+LOAD_OWNER_WAIT = "target/wait_for_load_owner.png"
 DELAY = 0.01
 MAX_ATTEMPTS = round(1.25 / (DELAY * 5))
 x_scale = 1
@@ -43,7 +46,55 @@ cutOffTopY = 0
 cutOffBottomY = 900
 
 
-def find_and_click_image(image_filename, biasx, biasy):
+def find_and_click_image_with_search(image_filename, continuous_search, up_or_down):
+    global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY
+    box = None
+    attempts = 0
+    # print("Searching for image: " + image_filename)
+    while box is None:
+        box = pyautogui.locateOnScreen(
+            image_filename,
+            confidence=0.9,
+            region=(
+                0,
+                cutOffTopY,
+                round(2880 * x_scale),
+                round(cutOffBottomY * 2 * y_scale),  # theocratically this works
+            ),
+        )
+        time.sleep(DELAY * 5)
+        attempts += 1
+        if attempts == 5 and continuous_search is True:
+            pyautogui.press("down")
+            attempts = 0
+        if attempts >= MAX_ATTEMPTS:
+            if os.name == "posix":  # macOS # TODO untested
+                os.system(
+                    f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error" sound name "Glass"\''
+                )
+        elif os.name == "nt":  # Windows # TODO untested
+            os.system(
+                f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
+                + '"'
+                + os.getcwd()
+                + "/target/chrome.png"
+                + ")"
+                + '"'
+            )
+
+    x, y, width, height = box
+    x = box.left / 2 + width / 4
+    y = box.top / 2 + height / 4
+    if (  # TODO find a way to remove
+        image_filename != PRIMIS
+        and image_filename != EDUCATION
+        and image_filename != LOAD_OPT_OUT_WAIT
+        and image_filename != LOAD_OWNER_WAIT
+    ):
+        cord_click((x, y))
+
+
+def find_and_click_image_with_bias(image_filename, biasx, biasy):
     global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY
     box = None
     attempts = 0
@@ -81,10 +132,54 @@ def find_and_click_image(image_filename, biasx, biasy):
     y = box.top / 2 + height / 4 + biasy
     if (  # TODO find a way to remove
         image_filename != PRIMIS
-        and image_filename != "target/education.png"
-        and image_filename != "target/receives_imprimis.png"
-        and image_filename != "target/wait_for_load_opt_out.png"
-        and image_filename != "target/wait_for_owner.png"
+        and image_filename != EDUCATION
+        and image_filename != LOAD_OPT_OUT_WAIT
+        and image_filename != LOAD_OWNER_WAIT
+    ):
+        cord_click((x, y))
+
+
+def find_and_click_image(image_filename):
+    global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY
+    box = None
+    attempts = 0
+    # print("Searching for image: " + image_filename)
+    while box is None:
+        box = pyautogui.locateOnScreen(
+            image_filename,
+            confidence=0.9,
+            region=(
+                0,
+                cutOffTopY,
+                round(2880 * x_scale),
+                round(cutOffBottomY * 2 * y_scale),  # theocratically this works
+            ),
+        )
+        time.sleep(DELAY * 5)
+        attempts += 1
+        if attempts >= MAX_ATTEMPTS:
+            if os.name == "posix":  # macOS # TODO untested
+                os.system(
+                    f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error" sound name "Glass"\''
+                )
+        elif os.name == "nt":  # Windows # TODO untested
+            os.system(
+                f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
+                + '"'
+                + os.getcwd()
+                + "/target/primis.png"
+                + ")"
+                + '"'
+            )
+
+    x, y, width, height = box
+    x = box.left / 2 + width / 4
+    y = box.top / 2 + height / 4
+    if (  # TODO find a way to remove
+        image_filename != PRIMIS
+        and image_filename != EDUCATION
+        and image_filename != LOAD_OPT_OUT_WAIT
+        and image_filename != LOAD_OWNER_WAIT
     ):
         cord_click((x, y))
 
@@ -103,20 +198,10 @@ def cord_click(cords):
     pyautogui.click()
 
 
-def up_command(num):
-    for _ in range(0, num):
-        pyautogui.press("up")
-
-
 def tab_command(num, delay):
     for _ in range(0, num):
         time.sleep(delay)
         pyautogui.press("tab")
-
-
-def down_command(num):
-    for _ in range(0, num):
-        pyautogui.press("down")
 
 
 def extract_digits_from_text(text):
@@ -131,9 +216,9 @@ def is_text_empty(text):
 
 
 def get_to_dead_page():
-    find_and_click_image("target/constituents.png", 0, 0)
-    find_and_click_image("target/updates.png", 0, 0)
-    find_and_click_image("target/name.png", 0, round(25 * y_scale))
+    find_and_click_image("target/constituents.png")
+    find_and_click_image("target/updates.png")
+    find_and_click_image_with_bias("target/name.png", 0, round(25 * y_scale))
 
 
 def interactions_num_finder():
@@ -162,30 +247,29 @@ def interactions_num_finder():
 
 
 def click_on_top_interaction(num):
-    find_and_click_image("target/status_alone.png", 0, round(num * 30 * y_scale))
-    find_and_click_image("target/edit_interaction.png", 0, 0)
+    find_and_click_image_with_bias(
+        "target/status_alone.png", 0, round(num * 30 * y_scale)
+    )
+    find_and_click_image("target/edit_interaction.png")
 
 
 def interactions_section(num):
-    global PRIMIS
-    OWNER = "target/wait_for_owner.png"
-    find_and_click_image("target/interactions.png", 0, 0)
-    find_and_click_image(PRIMIS, 0, 0)  # TODO find a way to remove
-    down_command(num + 8)  # TODO had a failure with this
-    # find_and_click_image(PRIMIS, 0, 0)  # TODO find a way to remove
+    global PRIMIS, LOAD_OWNER_WAIT
+    find_and_click_image("target/interactions.png")
+    find_and_click_image(PRIMIS)  # TODO find a way to remove
+    for _ in range(0, num + 8):
+        pyautogui.press("down")
     click_on_top_interaction(1)
     confirm()
     if num == 2:
-        find_and_click_image(OWNER, 0, 0)
+        find_and_click_image(LOAD_OWNER_WAIT)
         click_on_top_interaction(num)
         decline(num)
     elif num == 3:
-        find_and_click_image(OWNER, 0, 0)
-        # down_command(num - 1)
+        find_and_click_image(LOAD_OWNER_WAIT)
         click_on_top_interaction(num - 1)  # starts at 2 always
         decline(num)
-        find_and_click_image(OWNER, 0, 0)
-        # down_command(num - 2)
+        find_and_click_image(LOAD_OWNER_WAIT)
         click_on_top_interaction(num)
         decline(num)
 
@@ -201,18 +285,19 @@ def interactions_section(num):
             cord_click(CRM_cords)
             if decline(num) == DEFAULT_PROMPT:
                 duplicates = False
-    up_command(num * 3 + 1)
-    find_and_click_image(PRIMIS, 0, 0)  # TODO find a way to remove
-    find_and_click_image("target/personal_info.png", 0, 0)
-    find_and_click_image("target/marked_deceased.png", 0, 0)
+    for _ in range(0, num * 3 + 1):
+        pyautogui.press("up")
+    find_and_click_image(PRIMIS)  # TODO find a way to remove
+    find_and_click_image("target/personal_info.png")
+    find_and_click_image("target/marked_deceased.png")
 
 
 def confirm():
     global noted_date, initials, full_date
 
-    find_and_click_image("target/tab_down_complete.png", 0, 0)
-    find_and_click_image("target/completed_form.png", 0, 0)
-    find_and_click_image("target/wait_for_complete.png", 0, 0)
+    find_and_click_image("target/tab_down_complete.png")
+    find_and_click_image("target/completed_form.png")
+    find_and_click_image("target/wait_for_complete.png")
     tab_command(7, 0)
     keyboard.write(full_date)
     tab_command(3, 0)
@@ -241,7 +326,7 @@ def confirm():
         and "batch" not in found_text
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
-        find_and_click_image("target/sites.png", 0, 0)
+        find_and_click_image("target/sites.png")
     if is_text_empty(found_text) == False:
         pyautogui.press("down")
         pyautogui.press("enter")
@@ -253,8 +338,8 @@ def confirm():
 
 def decline(num):
     global initials, CRM_cords, noted_date
-    find_and_click_image("target/tab_down_complete.png", 0, 0)
-    find_and_click_image("target/declined.png", 0, 0)
+    find_and_click_image("target/tab_down_complete.png")
+    find_and_click_image("target/declined.png")
     tab_command(7, 0)
     keyboard.write(full_date)
     tab_command(3, 0)
@@ -283,7 +368,7 @@ def decline(num):
         and "batch" not in found_text
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
-        find_and_click_image("target/sites.png", 0, 0)
+        find_and_click_image("target/sites.png")
     pyautogui.press("down")
     pyautogui.press("enter")
     pyautogui.press("enter")
@@ -304,41 +389,42 @@ def decline(num):
 
 def deceased_form():
     global noted_date, formatted_date
-    find_and_click_image("target/deceased_date.png", 0, 0)
+    find_and_click_image("target/deceased_date.png")
     if noted_date == "1/":
         keyboard.write(formatted_date)
     elif noted_date != "1/":
         keyboard.write(noted_date)
         noted_date = "1/"
-    find_and_click_image("target/source_tab_down.png", 0, 0)
-    find_and_click_image("target/communication_from.png", 0, 0)
+    find_and_click_image("target/source_tab_down.png")
+    find_and_click_image("target/communication_from.png")
     pyautogui.press("enter")
 
 
 def move_to_communications():
     global PRIMIS
-    find_and_click_image("target/constitute.png", 0, 0)
-    find_and_click_image(PRIMIS, 0, 0)  # TODO find a way to remove
-    find_and_click_image("target/communications.png", 0, 0)
-    down_command(2)
-    find_and_click_image("target/add.png", 0, 0)
+    find_and_click_image("target/constitute.png")
+    find_and_click_image(PRIMIS)  # TODO find a way to remove
+    find_and_click_image("target/communications.png")
+    for _ in range(0, 2):
+        pyautogui.press("down")
+    find_and_click_image("target/add.png")
 
 
 def opt_out_form():
     global full_date
-    find_and_click_image("target/solicit_code.png", 0, 0)
+    find_and_click_image("target/solicit_code.png")
     keyboard.write("Imprimis")
-    find_and_click_image("target/imprimis_three.png", 0, 0)
-    find_and_click_image("target/imprintis_done.png", 0, 0)
+    find_and_click_image("target/imprimis_three.png")
+    find_and_click_image("target/imprintis_done.png")
     pyautogui.press("tab")
     for _ in range(0, 11):
         pyautogui.press("backspace")
     keyboard.write("Opt-out")
-    find_and_click_image("target/opt_out.png", 0, 0)
+    find_and_click_image("target/opt_out.png")
     pyautogui.press("tab")
     keyboard.write(full_date)
-    find_and_click_image("target/source_file_tab_down.png", 0, 0)
-    find_and_click_image("target/double_deceased.png", 0, 0)
+    find_and_click_image("target/source_file_tab_down.png")
+    find_and_click_image("target/double_deceased.png")
     pyautogui.press("enter")
 
 
@@ -391,7 +477,7 @@ def cutoff_section_of_screen(image_filename):
 
 
 def main():
-    global initials, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY
+    global initials, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, EDUCATION
     input_str = pyautogui.prompt(
         text="Enter Initials and screen , -1 to quit",
         title="Enter Initials and screen , -1 to quit",
@@ -417,7 +503,7 @@ def main():
         opt_out_form()
 
         end_time_recording(start_time)
-        find_and_click_image("target/education.png", 0, 0)  # TODO find a way to remove
+        find_and_click_image(EDUCATION)  # TODO find a way to remove
 
 
 if __name__ == "__main__":

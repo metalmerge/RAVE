@@ -21,18 +21,18 @@ import os
 DEFAULT_PROMPT = "0"
 initials = "DE"
 noted_date = "1/"
-pyautogui.FAILSAFE = True
+PRIMIS = "target/receives_imprimis.png"
 DELAY = 0.01
-pyautogui.PAUSE = DELAY
 MAX_ATTEMPTS = round(1.25 / (DELAY * 5))
 x_scale = 1
 y_scale = 1
+pyautogui.FAILSAFE = True
+pyautogui.PAUSE = DELAY
 # x_scale = 1440 / 2880
 # y_scale = 900 / 1800
 current_date = datetime.now()
 formatted_date = current_date.strftime("%-m/%Y")
 full_date = current_date.strftime("%-m/%-d/%Y")
-PRIMIS = "target/receives_imprimis.png"
 CRM_cords = (0, 0)
 cutOffTopY = 0
 cutOffBottomY = 900
@@ -87,6 +87,15 @@ def find_and_click_image(image_filename, biasx, biasy):
         cord_click((x, y))
 
 
+def extract_text_from_coordinates(x1, y1, x2, y2):
+    pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
+    screenshot = pyautogui.screenshot()
+    textbox_image = screenshot.crop((x1, y1, x2, y2))
+    extracted_text = pytesseract.image_to_string(textbox_image)
+    # print(extracted_text.strip())
+    return extracted_text.strip()
+
+
 def cord_click(cords):
     pyautogui.moveTo(cords[0], cords[1])
     pyautogui.click()
@@ -123,6 +132,72 @@ def get_to_dead_page():
     find_and_click_image("target/constituents.png", 0, 0)
     find_and_click_image("target/updates.png", 0, 0)
     find_and_click_image("target/name.png", 0, 25)
+
+
+def interactions_num_finder():
+    global DELAY
+    while True:
+        pretext = "Interactions: "
+        try:
+            text = extract_text_from_coordinates(420, 1350, 620, 1400)
+            if pretext in text:
+                # Extract the number following "Interactions:"
+                num_index = text.index(pretext) + len(pretext)
+                num_text = text[num_index:].strip()
+                num = int(extract_digits_from_text(num_text))
+                break
+            else:
+                time.sleep(DELAY)
+                continue
+        except ValueError:
+            continue
+    return num
+
+
+def click_on_top_interaction(num):
+    find_and_click_image("target/status_alone.png", 0, (num * 30))
+    find_and_click_image("target/edit_interaction.png", 0, 0)
+
+
+def interactions_section(num):
+    global PRIMIS
+    OWNER = "target/wait_for_owner.png"
+    find_and_click_image("target/interactions.png", 0, 0)
+    find_and_click_image(PRIMIS, 0, 0)  # TODO find a way to remove
+    down_command(num + 8)  # TODO had a failure with this
+    # find_and_click_image(PRIMIS, 0, 0)  # TODO find a way to remove
+    click_on_top_interaction(1)
+    confirm()
+    if num == 2:
+        find_and_click_image(OWNER, 0, 0)
+        click_on_top_interaction(num)
+        decline(num)
+    elif num == 3:
+        find_and_click_image(OWNER, 0, 0)
+        # down_command(num - 1)
+        click_on_top_interaction(num - 1)  # starts at 2 always
+        decline(num)
+        find_and_click_image(OWNER, 0, 0)
+        # down_command(num - 2)
+        click_on_top_interaction(num)
+        decline(num)
+
+    elif num > 3:
+        confirm()
+        duplicates = True
+        while duplicates:
+            pyautogui.prompt(
+                text="",
+                title="Enter when you are at the decline form",
+                default=DEFAULT_PROMPT,
+            )
+            cord_click(CRM_cords)
+            if decline(num) == DEFAULT_PROMPT:
+                duplicates = False
+    up_command(num * 3 + 1)
+    find_and_click_image(PRIMIS, 0, 0)  # TODO find a way to remove
+    find_and_click_image("target/personal_info.png", 0, 0)
+    find_and_click_image("target/marked_deceased.png", 0, 0)
 
 
 def confirm():
@@ -211,50 +286,6 @@ def decline(num):
     return end
 
 
-def click_on_top_interaction(num):
-    find_and_click_image("target/status_alone.png", 0, (num * 30))
-    find_and_click_image("target/edit_interaction.png", 0, 0)
-
-
-def interactions_section(num):
-    global PRIMIS
-    OWNER = "target/wait_for_owner.png"
-    find_and_click_image("target/interactions.png", 0, 0)
-    find_and_click_image(PRIMIS, 0, 0)  # TODO find a way to remove
-    down_command(num + 8)  # TODO had a failure with this
-    # find_and_click_image(PRIMIS, 0, 0)  # TODO find a way to remove
-    click_on_top_interaction(1)
-    confirm()
-    if num == 2:
-        find_and_click_image(OWNER, 0, 0)
-        click_on_top_interaction(num)
-        decline(num)
-    elif num == 3:
-        find_and_click_image(OWNER, 0, 0)
-        # down_command(num - 1)
-        click_on_top_interaction(num - 1)  # starts at 2 always
-        decline(num)
-        find_and_click_image(OWNER, 0, 0)
-        # down_command(num - 2)
-        click_on_top_interaction(num)
-        decline(num)
-
-    elif num > 3:
-        confirm()
-        duplicates = True
-        while duplicates:
-            pyautogui.prompt(
-                text="",
-                title="Enter when you are at the decline form",
-                default=DEFAULT_PROMPT,
-            )
-            cord_click(CRM_cords)
-            if decline(num) == DEFAULT_PROMPT:
-                duplicates = False
-    up_command(num * 3 + 1)
-    get_to_mark_deceased()
-
-
 def deceased_form():
     global noted_date, formatted_date
     find_and_click_image("target/deceased_date.png", 0, 0)
@@ -266,15 +297,6 @@ def deceased_form():
     find_and_click_image("target/source_tab_down.png", 0, 0)
     find_and_click_image("target/communication_from.png", 0, 0)
     pyautogui.press("enter")
-
-
-def extract_text_from_coordinates(x1, y1, x2, y2):
-    pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
-    screenshot = pyautogui.screenshot()
-    textbox_image = screenshot.crop((x1, y1, x2, y2))
-    extracted_text = pytesseract.image_to_string(textbox_image)
-    # print(extracted_text.strip())
-    return extracted_text.strip()
 
 
 def move_to_communications():
@@ -304,40 +326,13 @@ def opt_out_form():
     pyautogui.press("enter")
 
 
-def get_to_mark_deceased():
-    global PRIMIS
-    find_and_click_image(PRIMIS, 0, 0)  # TODO find a way to remove
-    find_and_click_image("target/personal_info.png", 0, 0)
-    find_and_click_image("target/marked_deceased.png", 0, 0)
-
-
-def interactions_num_finder():
-    global DELAY
-    while True:
-        pretext = "Interactions: "
-        try:
-            text = extract_text_from_coordinates(420, 1350, 620, 1400)
-            if pretext in text:
-                # Extract the number following "Interactions:"
-                num_index = text.index(pretext) + len(pretext)
-                num_text = text[num_index:].strip()
-                num = int(extract_digits_from_text(num_text))
-                break
-            else:
-                time.sleep(DELAY)
-                continue
-        except ValueError:
-            continue
-    return num
-
-
 def end_time_recording(start_time):
     global full_date
     end_time = time.time()
     duration = end_time - start_time
     log_file = "program_log.txt"
     with open(log_file, "a") as f:
-        f.write(f"{duration:.2f} = {full_date}\n")
+        f.write(f"{duration:.2f}\n")
 
 
 def cutoff_section_of_screen(image_filename):
@@ -372,7 +367,7 @@ def cutoff_section_of_screen(image_filename):
                 print("Unsupported operating system")
             break
 
-    x, y, width, height = box
+    _, y, width, height = box
     image_cords_x = box.left / 2 + width / 4
     image_cords_y = box.top / 2 + height / 4
 

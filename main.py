@@ -437,8 +437,8 @@ def cutoff_section_of_screen(image_filename):
 def main():
     global initials, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, EDUCATION, COM_NUM
     input_str = pyautogui.prompt(
-        text="Enter Initials and screen , -1 to quit",
-        title="Enter Initials and screen , -1 to quit",
+        text="Enter Initials, screen size (x & y), and which computer number this is, -1 to quit",
+        title="Enter Initials, screen size (x & y), and which computer number this is, -1 to quit",
         default="DE, 1440, 900, 1",
     )
     initials, x_scale, y_scale, computer_number = input_str.strip().split(",")

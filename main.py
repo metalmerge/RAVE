@@ -20,7 +20,6 @@ import os
 
 # original_x_scale = 1440 / 2880
 # original_y_scale = 900 / 1800
-# reform num > 3
 # make sure commands and control are accounted for based on type of computer
 
 # TODO rework readme
@@ -249,29 +248,11 @@ def interactions_section(num):
     find_and_click_image("target/interactions.png")
     click_on_top_interaction(1)
     confirm()
-    if num == 2:
-        find_and_click_image(LOAD_OWNER_WAIT)
-        click_on_top_interaction(num)
-        decline(num)
-    elif num == 3:
-        find_and_click_image(LOAD_OWNER_WAIT)
-        click_on_top_interaction(num - 1)  # starts at 2 always
-        decline(num)
-        find_and_click_image(LOAD_OWNER_WAIT)
-        click_on_top_interaction(num)
-        decline(num)
-    elif num > 3:
-        confirm()
-        duplicates = True
-        while duplicates:
-            pyautogui.prompt(
-                text="",
-                title="Enter when you are at the decline form",
-                default=DEFAULT_PROMPT,
-            )
-            cord_click(CRM_cords)
-            if decline(num) == DEFAULT_PROMPT:
-                duplicates = False
+    if num > 1:  # untested
+        for i in range(2, num):
+            find_and_click_image(LOAD_OWNER_WAIT)
+            click_on_top_interaction(i)
+            decline()
     find_and_click_image(PRIMIS)
     find_and_click_image_with_search("target/personal_info.png", 0, 0, "up")
     find_and_click_image("target/marked_deceased.png")
@@ -291,7 +272,6 @@ def confirm():
     time.sleep(0.1)
     keyboard.press_and_release("command+C")
     found_text = pyperclip.paste()
-    print(found_text)
     if (
         (
             extract_digits_from_text(found_text) != ""
@@ -324,7 +304,7 @@ def confirm():
     pyautogui.press("enter")
 
 
-def decline(num):
+def decline():
     global initials, CRM_cords, noted_date
     find_and_click_image("target/tab_down_complete.png")
     find_and_click_image("target/declined.png")
@@ -336,7 +316,6 @@ def decline(num):
     time.sleep(0.1)
     keyboard.press_and_release("command+C")
     found_text = pyperclip.paste()
-    print(found_text)
     if (
         (
             extract_digits_from_text(found_text) != ""
@@ -366,16 +345,6 @@ def decline(num):
     keyboard.write("Note: Duplicate - " + initials)
     tab_command(2, 0)
     pyautogui.press("enter")
-
-    if num <= 3:
-        return DEFAULT_PROMPT
-    elif num > 3:
-        end = pyautogui.prompt(
-            text="", title="More duplicates?, 1 = yes, 0 = no", default=DEFAULT_PROMPT
-        )
-        cord_click(CRM_cords)
-
-    return end
 
 
 def deceased_form():

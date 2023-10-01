@@ -7,8 +7,15 @@ This script automates repetitive tasks on a website using keyboard and mouse con
 ## Requirements
 
 <https://www.python.org/downloads/>
-cd Downloads/RAVE-main/RAVE-main
+
+cd Downloads
+
+cd RAVE-main
+
+cd RAVE-main
+
 python main.py
+
 pip install pyperclip, keyboard, pyautogui, pytesseract, opencv-python
 
 - Python 3.x, download with PATH and not admin.

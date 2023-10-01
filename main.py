@@ -75,7 +75,8 @@ def find_and_click_image_with_search(image_filename, biasx, biasy, up_or_down):
         if box is None:
             pyautogui.press(up_or_down)
             pyautogui.press(up_or_down)
-            time.sleep(1)  # TODO
+            pyautogui.press(up_or_down)
+            time.sleep(DELAY * 5)
 
     x, y, width, height = box
     x = box.left / 2 + width / 4 + biasx

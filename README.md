@@ -16,7 +16,7 @@ cd RAVE-main
 
 python main.py
 
-pip install pyperclip, keyboard, pyautogui, pytesseract, opencv-python
+pip install pyperclip keyboard pyautogui pytesseract opencv-python
 
 - Python 3.x, download with PATH and not admin.
 - pip install pyperclip, keyboard, pyautogui, pytesseract, opencv-python

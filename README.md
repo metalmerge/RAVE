@@ -6,8 +6,11 @@ This script automates repetitive tasks on a website using keyboard and mouse con
 
 ## Requirements
 
+<https://www.python.org/downloads/>
+pip install pyperclip, keyboard, pyautogui, pytesseract, opencv-python
+
 - Python 3.x
-- install pyperclip, keyboard, pyautogui, pytesseract, opencv-python
+- pip install pyperclip, keyboard, pyautogui, pytesseract, opencv-python
 
 If you get 'TypeError: '<' not supported between instances of 'str' and 'int' when running pyautogui, use this link to fix it: <https://stackoverflow.com/questions/76361049/how-to-fix-typeerror-not-supported-between-instances-of-str-and-int-wh/76383784#76383784>
 

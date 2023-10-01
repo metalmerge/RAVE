@@ -39,8 +39,18 @@ COM_NUM = 1
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = DELAY
 current_date = datetime.now()
-formatted_date = current_date.strftime("%-m/%Y")
-full_date = current_date.strftime("%-m/%-d/%Y")
+
+
+if os.name == "posix":
+    formatted_date = current_date.strftime("%-m/%Y")
+else:
+    formatted_date = current_date.strftime("%m/%Y")
+
+if os.name == "posix":
+    full_date = current_date.strftime("%-m/%-d/%Y")
+else:
+    full_date = current_date.strftime("%m/%d/%Y")
+
 CRM_cords = (0, 0)
 cutOffTopY = 0
 cutOffBottomY = 900
@@ -107,7 +117,7 @@ def find_and_click_image_with_bias(image_filename, biasx, biasy):
                 f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
                 + '"'
                 + os.getcwd()
-                + "/target/primis.png"
+                + "/target/chrome.png"
                 + ")"
                 + '"'
             )
@@ -152,7 +162,7 @@ def find_and_click_image(image_filename):
                 f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
                 + '"'
                 + os.getcwd()
-                + "/target/primis.png"
+                + "/target/chrome.png"
                 + ")"
                 + '"'
             )

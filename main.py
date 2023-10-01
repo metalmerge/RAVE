@@ -37,6 +37,7 @@ MAX_ATTEMPTS = round(1.25 / (DELAY * 5))
 x_scale = 1
 y_scale = 1
 COM_NUM = 1
+CONFIDENCE = 0.9
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = DELAY
 current_date = datetime.now()
@@ -55,13 +56,13 @@ cutOffBottomY = 900
 
 
 def find_and_click_image_with_search(image_filename, biasx, biasy, up_or_down):
-    global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY
+    global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, CONFIDENCE
     box = None
     # print("Searching for image: " + image_filename)
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
-            confidence=0.9,
+            confidence=CONFIDENCE,
             region=(
                 0,
                 cutOffTopY,
@@ -89,14 +90,14 @@ def find_and_click_image_with_search(image_filename, biasx, biasy, up_or_down):
 
 
 def find_and_click_image_with_bias(image_filename, biasx, biasy):
-    global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY
+    global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, CONFIDENCE
     box = None
     attempts = 0
     # print("Searching for image: " + image_filename)
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
-            confidence=0.9,
+            confidence=CONFIDENCE,
             region=(
                 0,
                 cutOffTopY,
@@ -134,14 +135,14 @@ def find_and_click_image_with_bias(image_filename, biasx, biasy):
 
 
 def find_and_click_image(image_filename):
-    global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY
+    global cutOffTopY, DELAY, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, CONFIDENCE
     box = None
     attempts = 0
     # print("Searching for image: " + image_filename)
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
-            confidence=0.9,
+            confidence=CONFIDENCE,
             region=(
                 0,
                 cutOffTopY,
@@ -406,13 +407,13 @@ def end_time_recording(start_time):
 
 def cutoff_section_of_screen(image_filename):
     # find the top y coordinate of the image on the screen
-    global DELAY, MAX_ATTEMPTS, x_scale, y_scale
+    global DELAY, MAX_ATTEMPTS, x_scale, y_scale, CONFIDENCE
     box = None
     attempts = 0
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
-            confidence=0.9,
+            confidence=CONFIDENCE,
             region=(0, 0, round(2880 * x_scale), round(1800 * y_scale)),
         )
         time.sleep(DELAY * 5)

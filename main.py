@@ -17,6 +17,7 @@ import os
 #   - Working sound notification for macOS and Windows
 #   - Use mss to take screenshots instead of pyautogui
 #   - Find workaround to recieves imprints and waits
+#   - Figure out how to extract the date from the comments
 
 # original_x_scale = 1440 / 2880
 # original_y_scale = 900 / 1800
@@ -43,12 +44,9 @@ current_date = datetime.now()
 
 if os.name == "posix":
     formatted_date = current_date.strftime("%-m/%Y")
-else:
-    formatted_date = current_date.strftime("%m/%Y")
-
-if os.name == "posix":
     full_date = current_date.strftime("%-m/%-d/%Y")
 else:
+    formatted_date = current_date.strftime("%m/%Y")
     full_date = current_date.strftime("%m/%d/%Y")
 
 CRM_cords = (0, 0)

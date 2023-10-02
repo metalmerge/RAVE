@@ -28,10 +28,10 @@ import os
 DEFAULT_PROMPT = "0"
 initials = "DE"
 noted_date = "1/"
-PRIMIS = "target/receives_imprimis.png"
-EDUCATION = "target/education.png"
-LOAD_OPT_OUT_WAIT = "target/wait_for_load_opt_out.png"
-LOAD_OWNER_WAIT = "target/wait_for_load_owner.png"
+PRIMIS = "appletarget/receives_imprimis.png"
+EDUCATION = "appletarget/education.png"
+LOAD_OPT_OUT_WAIT = "appletarget/wait_for_load_opt_out.png"
+LOAD_OWNER_WAIT = "appletarget/wait_for_load_owner.png"
 DELAY = 0.01
 MAX_ATTEMPTS = round(1.25 / (DELAY * 5))
 x_scale = 1
@@ -117,7 +117,7 @@ def find_and_click_image_with_bias(image_filename, biasx, biasy):
                 f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
                 + '"'
                 + os.getcwd()
-                + "/target/chrome.png"
+                + "/appletarget/chrome.png"
                 + ")"
                 + '"'
             )
@@ -162,7 +162,7 @@ def find_and_click_image(image_filename):
                 f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
                 + '"'
                 + os.getcwd()
-                + "/target/chrome.png"
+                + "/appletarget/chrome.png"
                 + ")"
                 + '"'
             )
@@ -212,13 +212,13 @@ def is_text_empty(text):
 
 def get_to_dead_page():
     global COM_NUM
-    find_and_click_image("target/constituents.png")
-    find_and_click_image("target/updates.png")
+    find_and_click_image("appletarget/constituents.png")
+    find_and_click_image("appletarget/updates.png")
     if COM_NUM == 2:  # untested
-        find_and_click_image("target/third_page.png")
+        find_and_click_image("appletarget/third_page.png")
     if COM_NUM == 3:
-        find_and_click_image("target/fifth_page.png")
-    find_and_click_image_with_bias("target/name.png", 0, round(25 * y_scale))
+        find_and_click_image("appletarget/fifth_page.png")
+    find_and_click_image_with_bias("appletarget/name.png", 0, round(25 * y_scale))
 
 
 def interactions_num_finder():
@@ -248,14 +248,14 @@ def interactions_num_finder():
 
 def click_on_top_interaction(num):
     find_and_click_image_with_search(
-        "target/status_alone.png", 0, round(num * 30 * y_scale), "down"
+        "appletarget/status_alone.png", 0, round(num * 30 * y_scale), "down"
     )
-    find_and_click_image_with_search("target/edit_interaction.png", 0, 0, "down")
+    find_and_click_image_with_search("appletarget/edit_interaction.png", 0, 0, "down")
 
 
 def interactions_section(num):
     global PRIMIS, LOAD_OWNER_WAIT
-    find_and_click_image("target/interactions.png")
+    find_and_click_image("appletarget/interactions.png")
     click_on_top_interaction(1)
     confirm()
     if num > 1:  # untested
@@ -264,16 +264,16 @@ def interactions_section(num):
             click_on_top_interaction(i)
             decline()
     find_and_click_image(PRIMIS)
-    find_and_click_image_with_search("target/personal_info.png", 0, 0, "up")
-    find_and_click_image("target/marked_deceased.png")
+    find_and_click_image_with_search("appletarget/personal_info.png", 0, 0, "up")
+    find_and_click_image("appletarget/marked_deceased.png")
 
 
 def confirm():
     global noted_date, initials, full_date
 
-    find_and_click_image("target/tab_down_complete.png")
-    find_and_click_image("target/completed_form.png")
-    find_and_click_image("target/wait_for_complete.png")
+    find_and_click_image("appletarget/tab_down_complete.png")
+    find_and_click_image("appletarget/completed_form.png")
+    find_and_click_image("appletarget/wait_for_complete.png")
     tab_command(7, 0)
     keyboard.write(full_date)
     pyperclip.copy("")
@@ -304,7 +304,7 @@ def confirm():
         and "batch" not in found_text
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
-        find_and_click_image("target/sites.png")
+        find_and_click_image("appletarget/sites.png")
     if is_text_empty(found_text) == False:
         pyautogui.press("down")
         pyautogui.press("enter")
@@ -316,8 +316,8 @@ def confirm():
 
 def decline():
     global initials, CRM_cords, noted_date
-    find_and_click_image("target/tab_down_complete.png")
-    find_and_click_image("target/declined.png")
+    find_and_click_image("appletarget/tab_down_complete.png")
+    find_and_click_image("appletarget/declined.png")
     tab_command(7, 0)
     keyboard.write(full_date)
     pyperclip.copy("")
@@ -348,7 +348,7 @@ def decline():
         and "batch" not in found_text
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
-        find_and_click_image("target/sites.png")
+        find_and_click_image("appletarget/sites.png")
     pyautogui.press("down")
     pyautogui.press("enter")
     pyautogui.press("enter")
@@ -359,40 +359,40 @@ def decline():
 
 def deceased_form():
     global noted_date, formatted_date
-    find_and_click_image("target/deceased_date.png")
+    find_and_click_image("appletarget/deceased_date.png")
     if noted_date == "1/":
         keyboard.write(formatted_date)
     elif noted_date != "1/":
         keyboard.write(noted_date)
         noted_date = "1/"
-    find_and_click_image("target/source_tab_down.png")
-    find_and_click_image("target/communication_from.png")
+    find_and_click_image("appletarget/source_tab_down.png")
+    find_and_click_image("appletarget/communication_from.png")
     pyautogui.press("enter")
 
 
 def move_to_communications():
     global PRIMIS
-    find_and_click_image("target/constitute.png")
+    find_and_click_image("appletarget/constitute.png")
     find_and_click_image(PRIMIS)  # TODO find a way to remove
-    find_and_click_image("target/communications.png")
-    find_and_click_image_with_search("target/add.png", 0, 0, "down")
+    find_and_click_image("appletarget/communications.png")
+    find_and_click_image_with_search("appletarget/add.png", 0, 0, "down")
 
 
 def opt_out_form():
     global full_date
-    find_and_click_image("target/solicit_code.png")
+    find_and_click_image("appletarget/solicit_code.png")
     keyboard.write("Imprimis")
-    find_and_click_image("target/imprimis_three.png")
-    find_and_click_image("target/imprimis_done.png")
+    find_and_click_image("appletarget/imprimis_three.png")
+    find_and_click_image("appletarget/imprimis_done.png")
     pyautogui.press("tab")
     for _ in range(0, 11):
         pyautogui.press("backspace")
     keyboard.write("Opt-out")
-    find_and_click_image("target/opt_out.png")
+    find_and_click_image("appletarget/opt_out.png")
     pyautogui.press("tab")
     keyboard.write(full_date)
-    find_and_click_image("target/source_file_tab_down.png")
-    find_and_click_image("target/double_deceased.png")
+    find_and_click_image("appletarget/source_file_tab_down.png")
+    find_and_click_image("appletarget/double_deceased.png")
     pyautogui.press("enter")
 
 
@@ -429,7 +429,7 @@ def cutoff_section_of_screen(image_filename):
                     f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
                     + '"'
                     + os.getcwd()
-                    + "/target/chrome.png"
+                    + "/appletarget/chrome.png"
                     + ")"
                     + '"'
                 )
@@ -457,7 +457,7 @@ def main():
     y_scale = screen_height / 900
     COM_NUM = int(computer_number.strip())
     cutOffBottomY = screen_height
-    cutOffTopY, CRM_cords = cutoff_section_of_screen("target/blackbaud_CRM.png")
+    cutOffTopY, CRM_cords = cutoff_section_of_screen("appletarget/blackbaud_CRM.png")
     cord_click(CRM_cords)
 
     while initials != "-1":

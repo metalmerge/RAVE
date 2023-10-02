@@ -41,14 +41,8 @@ CONFIDENCE = 0.9
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = DELAY
 current_date = datetime.now()
-
-
-if os.name == "posix":
-    formatted_date = current_date.strftime("%-m/%Y")
-    full_date = current_date.strftime("%-m/%-d/%Y")
-else:
-    formatted_date = current_date.strftime("%m/%Y")
-    full_date = current_date.strftime("%m/%d/%Y")
+formatted_date = current_date.strftime("%-m/%Y")
+full_date = current_date.strftime("%-m/%-d/%Y")
 
 CRM_cords = (0, 0)
 cutOffTopY = 0
@@ -71,7 +65,7 @@ def find_and_click_image_with_search(image_filename, biasx, biasy, up_or_down):
             ),
         )
         time.sleep(DELAY * 5)
-        if box is None:
+        if box is None:  # skroll
             pyautogui.press(up_or_down)
             pyautogui.press(up_or_down)
             pyautogui.press(up_or_down)
@@ -108,18 +102,8 @@ def find_and_click_image_with_bias(image_filename, biasx, biasy):
         time.sleep(DELAY * 5)
         attempts += 1
         if attempts >= MAX_ATTEMPTS:
-            if os.name == "posix":  # macOS # TODO untested
-                os.system(
-                    f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error" sound name "Glass"\''
-                )
-        elif os.name == "nt":  # Windows # TODO untested
             os.system(
-                f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
-                + '"'
-                + os.getcwd()
-                + "/appletarget/chrome.png"
-                + ")"
-                + '"'
+                f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error" sound name "Glass"\''
             )
 
     x, y, width, height = box
@@ -153,18 +137,8 @@ def find_and_click_image(image_filename):
         time.sleep(DELAY * 5)
         attempts += 1
         if attempts >= MAX_ATTEMPTS:
-            if os.name == "posix":  # macOS # TODO untested
-                os.system(
-                    f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error" sound name "Glass"\''
-                )
-        elif os.name == "nt":  # Windows # TODO untested
             os.system(
-                f'powershell -command "New-BurntToastNotification -Text "Could not find image {image_filename}" -AppLogo '
-                + '"'
-                + os.getcwd()
-                + "/appletarget/chrome.png"
-                + ")"
-                + '"'
+                f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error" sound name "Glass"\''
             )
 
     x, y, width, height = box

@@ -383,7 +383,7 @@ def opt_out_form():
     find_and_click_image("target/solicit_code.png")
     keyboard.write("Imprimis")
     find_and_click_image("target/imprimis_three.png")
-    find_and_click_image("target/imprintis_done.png")
+    find_and_click_image("target/imprimis_done.png")
     pyautogui.press("tab")
     for _ in range(0, 11):
         pyautogui.press("backspace")
@@ -454,12 +454,10 @@ def main():
     initials, computer_number = input_str.strip().split(",")
     screen_width, screen_height = pyautogui.size()
     x_scale = screen_width / 1440
-    y_scale = screen_height
+    y_scale = screen_height / 900
     COM_NUM = int(computer_number.strip())
-    cutOffBottomY = y_scale
-    y_scale /= 900
+    cutOffBottomY = screen_height
     cutOffTopY, CRM_cords = cutoff_section_of_screen("target/blackbaud_CRM.png")
-    # cutOffBottomY, _ = cutoff_section_of_screen("target/chrome.png")
     cord_click(CRM_cords)
 
     while initials != "-1":

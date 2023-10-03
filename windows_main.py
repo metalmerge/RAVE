@@ -218,7 +218,7 @@ def click_on_top_interaction(num):
     find_and_click_image_with_search(
         "windowstarget/status_alone.png", 0, round(num * 30 * y_scale), "down"
     )
-    time.sleep(1)
+    # time.sleep(1)
     find_and_click_image_with_search("windowstarget/edit_interaction.png", 0, 0, "down")
 
 
@@ -232,7 +232,7 @@ def interactions_section(num):
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
             decline()
-    time.sleep(2)
+    # time.sleep(2)
     find_and_click_image("windowstarget/primary_email.png")
     find_and_click_image_with_search("windowstarget/personal_info.png", 0, 0, "up")
     find_and_click_image("windowstarget/marked_deceased.png")
@@ -278,6 +278,7 @@ def confirm():
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         find_and_click_image("windowstarget/sites.png")
+        tab_command(2,0)
     if is_text_empty(found_text) == False:
         pyautogui.press("down")
         pyautogui.press("enter")
@@ -324,6 +325,7 @@ def decline():
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         find_and_click_image("windowstarget/sites.png")
+        tab_command(2, 0)
     pyautogui.press("down")
     pyautogui.press("enter")
     pyautogui.press("enter")
@@ -425,13 +427,12 @@ def main():
         
         interactions_section(num)
         deceased_form()
-        time.sleep(2)
         move_to_communications()
         opt_out_form()
 
         end_time_recording(start_time)
         find_and_click_image("windowstarget/primary_email.png")  # TODO find a way to remove
-        time.sleep(2)
+
 
 
 if __name__ == "__main__":

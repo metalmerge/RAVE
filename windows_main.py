@@ -5,7 +5,7 @@ from datetime import datetime
 import pyperclip
 import keyboard
 import pyautogui
-import pytesseract
+from pytesseract import pytesseract
 import os
 
 # Interactions: 2 = 79.14 bot; 75.66 no copy pasting, experienced, fast as possible human
@@ -42,13 +42,8 @@ pyautogui.FAILSAFE = True
 pyautogui.PAUSE = DELAY
 current_date = datetime.now()
 
-
-if os.name == "posix":
-    formatted_date = current_date.strftime("%-m/%Y")
-    full_date = current_date.strftime("%-m/%-d/%Y")
-else:
-    formatted_date = current_date.strftime("%m/%Y")
-    full_date = current_date.strftime("%m/%d/%Y")
+formatted_date = current_date.strftime("%m/%Y")
+full_date = current_date.strftime("%m/%d/%Y")
 
 CRM_cords = (0, 0)
 cutOffTopY = 0
@@ -72,9 +67,9 @@ def find_and_click_image_with_search(image_filename, biasx, biasy, up_or_down):
         )
         time.sleep(DELAY * 5)
         if box is None:
-            factor = -3
+            factor = -30
             if up_or_down == "up":
-                factor = 3
+                factor = 30
             pyautogui.scroll(factor)
             time.sleep(DELAY * 5)
 
@@ -84,6 +79,7 @@ def find_and_click_image_with_search(image_filename, biasx, biasy, up_or_down):
     if (  # TODO find a way to remove
         image_filename != PRIMIS
         and image_filename != EDUCATION
+        and image_filename != "windowstarget/primary_email.png"
         and image_filename != LOAD_OPT_OUT_WAIT
         and image_filename != LOAD_OWNER_WAIT
     ):
@@ -113,6 +109,7 @@ def find_and_click_image_with_bias(image_filename, biasx, biasy):
     if (  # TODO find a way to remove
         image_filename != PRIMIS
         and image_filename != EDUCATION
+        and image_filename != "windowstarget/primary_email.png"
         and image_filename != LOAD_OPT_OUT_WAIT
         and image_filename != LOAD_OWNER_WAIT
     ):
@@ -144,16 +141,14 @@ def find_and_click_image(image_filename):
         image_filename != PRIMIS
         and image_filename != EDUCATION
         and image_filename != LOAD_OPT_OUT_WAIT
+        and image_filename != "windowstarget/primary_email.png"
         and image_filename != LOAD_OWNER_WAIT
     ):
         cord_click((x, y))
 
 
 def extract_text_from_coordinates(x1, y1, x2, y2):
-    # pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
-    pytesseract.pytesseract.tesseract_cmd = (
-        "C:/Program Files/Tesseract-OCR/tesseract.exe"
-    )
+    path_to_tesseract = r"C:\Users\dermakov\Downloads\RAVE-main\RAVE-main\tesseract.exe"
     screenshot = pyautogui.screenshot()
     textbox_image = screenshot.crop((x1, y1, x2, y2))
     extracted_text = pytesseract.image_to_string(textbox_image)
@@ -200,10 +195,10 @@ def interactions_num_finder():
         pretext = "Interactions: "
         try:
             text = extract_text_from_coordinates(
+                1192,
                 500,
-                1193,
-                522,
-                1273,
+                1286,
+                524,
             )
             if pretext in text:
                 # Extract the number following "Interactions:"
@@ -220,17 +215,11 @@ def interactions_num_finder():
 
 
 def click_on_top_interaction(num):
-    find_and_click_image_with_bias(
-        "windowstarget/status_alone.png", 0, round(num * 30 * y_scale)
-    )
-    find_and_click_image_with_bias(
-        "windowstarget/status_alone.png", 0, round(num * 30 * y_scale)
-    )
-    find_and_click_image_with_bias(
-        "windowstarget/status_alone.png", 0, round(num * 30 * y_scale)
+    find_and_click_image_with_search(
+        "windowstarget/status_alone.png", 0, round(num * 30 * y_scale), "down"
     )
     time.sleep(1)
-    find_and_click_image("windowstarget/edit_interaction.png")
+    find_and_click_image_with_search("windowstarget/edit_interaction.png", 0, 0, "down")
 
 
 def interactions_section(num):
@@ -239,12 +228,12 @@ def interactions_section(num):
     click_on_top_interaction(1)
     confirm()
     if num > 1:  # untested
-        for i in range(2, num):
+        for i in range(2, num+1):
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
             decline()
     time.sleep(2)
-    find_and_click_image(PRIMIS)
+    find_and_click_image("windowstarget/primary_email.png")
     find_and_click_image_with_search("windowstarget/personal_info.png", 0, 0, "up")
     find_and_click_image("windowstarget/marked_deceased.png")
 
@@ -265,8 +254,7 @@ def confirm():
     # keyboard.write("Note: Confirmed - " + initials)
     # keyboard.press("ctrl+v")
     # found_text = pyperclip.paste()
-    found_text = extract_text_from_coordinates(1190, 500, 1275, 527)
-    print(found_text)
+    found_text = extract_text_from_coordinates(601, 600, 1277, 726)
     if (
         (
             extract_digits_from_text(found_text) != ""
@@ -303,7 +291,8 @@ def decline():
     global initials, CRM_cords, noted_date
     find_and_click_image("windowstarget/tab_down_complete.png")
     find_and_click_image("windowstarget/declined.png")
-    tab_command(7, 0)
+    find_and_click_image("windowstarget/wait_for_declined.png")
+    tab_command(8, 0)
     keyboard.write(full_date)
     # pyperclip.copy("")
     tab_command(3, 0)
@@ -311,7 +300,7 @@ def decline():
     # time.sleep(0.1)
     # keyboard.press_and_release("command+C")
     # found_text = pyperclip.paste()
-    found_text = extract_text_from_coordinates(1190, 500, 1275, 527)
+    found_text = extract_text_from_coordinates(601, 600, 1277, 726)
     if (
         (
             extract_digits_from_text(found_text) != ""
@@ -361,7 +350,7 @@ def move_to_communications():
     find_and_click_image("windowstarget/constitute.png")
     find_and_click_image(PRIMIS)  # TODO find a way to remove
     find_and_click_image("windowstarget/communications.png")
-    find_and_click_image_with_search("windowstarget/add.png", 0, 0, "down")
+    find_and_click_image("windowstarget/add.png")
 
 
 def opt_out_form():
@@ -407,7 +396,6 @@ def cutoff_section_of_screen(image_filename):
         print("Searching for image: " + image_filename)
 
     _, y, width, height = box
-    print(box)
 
     image_cords_x = (box.left) + width / 2
     image_cords_y = (box.top) + height / 2
@@ -432,16 +420,18 @@ def main():
 
     while initials != "-1":
         start_time = time.time()
-
         get_to_dead_page()
         num = interactions_num_finder()
+        
         interactions_section(num)
         deceased_form()
+        time.sleep(2)
         move_to_communications()
         opt_out_form()
 
         end_time_recording(start_time)
-        find_and_click_image(EDUCATION)  # TODO find a way to remove
+        find_and_click_image("windowstarget/primary_email.png")  # TODO find a way to remove
+        time.sleep(2)
 
 
 if __name__ == "__main__":

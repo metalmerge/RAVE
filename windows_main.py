@@ -9,7 +9,7 @@ from pytesseract import pytesseract
 import os
 
 # Interactions: 2 = 79.14 bot; 75.66 no copy pasting, experienced, fast as possible human
-# Interactions: 1 = 50.66 bot; 51.08 no copy pasting, experienced, fast as possible human
+# Interactions: 1 = 33.86 bot; 45.68 human
 
 # TODO
 # Protential improvements:
@@ -18,12 +18,11 @@ import os
 #   - Use mss to take screenshots instead of pyautogui
 #   - Find workaround to recieves imprints and waits
 #   - Figure out how to extract the date from the comments
+#   - Figure out how to use the copy paste for confirm and decline
 
 # original_x_scale = 1440 / 2880
 # original_y_scale = 900 / 1800
 # make sure commands and control are accounted for based on type of computer
-
-# TODO rework readme
 
 DEFAULT_PROMPT = "0"
 initials = "DE"
@@ -32,7 +31,7 @@ PRIMIS = "windowstarget/receives_imprimis.png"
 EDUCATION = "windowstarget/education.png"
 LOAD_OPT_OUT_WAIT = "windowstarget/wait_for_load_opt_out.png"
 LOAD_OWNER_WAIT = "windowstarget/wait_for_load_owner.png"
-DELAY = 0.1
+DELAY = 0.05
 MAX_ATTEMPTS = round(1.25 / (DELAY * 5))
 x_scale = 1
 y_scale = 1
@@ -65,13 +64,13 @@ def find_and_click_image_with_search(image_filename, biasx, biasy, up_or_down):
                 round(cutOffBottomY * 2 * y_scale),  # theocratically this works
             ),
         )
-        time.sleep(DELAY * 5)
+        time.sleep(DELAY * 10)
         if box is None:
-            factor = -30
+            factor = -14
             if up_or_down == "up":
-                factor = 30
+                factor = 14
             pyautogui.scroll(factor)
-            time.sleep(DELAY * 5)
+            time.sleep(DELAY * 2)
 
     x, y, width, height = box
     x = box.left + width / 2 + biasx
@@ -121,6 +120,8 @@ def find_and_click_image(image_filename):
     box = None
 
     print("Searching for image: " + image_filename)
+    if (image_filename == "windowstarget/source_file_tab_down.png"):
+        CONFIDENCE = .8
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
@@ -231,10 +232,11 @@ def interactions_section(num):
         for i in range(2, num+1):
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
+            find_and_click_image(LOAD_OWNER_WAIT)
             decline()
     # time.sleep(2)
-    find_and_click_image("windowstarget/primary_email.png")
-    find_and_click_image_with_search("windowstarget/personal_info.png", 0, 0, "up")
+    find_and_click_image_with_search("windowstarget/primary_email.png", 0, 0, "up")
+    find_and_click_image("windowstarget/personal_info.png")
     find_and_click_image("windowstarget/marked_deceased.png")
 
 
@@ -254,6 +256,7 @@ def confirm():
     # keyboard.write("Note: Confirmed - " + initials)
     # keyboard.press("ctrl+v")
     # found_text = pyperclip.paste()
+    time.sleep(DELAY)
     found_text = extract_text_from_coordinates(601, 600, 1277, 726)
     if (
         (
@@ -301,6 +304,7 @@ def decline():
     # time.sleep(0.1)
     # keyboard.press_and_release("command+C")
     # found_text = pyperclip.paste()
+    time.sleep(DELAY)
     found_text = extract_text_from_coordinates(601, 600, 1277, 726)
     if (
         (
@@ -370,7 +374,10 @@ def opt_out_form():
     pyautogui.press("tab")
     keyboard.write(full_date)
     find_and_click_image("windowstarget/source_file_tab_down.png")
+    # tab_command(3,0)
+    # keyboard.write("Deceased")
     find_and_click_image("windowstarget/double_deceased.png")
+    # tab_command(5,0)
     pyautogui.press("enter")
 
 
@@ -387,7 +394,6 @@ def cutoff_section_of_screen(image_filename):
     # find the top y coordinate of the image on the screen
     global DELAY, MAX_ATTEMPTS, x_scale, y_scale, CONFIDENCE
     box = None
-
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
@@ -432,8 +438,6 @@ def main():
 
         end_time_recording(start_time)
         find_and_click_image("windowstarget/primary_email.png")  # TODO find a way to remove
-
-
 
 if __name__ == "__main__":
     main()

@@ -20,6 +20,7 @@ python main.py
 
 
 - Python 3.x, download with PATH and not admin.
+- <https://github.com/UB-Mannheim/tesseract/wiki>
 - Install pyperclip, keyboard, pyautogui, pytesseract, opencv-python, tesseract
 
 If you get 'TypeError: '<' not supported between instances of 'str' and 'int' when running pyautogui, use this link to fix it: <https://stackoverflow.com/questions/76361049/how-to-fix-typeerror-not-supported-between-instances-of-str-and-int-wh/76383784#76383784>

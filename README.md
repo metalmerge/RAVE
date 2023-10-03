@@ -16,7 +16,7 @@ cd RAVE-main
 
 pip install pyperclip keyboard pyautogui pytesseract opencv-python tesseract
 
-python main.py
+python windows_main.py
 
 
 - Python 3.x, download with PATH and not admin.

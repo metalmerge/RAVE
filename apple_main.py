@@ -237,8 +237,8 @@ def interactions_section(num):
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
             decline()
-    find_and_click_image(PRIMIS)
-    find_and_click_image_with_search("appletarget/personal_info.png", 0, 0, "up")
+    find_and_click_image_with_search(PRIMIS, 0, 0, "up")
+    find_and_click_image("appletarget/personal_info.png")
     find_and_click_image("appletarget/marked_deceased.png")
 
 

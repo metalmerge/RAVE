@@ -150,7 +150,10 @@ def find_and_click_image(image_filename):
 
 
 def extract_text_from_coordinates(x1, y1, x2, y2):
-    pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
+    # pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
+    pytesseract.pytesseract.tesseract_cmd = (
+        "C:/Program Files/Tesseract-OCR/tesseract.exe"
+    )
     screenshot = pyautogui.screenshot()
     textbox_image = screenshot.crop((x1, y1, x2, y2))
     extracted_text = pytesseract.image_to_string(textbox_image)
@@ -254,7 +257,7 @@ def confirm():
     find_and_click_image("windowstarget/wait_for_complete.png")
     tab_command(9, 0)
     keyboard.write(full_date)
-    pyperclip.copy("")
+    # pyperclip.copy("")
     tab_command(3, 0)
     # keyboard.press("ctrl+a")
     # time.sleep(0.2)
@@ -262,37 +265,35 @@ def confirm():
     # keyboard.write("Note: Confirmed - " + initials)
     # keyboard.press("ctrl+v")
     # found_text = pyperclip.paste()
-    # print(found_text)
-    # if (
-    #     (
-    #         extract_digits_from_text(found_text) != ""
-    #         or "year" in found_text
-    #         or "month" in found_text
-    #         or "January" in found_text
-    #         or "February" in found_text
-    #         or "March" in found_text
-    #         or "April" in found_text
-    #         or "May" in found_text
-    #         or "June" in found_text
-    #         or "July" in found_text
-    #         or "August" in found_text
-    #         or "September" in found_text
-    #         or "October" in found_text
-    #         or "November" in found_text
-    #         or "December" in found_text
-    #     )
-    #     and "id=" not in found_text
-    #     and "batch" not in found_text
-    # ):
-    #     noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
-    #     find_and_click_image("windowstarget/sites.png")
-    # if is_text_empty(found_text) == False:
-    #     pyautogui.press("down")
-    #     pyautogui.press("enter")
-    #     pyautogui.press("enter")
-    pyautogui.press("down")
-    pyautogui.press("enter")
-    pyautogui.press("enter")
+    found_text = extract_text_from_coordinates(1190, 500, 1275, 527)
+    print(found_text)
+    if (
+        (
+            extract_digits_from_text(found_text) != ""
+            or "year" in found_text
+            or "month" in found_text
+            or "January" in found_text
+            or "February" in found_text
+            or "March" in found_text
+            or "April" in found_text
+            or "May" in found_text
+            or "June" in found_text
+            or "July" in found_text
+            or "August" in found_text
+            or "September" in found_text
+            or "October" in found_text
+            or "November" in found_text
+            or "December" in found_text
+        )
+        and "id=" not in found_text
+        and "batch" not in found_text
+    ):
+        noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
+        find_and_click_image("windowstarget/sites.png")
+    if is_text_empty(found_text) == False:
+        pyautogui.press("down")
+        pyautogui.press("enter")
+        pyautogui.press("enter")
     keyboard.write("Note: Not Researched - " + initials)
     tab_command(2, 0)
     pyautogui.press("enter")
@@ -304,12 +305,13 @@ def decline():
     find_and_click_image("windowstarget/declined.png")
     tab_command(7, 0)
     keyboard.write(full_date)
-    pyperclip.copy("")
+    # pyperclip.copy("")
     tab_command(3, 0)
-    keyboard.press("command+A")
-    time.sleep(0.1)
-    keyboard.press_and_release("command+C")
-    found_text = pyperclip.paste()
+    # keyboard.press("command+A")
+    # time.sleep(0.1)
+    # keyboard.press_and_release("command+C")
+    # found_text = pyperclip.paste()
+    found_text = extract_text_from_coordinates(1190, 500, 1275, 527)
     if (
         (
             extract_digits_from_text(found_text) != ""
@@ -432,8 +434,7 @@ def main():
         start_time = time.time()
 
         get_to_dead_page()
-        # num = interactions_num_finder()
-        num = 1
+        num = interactions_num_finder()
         interactions_section(num)
         deceased_form()
         move_to_communications()

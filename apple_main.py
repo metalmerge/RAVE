@@ -51,7 +51,6 @@ MAX_ATTEMPTS = round(1.25 / (delay * 5))
 def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     box = None
     attempts = 0
-
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
@@ -69,23 +68,21 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             os.system(
                 f'osascript -e \'display notification "Could not find image {image_filename}" with title "Error" sound name "Glass"\''
             )
-
         if box is None and up_or_down is not None:
             pyautogui.press(up_or_down)
             pyautogui.press(up_or_down)
             pyautogui.press(up_or_down)
             time.sleep(delay * 5)
-
     x, y, width, height = box
     x = box.left / 2 + width / 4 + biasx
     y = box.top / 2 + height / 4 + biasy
 
-    if (
-        image_filename != PRIMIS
-        and image_filename != EDUCATION
-        and image_filename != LOAD_OPT_OUT_WAIT
-        and image_filename != LOAD_OWNER_WAIT
-    ):
+    if image_filename not in [
+        PRIMIS,
+        EDUCATION,
+        LOAD_OPT_OUT_WAIT,
+        LOAD_OWNER_WAIT,
+    ]:
         cord_click((x, y))
 
 
@@ -115,15 +112,14 @@ def extract_digits_from_text(text):
 def is_text_empty(text):
     if text is None or len(text.strip()) == 0:
         return True
-    else:
-        return False
+    return False
 
 
 def get_to_dead_page():
     global COM_NUM
     find_and_click_image("appletarget/constituents.png")
     find_and_click_image("appletarget/updates.png")
-    if COM_NUM == 2:  # untested
+    if COM_NUM == 2:  # TODO untested
         find_and_click_image("appletarget/third_page.png")
     if COM_NUM == 3:
         find_and_click_image("appletarget/fifth_page.png")
@@ -279,7 +275,7 @@ def end_time_recording(start_time):
     global FULL_DATE
     end_time = time.time()
     duration = end_time - start_time
-    log_file = "program_log.txt"
+    log_file = "apple_program_log.txt"
     with open(log_file, "a") as f:
         f.write(f"{duration:.2f}\n")
 

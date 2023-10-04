@@ -275,7 +275,7 @@ def end_time_recording(start_time):
     global FULL_DATE
     end_time = time.time()
     duration = end_time - start_time
-    log_file = "apple_program_log.txt"
+    log_file = "time_logs/apple_program_log.txt"
     with open(log_file, "a") as f:
         f.write(f"{duration:.2f}\n")
 

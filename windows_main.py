@@ -43,8 +43,12 @@ LOAD_OWNER_WAIT = "windowstarget/wait_for_load_owner.png"
 PRIMARY_EMAIL = "windowstarget/primary_email.png"
 MAX_ATTEMPTS = round(1.25 / (delay * 5))
 CURRENT_DATE = datetime.now()
-FORMATTED_DATE = CURRENT_DATE.strftime("%m/%Y")
-FULL_DATE = CURRENT_DATE.strftime("%m/%d/%Y")
+formatted_month = str(CURRENT_DATE.month)
+formatted_year = str(CURRENT_DATE.year)
+formatted_day = str(CURRENT_DATE.day)
+
+FORMATTED_DATE = f"{formatted_month}/{formatted_year}"
+FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 
 
 def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
@@ -69,7 +73,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         time.sleep(delay * 5)
 
         if box is None and up_or_down:
-            factor = -14 if up_or_down == "up" else 14
+            factor = 14 if up_or_down == "up" else -14
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
 
@@ -306,9 +310,13 @@ def opt_out_form():
         pyautogui.press("backspace")
     keyboard.write("Opt-out")
     find_and_click_image("windowstarget/opt_out.png")
+    time.sleep(delay)
     pyautogui.press("tab")
     keyboard.write(FULL_DATE)
-    find_and_click_image("windowstarget/source_file_tab_down.png")
+    time.sleep(delay)
+    tab_command(3, 0)
+    # find_and_click_image("windowstarget/source_file_tab_down.png")
+    keyboard.write("Deceased")
     find_and_click_image("windowstarget/double_deceased.png")
     pyautogui.press("enter")
 
@@ -317,7 +325,7 @@ def end_time_recording(start_time):
     global FULL_DATE
     end_time = time.time()
     duration = end_time - start_time
-    log_file = "program_log.txt"
+    log_file = "windows_program_log.txt"
     with open(log_file, "a") as f:
         f.write(f"{duration:.2f}\n")
 
@@ -371,7 +379,6 @@ def main():
 
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)  # TODO find a way to remove
-        time.sleep(2)
 
 
 if __name__ == "__main__":

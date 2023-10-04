@@ -125,11 +125,14 @@ def is_text_empty(text):
 def get_to_dead_page():
     global COM_NUM
     find_and_click_image("windowstarget/constituents.png")
+    time.sleep(delay)
     find_and_click_image("windowstarget/updates.png")
-    if COM_NUM == 2:  # untested
+    if COM_NUM == 2:
         find_and_click_image("windowstarget/third_page.png")
+        time.sleep(delay * 10)
     if COM_NUM == 3:
         find_and_click_image("windowstarget/fifth_page.png")
+        time.sleep(delay * 10)
     find_and_click_image("windowstarget/name.png", 0, round(25 * y_scale))
 
 
@@ -356,7 +359,7 @@ def main():
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time -1 to quit",
         title="Enter Initials, which computer number this is, and delay time -1 to quit",
-        default="DE, 1, 0.1",
+        default="DE, 1, 0.05",
     )
     initials, computer_number, delay = input_str.strip().split(",")
     screen_width, screen_height = pyautogui.size()

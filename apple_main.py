@@ -119,7 +119,7 @@ def get_to_dead_page():
     global COM_NUM
     find_and_click_image("appletarget/constituents.png")
     find_and_click_image("appletarget/updates.png")
-    if COM_NUM == 2:  # TODO untested
+    if COM_NUM == 2:
         find_and_click_image("appletarget/third_page.png")
     if COM_NUM == 3:
         find_and_click_image("appletarget/fifth_page.png")
@@ -311,7 +311,7 @@ def main():
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time -1 to quit",
         title="Enter Initials, which computer number this is, and delay time -1 to quit",
-        default="DE, 1, 0.1",
+        default="DE, 1, 0.01",
     )
     initials, computer_number, delay = input_str.strip().split(",")
     screen_width, screen_height = pyautogui.size()

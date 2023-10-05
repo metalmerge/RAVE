@@ -8,6 +8,13 @@ import pyautogui
 import pytesseract
 import os
 
+from main_shared_functions import (
+    extract_text_from_coordinates,
+    cord_click,
+    tab_command,
+    extract_digits_from_text,
+)
+
 # Interactions: 2 = 79.14 bot; 75.66 no copy pasting, experienced, fast as possible human
 # Interactions: 1 = 50.66 bot; 51.08 no copy pasting, experienced, fast as possible human
 
@@ -79,34 +86,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         LOAD_OWNER_WAIT,
     ]:
         cord_click((x, y))
-
-
-def extract_text_from_coordinates(x1, y1, x2, y2):
-    pytesseract.pytesseract.tesseract_cmd = "/usr/local/bin/tesseract"
-    screenshot = pyautogui.screenshot()
-    textbox_image = screenshot.crop((x1, y1, x2, y2))
-    extracted_text = pytesseract.image_to_string(textbox_image)
-    return extracted_text.strip()
-
-
-def cord_click(cords):
-    pyautogui.moveTo(cords[0], cords[1])
-    pyautogui.click()
-
-
-def tab_command(number_of_interactions):
-    for _ in range(0, number_of_interactions):
-        pyautogui.press("tab")
-
-
-def extract_digits_from_text(text):
-    return "".join(filter(str.isdigit, text))
-
-
-def is_text_empty(text):
-    if text is None or len(text.strip()) == 0:
-        return True
-    return False
 
 
 def get_to_dead_page():

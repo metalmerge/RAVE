@@ -22,13 +22,11 @@ Before using RAVE, make sure you have the following prerequisites installed:
 
 2. Navigate to the RAVE directory:
 
-3. Run the this command if on an apple computer:
+3. Run the this one of these two commands depending on your computer:
 
    ```bash
    python3 apple_main.py
    ```
-
-3.5. Run the this command if on an apple computer:
 
    ```bash
    python windows_main.py

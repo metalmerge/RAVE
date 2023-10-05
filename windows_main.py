@@ -102,7 +102,8 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         PRIMARY_EMAIL,
         LOAD_OPT_OUT_WAIT,
         LOAD_OWNER_WAIT,
-        "windowstarget/personal_info_wait.png"
+        "windowstarget/personal_info_wait.png",
+        "windowstarget/source_wait.png",
     ]:
         # Call 'cord_click' function with the adjusted coordinates
         cord_click((x, y))
@@ -206,7 +207,6 @@ def process_application(is_confirmed=True):
         find_and_click_image("windowstarget/tab_down_complete.png")
         find_and_click_image("windowstarget/completed_form.png")
         find_and_click_image("windowstarget/wait_for_complete.png")
-        pyautogui.press("tab")
     else:
         find_and_click_image("windowstarget/tab_down_complete.png")
         find_and_click_image("windowstarget/declined.png")
@@ -300,7 +300,7 @@ def opt_out_form():
 
     # Click on "imprimis_three" and "imprimis_done"
     find_and_click_image("windowstarget/imprimis_three.png")
-    time.sleep(.1)
+    find_and_click_image("windowstarget/source_wait.png")
     find_and_click_image("windowstarget/opt_out_tab_down.png")
 
     # Click on "opt_out" and enter the FULL_DATE

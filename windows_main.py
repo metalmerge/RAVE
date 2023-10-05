@@ -167,73 +167,33 @@ def click_on_top_interaction(num):
 
 
 def interactions_section(num):
-    global PRIMIS, LOAD_OWNER_WAIT, PRIMARY_EMAIL
+    global LOAD_OWNER_WAIT, PRIMARY_EMAIL
     find_and_click_image("windowstarget/interactions.png")
     click_on_top_interaction(1)
-    confirm()
+    process_application()
     if num > 1:
         for i in range(2, num + 1):
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
             find_and_click_image(LOAD_OWNER_WAIT)
-            decline()
+            process_application(False)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "up")
     find_and_click_image("windowstarget/personal_info.png")
     find_and_click_image("windowstarget/marked_deceased.png")
 
 
-def confirm():
-    global noted_date, initials, FULL_DATE
-    find_and_click_image("windowstarget/tab_down_complete.png")
-    find_and_click_image("windowstarget/completed_form.png")
-    find_and_click_image("windowstarget/wait_for_complete.png")
-    tab_command(9)
-    keyboard.write(FULL_DATE)
-    tab_command(3)
-    pyperclip.copy("")
-    keyboard.press_and_release("ctrl+a")
-    keyboard.press_and_release("ctrl+c")
-    time.sleep(0.1)
-    found_text = pyperclip.paste()
-    if (
-        (
-            extract_digits_from_text(found_text) != ""
-            or "year" in found_text
-            or "month" in found_text
-            or "January" in found_text
-            or "February" in found_text
-            or "March" in found_text
-            or "April" in found_text
-            or "May" in found_text
-            or "June" in found_text
-            or "July" in found_text
-            or "August" in found_text
-            or "September" in found_text
-            or "October" in found_text
-            or "November" in found_text
-            or "December" in found_text
-        )
-        and "id=" not in found_text
-        and "batch" not in found_text
-    ):
-        noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
-        find_and_click_image("windowstarget/sites.png")
-        tab_command(2)
-    if is_text_empty(found_text) is False:
-        pyautogui.press("down")
-        pyautogui.press("enter")
-        pyautogui.press("enter")
-    keyboard.write("Note: Not Researched - " + initials)
-    tab_command(2)
-    pyautogui.press("enter")
-
-
-def decline():
-    global initials, CRM_cords, noted_date
-    find_and_click_image("windowstarget/tab_down_complete.png")
-    find_and_click_image("windowstarget/declined.png")
-    find_and_click_image("windowstarget/wait_for_declined.png")
-    tab_command(8)
+def process_application(is_confirmed=True):
+    global PRIMIS, LOAD_OWNER_WAIT, PRIMARY_EMAIL, initials, noted_date, FULL_DATE
+    if is_confirmed:
+        find_and_click_image("windowstarget/tab_down_complete.png")
+        find_and_click_image("windowstarget/completed_form.png")
+        find_and_click_image("windowstarget/wait_for_complete.png")
+        tab_command(9)
+    else:
+        find_and_click_image("windowstarget/tab_down_complete.png")
+        find_and_click_image("windowstarget/declined.png")
+        find_and_click_image("windowstarget/wait_for_declined.png")
+        tab_command(8)
     keyboard.write(FULL_DATE)
     tab_command(3)
     pyperclip.copy("")
@@ -268,7 +228,10 @@ def decline():
     pyautogui.press("down")
     pyautogui.press("enter")
     pyautogui.press("enter")
-    keyboard.write("Note: Duplicate - " + initials)
+    if is_confirmed:
+        keyboard.write("Note: Not Researched - " + initials)
+    else:
+        keyboard.write("Note: Duplicate - " + initials)
     tab_command(2)
     pyautogui.press("enter")
 

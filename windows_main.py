@@ -113,14 +113,14 @@ def is_text_empty(text):
 def get_to_dead_page():
     global COM_NUM, delay
     find_and_click_image("windowstarget/constituents.png")
-    time.sleep(delay)
+    time.sleep(0.05 + delay)
     find_and_click_image("windowstarget/updates.png")
     if COM_NUM == 2:
         find_and_click_image("windowstarget/third_page.png")
-        time.sleep(delay * 20)
+        time.sleep(1 + delay * 5)
     if COM_NUM == 3:
         find_and_click_image("windowstarget/fifth_page.png")
-        time.sleep(delay * 20)
+        time.sleep(1 + delay * 5)
     find_and_click_image("windowstarget/name.png", 0, round(25 * y_scale))
 
 
@@ -191,7 +191,7 @@ def process_application(is_confirmed=True):
     pyperclip.copy("")
     keyboard.press_and_release("ctrl+a")
     keyboard.press_and_release("ctrl+c")
-    time.sleep(0.1)
+    time.sleep(0.05+delay)
     found_text = pyperclip.paste()
     if (
         (
@@ -261,10 +261,8 @@ def opt_out_form():
         pyautogui.press("backspace")
     keyboard.write("Opt-out")
     find_and_click_image("windowstarget/opt_out.png")
-    time.sleep(delay)
     pyautogui.press("tab")
     keyboard.write(FULL_DATE)
-    time.sleep(delay)
     tab_command(3)
     keyboard.write("Deceased")
     find_and_click_image("windowstarget/double_deceased.png")

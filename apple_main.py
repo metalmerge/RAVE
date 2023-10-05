@@ -14,16 +14,11 @@ import os
 # TODO
 # Protential improvements:
 #   - Find a better way to know the number of interactions than using extract_text_from_coordinates
-#   - Working sound notification for macOS and Windows
 #   - Use mss to take screenshots instead of pyautogui
 #   - Find workaround to recieves imprints and waits
-#   - Figure out how to extract the date from the comments
 
 # original_x_scale = 1440 / 2880
 # original_y_scale = 900 / 1800
-# make sure commands and control are accounted for based on type of computer
-
-# TODO rework readme
 
 initials = "DE"
 noted_date = "1/"
@@ -91,7 +86,6 @@ def extract_text_from_coordinates(x1, y1, x2, y2):
     screenshot = pyautogui.screenshot()
     textbox_image = screenshot.crop((x1, y1, x2, y2))
     extracted_text = pytesseract.image_to_string(textbox_image)
-    # print(extracted_text.strip())
     return extracted_text.strip()
 
 
@@ -138,7 +132,6 @@ def interactions_num_finder():
                 round(1400 * y_scale),
             )
             if pretext in text:
-                # Extract the number following "Interactions:"
                 num_index = text.index(pretext) + len(pretext)
                 num_text = text[num_index:].strip()
                 number_of_interactions = int(extract_digits_from_text(num_text))
@@ -166,7 +159,7 @@ def interactions_section(number_of_interactions):
     find_and_click_image("appletarget/interactions.png")
     click_on_top_interaction(1)
     process_application()
-    if number_of_interactions > 1:  # untested
+    if number_of_interactions > 1:
         for i in range(2, number_of_interactions):
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
@@ -248,7 +241,7 @@ def deceased_form():
 def move_to_communications():
     global PRIMIS
     find_and_click_image("appletarget/constitute.png")
-    find_and_click_image(PRIMIS)  # TODO find a way to remove
+    find_and_click_image(PRIMIS)
     find_and_click_image("appletarget/communications.png")
     find_and_click_image("appletarget/add.png", 0, 0, "down")
 
@@ -291,7 +284,6 @@ def cutoff_section_of_screen(image_filename):
             region=(0, 0, round(2880 * x_scale), round(1800 * y_scale)),
         )
         time.sleep(delay * 5)
-        # print("Searching for image: " + image_filename)
         attempts += 1
         if attempts >= MAX_ATTEMPTS:
             os.system(
@@ -334,7 +326,7 @@ def main():
         opt_out_form()
 
         end_time_recording(start_time)
-        find_and_click_image(EDUCATION)  # TODO find a way to remove
+        find_and_click_image(EDUCATION)
 
 
 if __name__ == "__main__":

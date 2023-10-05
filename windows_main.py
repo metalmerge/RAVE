@@ -159,10 +159,12 @@ def interactions_num_finder():
 
 def click_on_top_interaction(number_of_interactions):
     # Click on the top interaction based on the number of interactions
+    time.sleep(.5)
+    find_and_click_image(PRIMIS)
     find_and_click_image(
         "windowstarget/status_alone.png",
         0,
-        round(number_of_interactions * 30 * y_scale),
+        round(number_of_interactions * 30),
         "down",
     )
     find_and_click_image("windowstarget/edit_interaction.png", 0, 0, "down")
@@ -190,8 +192,9 @@ def interactions_section(number_of_interactions):
             process_application(False)
 
     # Click on the "PRIMARY_EMAIL" image and other actions
-    find_and_click_image(PRIMARY_EMAIL, 0, 0, "up")
+    find_and_click_image(PRIMARY_EMAIL, 0, 0, None if number_of_interactions == 1 else "up")
     find_and_click_image("windowstarget/personal_info.png")
+    time.sleep(.25)
     find_and_click_image("windowstarget/marked_deceased.png")
 
 
@@ -208,6 +211,7 @@ def process_application(is_confirmed=True):
         find_and_click_image("windowstarget/tab_down_complete.png")
         find_and_click_image("windowstarget/declined.png")
         find_and_click_image("windowstarget/wait_for_declined.png")
+        time.sleep(.05)
 
     tab_command(8)
     keyboard.write(FULL_DATE)
@@ -281,6 +285,7 @@ def move_to_communications():
     # Click on "constitute," PRIMIS, communications, and add
     find_and_click_image("windowstarget/constitute.png")
     find_and_click_image(PRIMIS)
+    time.sleep(.05)
     find_and_click_image("windowstarget/communications.png")
     find_and_click_image("windowstarget/add.png")
 

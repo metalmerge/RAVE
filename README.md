@@ -1,32 +1,46 @@
-# RAVE
+# RAVE - Repetitive Automation Via Efficiency
 
-Repetitive Automation Via Efficiency
-
-This script automates repetitive tasks on a website using keyboard and mouse control. It is designed to streamline the process of editing data objects in Blackbaud CRM. Please use this script responsibly and ensure that you comply with the terms of use and ethical considerations of the website.
+RAVE is a Python script designed to automate repetitive tasks on a website by simulating keyboard and mouse actions. This script is specifically tailored to streamline the process of editing data objects in Blackbaud CRM. Please use this script responsibly and ensure that you comply with the terms of use and ethical considerations of the website you are interacting with.
 
 ## Requirements
 
-<https://www.python.org/downloads/>
+Before using RAVE, make sure you have the following prerequisites installed:
 
-cd Downloads
+1. **Python 3.x**: Download and install Python 3.x. Make sure it's added to your PATH and not installed with administrative privileges. You can download Python from [Python.org](https://www.python.org/downloads/).
 
-cd RAVE-main
+2. **Tesseract OCR**: RAVE uses Tesseract OCR for text recognition. You can find installation instructions for your operating system on the [Tesseract GitHub Wiki](https://github.com/UB-Mannheim/tesseract/wiki).
 
-cd RAVE-main
+3. **Python Libraries**: Install the necessary Python libraries by running the following commands in your terminal or command prompt:
 
-pip install pyperclip keyboard pyautogui pytesseract opencv-python tesseract
+   ```bash
+   pip install pyperclip keyboard pyautogui pytesseract opencv-python-headless
+   ```
 
-python main.py
+## Usage
 
+1. Clone or download the RAVE repository to your local machine.
 
-- Python 3.x, download with PATH and not admin.
-- <https://github.com/UB-Mannheim/tesseract/wiki>
-- Install pyperclip, keyboard, pyautogui, pytesseract, opencv-python, tesseract
+2. Navigate to the RAVE directory:
 
-If you get 'TypeError: '<' not supported between instances of 'str' and 'int' when running pyautogui, use this link to fix it: <https://stackoverflow.com/questions/76361049/how-to-fix-typeerror-not-supported-between-instances-of-str-and-int-wh/76383784#76383784>
+3. Run the this command if on an apple computer:
 
-## Aknowledgements
+   ```bash
+   python3 apple_main.py
+   ```
 
-Special Thanks to Coding 101 with Steve and Indently for the informative videos on Pyautogui
-<https://www.youtube.com/watch?v=qIJpBz6R2Uw>
-<https://www.youtube.com/watch?v=cZQDO0ktnrw>
+3.5. Run the this command if on an apple computer:
+
+   ```bash
+   python windows_main.py
+   ```
+
+## Troubleshooting
+
+- If you encounter a 'TypeError: `<' not supported between instances of 'str' and 'int''` error when running pyautogui, you can find a solution [here](https://stackoverflow.com/questions/76361049/how-to-fix-typeerror-not-supported-between-instances-of-str-and-int-wh/76383784#76383784).
+
+## Acknowledgments
+
+Special thanks to Coding 101 with Steve and Indently for their informative videos on Pyautogui:
+
+- [Coding 101 with Steve](https://www.youtube.com/watch?v=qIJpBz6R2Uw)
+- [Indently](https://www.youtube.com/watch?v=cZQDO0ktnrw)

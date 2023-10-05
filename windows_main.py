@@ -301,8 +301,8 @@ def opt_out_form():
 
     # Click on "imprimis_three" and "imprimis_done"
     find_and_click_image("windowstarget/imprimis_three.png")
-    find_and_click_image("windowstarget/imprimis_done.png")
-    time.sleep(.05)
+    time.sleep(.1)
+    find_and_click_image("windowstarget/opt_out_tab_down.png")
 
     # Click on "opt_out" and enter the FULL_DATE
     find_and_click_image("windowstarget/opt_out.png")

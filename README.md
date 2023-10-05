@@ -8,7 +8,7 @@ Before using RAVE, make sure you have the following prerequisites installed:
 
 1. **Python 3.x**: Download and install Python 3.x. Make sure it's added to your PATH and not installed with administrative privileges. You can download Python from [Python.org](https://www.python.org/downloads/).
 
-2. **Tesseract OCR**: RAVE uses Tesseract OCR for text recognition. You can find installation instructions for your operating system on the [Tesseract GitHub Wiki](https://github.com/UB-Mannheim/tesseract/wiki).
+2. **Tesseract OCR**: RAVE uses Tesseract OCR for text recognition. If you are having trouble with Tesseract, you can download it directly at the [Tesseract GitHub Wiki](https://github.com/UB-Mannheim/tesseract/wiki).
 
 3. **Python Libraries**: Install the necessary Python libraries by running the following commands in your terminal or command prompt:
 
@@ -22,7 +22,7 @@ Before using RAVE, make sure you have the following prerequisites installed:
 
 2. Navigate to the RAVE directory:
 
-3. Run the this one of these two commands depending on your computer:
+3. Run one of these two commands depending on your computer:
 
    ```bash
    python3 apple_main.py

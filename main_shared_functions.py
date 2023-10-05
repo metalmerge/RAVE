@@ -3,8 +3,8 @@ import pytesseract
 
 
 def extract_text_from_coordinates(x1, y1, x2, y2):
-    # Path to the Tesseract executable
-    path_to_tesseract = r"C:\Users\dermakov\Downloads\RAVE-main\RAVE-main\tesseract.exe"
+    # Path to the Tesseract executable, may need to use path to the .exe file depending on the operating system
+    # path_to_tesseract = "tesseract.exe"
 
     # Capture the current screen as a screenshot
     screenshot = pyautogui.screenshot()

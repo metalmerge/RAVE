@@ -105,9 +105,8 @@ def cord_click(cords):
     pyautogui.click()
 
 
-def tab_command(num, delay):
+def tab_command(num):
     for _ in range(0, num):
-        time.sleep(delay)
         pyautogui.press("tab")
 
 
@@ -188,9 +187,9 @@ def confirm():
     find_and_click_image("windowstarget/tab_down_complete.png")
     find_and_click_image("windowstarget/completed_form.png")
     find_and_click_image("windowstarget/wait_for_complete.png")
-    tab_command(9, 0)
+    tab_command(9)
     keyboard.write(FULL_DATE)
-    tab_command(3, 0)
+    tab_command(3)
     pyperclip.copy("")
     keyboard.press_and_release("ctrl+a")
     keyboard.press_and_release("ctrl+c")
@@ -219,13 +218,13 @@ def confirm():
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         find_and_click_image("windowstarget/sites.png")
-        tab_command(2, 0)
+        tab_command(2)
     if is_text_empty(found_text) is False:
         pyautogui.press("down")
         pyautogui.press("enter")
         pyautogui.press("enter")
     keyboard.write("Note: Not Researched - " + initials)
-    tab_command(2, 0)
+    tab_command(2)
     pyautogui.press("enter")
 
 
@@ -234,9 +233,9 @@ def decline():
     find_and_click_image("windowstarget/tab_down_complete.png")
     find_and_click_image("windowstarget/declined.png")
     find_and_click_image("windowstarget/wait_for_declined.png")
-    tab_command(8, 0)
+    tab_command(8)
     keyboard.write(FULL_DATE)
-    tab_command(3, 0)
+    tab_command(3)
     pyperclip.copy("")
     keyboard.press_and_release("ctrl+a")
     keyboard.press_and_release("ctrl+c")
@@ -265,12 +264,12 @@ def decline():
     ):
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
         find_and_click_image("windowstarget/sites.png")
-        tab_command(2, 0)
+        tab_command(2)
     pyautogui.press("down")
     pyautogui.press("enter")
     pyautogui.press("enter")
     keyboard.write("Note: Duplicate - " + initials)
-    tab_command(2, 0)
+    tab_command(2)
     pyautogui.press("enter")
 
 
@@ -290,7 +289,7 @@ def deceased_form():
 def move_to_communications():
     global PRIMIS
     find_and_click_image("windowstarget/constitute.png")
-    find_and_click_image(PRIMIS)  # TODO find a way to remove
+    find_and_click_image(PRIMIS)
     find_and_click_image("windowstarget/communications.png")
     find_and_click_image("windowstarget/add.png")
 
@@ -311,8 +310,7 @@ def opt_out_form():
     pyautogui.press("tab")
     keyboard.write(FULL_DATE)
     time.sleep(delay)
-    tab_command(3, 0)
-    # find_and_click_image("windowstarget/source_file_tab_down.png")
+    tab_command(3)
     keyboard.write("Deceased")
     find_and_click_image("windowstarget/double_deceased.png")
     pyautogui.press("enter")
@@ -365,19 +363,15 @@ def main():
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowstarget/blackbaud_CRM.png")
 
     while initials != "-1":
-        confirm()
-        # start_time = time.time()
-        # get_to_dead_page()
-        # num = interactions_num_finder()
-
-        # interactions_section(num)
-        # deceased_form()
-        # move_to_communications()
-        # opt_out_form()
-
-        # end_time_recording(start_time)
-        # find_and_click_image(PRIMARY_EMAIL)  # TODO find a way to remove
-        break
+        start_time = time.time()
+        get_to_dead_page()
+        num = interactions_num_finder()
+        interactions_section(num)
+        deceased_form()
+        move_to_communications()
+        opt_out_form()
+        end_time_recording(start_time)
+        find_and_click_image(PRIMARY_EMAIL)
 
 
 if __name__ == "__main__":

@@ -1,6 +1,6 @@
 # RAVE - Repetitive Automation Via Efficiency
 
-RAVE is a Python script designed to automate repetitive tasks on a website by simulating keyboard and mouse actions. This script is specifically tailored to streamline the process of editing data objects in Blackbaud CRM. Please use this script responsibly and ensure that you comply with the terms of use and ethical considerations of the website you are interacting with.
+RAVE is a Python script designed to automate a specfic repetitive task on Blackbaud CRM by simulating keyboard and mouse actions. Completed 10/4/2023.
 
 ## Requirements
 

@@ -13,15 +13,11 @@ from pytesseract import pytesseract
 # TODO
 # Protential improvements:
 #   - Find a better way to know the number of interactions than using extract_text_from_coordinates
-#   - Working sound notification for macOS and Windows
 #   - Use mss to take screenshots instead of pyautogui
 #   - Find workaround to recieves imprints and waits
-#   - Figure out how to extract the date from the comments
-#   - Figure out how to use the copy paste for confirm and decline
 
 # original_x_scale = 1440 / 2880
 # original_y_scale = 900 / 1800
-# make sure commands and control are accounted for based on type of computer
 
 x_scale = 1
 y_scale = 1
@@ -52,13 +48,10 @@ FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 
 
 def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
-    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL
+    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, PRIMIS, EDUCATION, LOAD_OPT_OUT_WAIT, LOAD_OWNER_WAIT
     box = None
-    print("Searching for image: " + image_filename)
-
     if image_filename == "windowstarget/source_file_tab_down.png":
         confidence = 0.8
-
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
@@ -67,20 +60,17 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
                 0,
                 cutOffTopY,
                 round(2880 * x_scale),
-                round(cutOffBottomY * 2 * y_scale),  # Theoretically this works
+                round(cutOffBottomY * 2 * y_scale),
             ),
         )
         time.sleep(delay * 5)
-
         if box is None and up_or_down:
             factor = 14 if up_or_down == "up" else -14
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
-
     x, y, width, height = box
     x = box.left + width / 2 + biasx
     y = box.top + height / 2 + biasy
-
     if image_filename not in [
         PRIMIS,
         EDUCATION,
@@ -96,17 +86,16 @@ def extract_text_from_coordinates(x1, y1, x2, y2):
     screenshot = pyautogui.screenshot()
     textbox_image = screenshot.crop((x1, y1, x2, y2))
     extracted_text = pytesseract.image_to_string(textbox_image)
-    # print(extracted_text.strip())
     return extracted_text.strip()
 
 
-def cord_click(cords):
-    pyautogui.moveTo(cords[0], cords[1])
+def cord_click(coordinates):
+    pyautogui.moveTo(coordinates[0], coordinates[1])
     pyautogui.click()
 
 
-def tab_command(num):
-    for _ in range(0, num):
+def tab_command(number_of_interactions):
+    for _ in range(0, number_of_interactions):
         pyautogui.press("tab")
 
 
@@ -122,7 +111,7 @@ def is_text_empty(text):
 
 
 def get_to_dead_page():
-    global COM_NUM
+    global COM_NUM, delay
     find_and_click_image("windowstarget/constituents.png")
     time.sleep(delay)
     find_and_click_image("windowstarget/updates.png")
@@ -149,30 +138,33 @@ def interactions_num_finder():
             if pretext in text:
                 num_index = text.index(pretext) + len(pretext)
                 num_text = text[num_index:].strip()
-                num = int(extract_digits_from_text(num_text))
+                number_of_interactions = int(extract_digits_from_text(num_text))
                 break
             else:
                 time.sleep(delay)
                 continue
         except ValueError:
             continue
-    return num
+    return number_of_interactions
 
 
-def click_on_top_interaction(num):
+def click_on_top_interaction(number_of_interactions):
     find_and_click_image(
-        "windowstarget/status_alone.png", 0, round(num * 30 * y_scale), "down"
+        "windowstarget/status_alone.png",
+        0,
+        round(number_of_interactions * 30 * y_scale),
+        "down",
     )
     find_and_click_image("windowstarget/edit_interaction.png", 0, 0, "down")
 
 
-def interactions_section(num):
+def interactions_section(number_of_interactions):
     global LOAD_OWNER_WAIT, PRIMARY_EMAIL
     find_and_click_image("windowstarget/interactions.png")
     click_on_top_interaction(1)
     process_application()
-    if num > 1:
-        for i in range(2, num + 1):
+    if number_of_interactions > 1:
+        for i in range(2, number_of_interactions + 1):
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
             find_and_click_image(LOAD_OWNER_WAIT)
@@ -183,17 +175,17 @@ def interactions_section(num):
 
 
 def process_application(is_confirmed=True):
-    global PRIMIS, LOAD_OWNER_WAIT, PRIMARY_EMAIL, initials, noted_date, FULL_DATE
+    global initials, noted_date, FULL_DATE
     if is_confirmed:
         find_and_click_image("windowstarget/tab_down_complete.png")
         find_and_click_image("windowstarget/completed_form.png")
         find_and_click_image("windowstarget/wait_for_complete.png")
-        tab_command(9)
+        pyautogui.press("tab")
     else:
         find_and_click_image("windowstarget/tab_down_complete.png")
         find_and_click_image("windowstarget/declined.png")
         find_and_click_image("windowstarget/wait_for_declined.png")
-        tab_command(8)
+    tab_command(8)
     keyboard.write(FULL_DATE)
     tab_command(3)
     pyperclip.copy("")
@@ -289,7 +281,6 @@ def end_time_recording(start_time):
 
 
 def cutoff_section_of_screen(image_filename):
-    # find the top y coordinate of the image on the screen
     global delay, MAX_ATTEMPTS, x_scale, y_scale, confidence
     box = None
     while box is None:
@@ -299,13 +290,9 @@ def cutoff_section_of_screen(image_filename):
             region=(0, 0, round(2880 * x_scale), round(1800 * y_scale)),
         )
         time.sleep(delay * 5)
-        print("Searching for image: " + image_filename)
-
     _, y, width, height = box
-
     image_cords_x = (box.left) + width / 2
     image_cords_y = (box.top) + height / 2
-
     return round(y), (image_cords_x, image_cords_y)
 
 
@@ -328,8 +315,8 @@ def main():
     while initials != "-1":
         start_time = time.time()
         get_to_dead_page()
-        num = interactions_num_finder()
-        interactions_section(num)
+        number_of_interactions = interactions_num_finder()
+        interactions_section(number_of_interactions)
         deceased_form()
         move_to_communications()
         opt_out_form()

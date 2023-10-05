@@ -296,16 +296,6 @@ def opt_out_form():
     find_and_click_image("windowstarget/imprimis_three.png")
     find_and_click_image("windowstarget/imprimis_done.png")
 
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-
-    # Delete any existing text in the input field
-    for _ in range(0, 11):
-        pyautogui.press("backspace")
-
-    # Enter "Opt-out"
-    keyboard.write("Opt-out")
-
     # Click on "opt_out" and enter the FULL_DATE
     find_and_click_image("windowstarget/opt_out.png")
     pyautogui.press("tab")

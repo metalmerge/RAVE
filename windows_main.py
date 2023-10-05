@@ -13,6 +13,7 @@ from main_shared_functions import (
     cord_click,
     tab_command,
     extract_digits_from_text,
+    detect_dates
 )
 
 # Interactions: 2 = 79.14 bot; 75.66 no copy pasting, experienced, fast as possible human
@@ -238,7 +239,7 @@ def process_application(is_confirmed=True):
         and "id=" not in found_text
         and "batch" not in found_text
     ):
-        noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
+        noted_date = pyautogui.prompt(text="", title="Noted Date?", default=detect_dates(found_text))
         find_and_click_image("windowstarget/sites.png")
         tab_command(2)
 

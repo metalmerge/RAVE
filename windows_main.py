@@ -129,10 +129,10 @@ def get_to_dead_page():
     find_and_click_image("windowstarget/updates.png")
     if COM_NUM == 2:
         find_and_click_image("windowstarget/third_page.png")
-        time.sleep(delay * 10)
+        time.sleep(delay * 20)
     if COM_NUM == 3:
         find_and_click_image("windowstarget/fifth_page.png")
-        time.sleep(delay * 10)
+        time.sleep(delay * 20)
     find_and_click_image("windowstarget/name.png", 0, round(25 * y_scale))
 
 

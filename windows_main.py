@@ -103,6 +103,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         PRIMARY_EMAIL,
         LOAD_OPT_OUT_WAIT,
         LOAD_OWNER_WAIT,
+        "windowstarget/personal_info_wait.png"
     ]:
         # Call 'cord_click' function with the adjusted coordinates
         cord_click((x, y))
@@ -194,7 +195,7 @@ def interactions_section(number_of_interactions):
     # Click on the "PRIMARY_EMAIL" image and other actions
     find_and_click_image(PRIMARY_EMAIL, 0, 0, None if number_of_interactions == 1 else "up")
     find_and_click_image("windowstarget/personal_info.png")
-    time.sleep(.25)
+    find_and_click_image("windowstarget/personal_info_wait.png")
     find_and_click_image("windowstarget/marked_deceased.png")
 
 
@@ -301,6 +302,7 @@ def opt_out_form():
     # Click on "imprimis_three" and "imprimis_done"
     find_and_click_image("windowstarget/imprimis_three.png")
     find_and_click_image("windowstarget/imprimis_done.png")
+    time.sleep(.05)
 
     # Click on "opt_out" and enter the FULL_DATE
     find_and_click_image("windowstarget/opt_out.png")

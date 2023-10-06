@@ -15,9 +15,6 @@ from main_shared_functions import (
     extract_digits_from_text,
 )
 
-# Interactions: 2 = 79.14 bot; 75.66 no copy pasting, experienced, fast as possible human
-# Interactions: 1 = 33.86 bot; 45.68 human
-
 # TODO
 # Protential improvements:
 #   - Find a better way to know the number of interactions than using extract_text_from_coordinates

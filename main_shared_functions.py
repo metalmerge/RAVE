@@ -2,6 +2,8 @@ import pyautogui
 import pytesseract
 import re
 from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 
 def detect_dates(input_text):
@@ -14,8 +16,6 @@ def detect_dates(input_text):
         r"\d{1,2}-[A-Za-z]{3}-\d{4}",  # DD-Mon-YYYY (e.g., 15-Jan-2023)
         r"\d{1,2} [A-Za-z]{3} \d{4}",  # DD Mon YYYY (e.g., 15 Jan 2023)
         r"[Jj]anuary|[Ff]ebruary|[Mm]arch|[Aa]pril|[Mm]ay|[Jj]une|[Jj]uly|[Aa]ugust|[Ss]eptember|[Oo]ctober|[Nn]ovember|[Dd]ecember",  # Month names
-        r"[Ll]ast [Mm]onth|[Nn]ext [Mm]onth|[Ll]ast [Yy]ear|[Nn]ext [Yy]ear",  # Last/Next month/year
-        r"\d{1,2} [Jj]anuary|\d{1,2} [Ff]ebruary|\d{1,2} [Mm]arch|\d{1,2} [Aa]pril|\d{1,2} [Mm]ay|\d{1,2} [Jj]une|\d{1,2} [Jj]uly|\d{1,2} [Aa]ugust|\d{1,2} [Ss]eptember|\d{1,2} [Oo]ctober|\d{1,2} [Nn]ovember|\d{1,2} [Dd]ecember \d{4}",  # Day Month YYYY (e.g., 15 January 2023)
     ]
 
     # Combine the date format regular expressions into a single pattern
@@ -25,18 +25,37 @@ def detect_dates(input_text):
     matched_dates = re.findall(date_pattern, input_text)
 
     # Parse the matched dates using dateutil.parser and format them
+    DATE_FORMAT = "%-m/%Y"
     formatted_dates = []
 
     for date_str in matched_dates:
         try:
             parsed_date = parse(date_str)
-            formatted_date = parsed_date.strftime("%-m/%Y")
+            formatted_date = parsed_date.strftime(DATE_FORMAT)
             formatted_dates.append(formatted_date)
         except ValueError:
             # Handle parsing errors (e.g., invalid date strings)
             pass
 
-    return formatted_dates
+    # Handle phrases like "last month," "next month," "last year," and "this year"
+    if re.search(r"\b[Ll]ast [Mm]onth\b", input_text):
+        last_month = datetime.now() - relativedelta(months=1)
+        formatted_dates[0] = last_month.strftime(DATE_FORMAT)
+    if re.search(r"\b[Nn]ext [Mm]onth\b", input_text):
+        next_month = datetime.now() + relativedelta(months=1)
+        formatted_dates[0] = next_month.strftime(DATE_FORMAT)
+    if re.search(r"\b[Ll]ast [Yy]ear\b", input_text):
+        last_year = datetime.now() - relativedelta(years=1)
+        formatted_dates[0] = last_year.strftime(DATE_FORMAT)
+    if re.search(r"\b[Tt]his [Yy]ear\b", input_text):
+        this_year = datetime.now()
+        formatted_dates[0] = this_year.strftime(DATE_FORMAT)
+
+    # Add the current month and year by default if no other dates are detected
+    if not formatted_dates:
+        formatted_dates.append(datetime.now().strftime(DATE_FORMAT))
+
+    return formatted_dates[0]
 
 
 def extract_text_from_coordinates(x1, y1, x2, y2):

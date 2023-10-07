@@ -6,6 +6,10 @@ import pyperclip
 import keyboard
 import pyautogui
 from pytesseract import pytesseract
+import re
+from dateutil.parser import parse
+from dateutil.relativedelta import relativedelta
+from datetime import datetime
 
 
 from main_shared_functions import (
@@ -13,13 +17,14 @@ from main_shared_functions import (
     cord_click,
     tab_command,
     extract_digits_from_text,
+    detect_dates,
 )
 
 # TODO
-# Protential improvements:
+# Potential improvements:
 #   - Find a better way to know the number of interactions than using extract_text_from_coordinates
 #   - Use mss to take screenshots instead of pyautogui
-#   - Find workaround to recieves imprints and waits
+#   - Find workaround to receives imprints and waits
 
 # original_x_scale = 1440 / 2880
 # original_y_scale = 900 / 1800
@@ -37,11 +42,11 @@ pyautogui.PAUSE = delay
 DEFAULT_PROMPT = "0"
 initials = "DE"
 noted_date = "1/"
-PRIMIS = "windowstarget/receives_imprimis.png"
-EDUCATION = "windowstarget/education.png"
-LOAD_OPT_OUT_WAIT = "windowstarget/wait_for_load_opt_out.png"
-LOAD_OWNER_WAIT = "windowstarget/wait_for_load_owner.png"
-PRIMARY_EMAIL = "windowstarget/primary_email.png"
+IMPRIMIS = "windowsTarget/receives_imprimis.png"
+EDUCATION = "windowsTarget/education.png"
+LOAD_OPT_OUT_WAIT = "windowsTarget/wait_for_load_opt_out.png"
+LOAD_OWNER_WAIT = "windowsTarget/wait_for_load_owner.png"
+PRIMARY_EMAIL = "windowsTarget/primary_email.png"
 MAX_ATTEMPTS = round(1.25 / (delay * 5))
 CURRENT_DATE = datetime.now()
 formatted_month = str(CURRENT_DATE.month)
@@ -54,13 +59,13 @@ FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 
 def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     # Global variables used in this method
-    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, PRIMIS, EDUCATION, LOAD_OPT_OUT_WAIT, LOAD_OWNER_WAIT
+    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, EDUCATION, LOAD_OPT_OUT_WAIT, LOAD_OWNER_WAIT
 
     # Initialize the bounding box as None
     box = None
 
     # Special case: Adjust confidence for a specific image
-    if image_filename == "windowstarget/source_file_tab_down.png":
+    if image_filename == "windowsTarget/source_file_tab_down.png":
         confidence = 0.8
 
     # Loop until a valid bounding box is found
@@ -94,13 +99,13 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
 
     # Check if the image is not one of specific types
     if image_filename not in [
-        PRIMIS,
+        IMPRIMIS,
         EDUCATION,
         PRIMARY_EMAIL,
         LOAD_OPT_OUT_WAIT,
         LOAD_OWNER_WAIT,
-        "windowstarget/personal_info_wait.png",
-        "windowstarget/source_wait.png",
+        "windowsTarget/personal_info_wait.png",
+        "windowsTarget/source_wait.png",
     ]:
         # Call 'cord_click' function with the adjusted coordinates
         cord_click((x, y))
@@ -111,20 +116,20 @@ def get_to_dead_page():
     global COM_NUM, delay
 
     # Navigate to the required pages by clicking on specific images
-    find_and_click_image("windowstarget/constituents.png")
+    find_and_click_image("windowsTarget/constituents.png")
     time.sleep(0.05 + delay)
-    find_and_click_image("windowstarget/updates.png")
+    find_and_click_image("windowsTarget/updates.png")
 
     # Check the value of COM_NUM to determine further actions
     if COM_NUM == 2:
-        find_and_click_image("windowstarget/third_page.png")
+        find_and_click_image("windowsTarget/third_page.png")
         time.sleep(1 + delay * 5)
     if COM_NUM == 3:
-        find_and_click_image("windowstarget/fifth_page.png")
+        find_and_click_image("windowsTarget/fifth_page.png")
         time.sleep(1 + delay * 5)
 
     # Click on the "name" image with a vertical bias
-    find_and_click_image("windowstarget/name.png", 0, round(25 * y_scale))
+    find_and_click_image("windowsTarget/name.png", 0, round(25 * y_scale))
 
 
 def interactions_num_finder():
@@ -157,15 +162,15 @@ def interactions_num_finder():
 
 def click_on_top_interaction(number_of_interactions):
     # Click on the top interaction based on the number of interactions
-    time.sleep(.5)
-    find_and_click_image(PRIMIS)
+    time.sleep(0.5)
+    find_and_click_image(IMPRIMIS)
     find_and_click_image(
-        "windowstarget/status_alone.png",
+        "windowsTarget/status_alone.png",
         0,
         round(number_of_interactions * 30),
         "down",
     )
-    find_and_click_image("windowstarget/edit_interaction.png", 0, 0, "down")
+    find_and_click_image("windowsTarget/edit_interaction.png", 0, 0, "down")
 
 
 def interactions_section(number_of_interactions):
@@ -173,7 +178,7 @@ def interactions_section(number_of_interactions):
     global LOAD_OWNER_WAIT, PRIMARY_EMAIL
 
     # Click on the "interactions" image
-    find_and_click_image("windowstarget/interactions.png")
+    find_and_click_image("windowsTarget/interactions.png")
 
     # Click on the top interaction
     click_on_top_interaction(1)
@@ -190,10 +195,12 @@ def interactions_section(number_of_interactions):
             process_application(False)
 
     # Click on the "PRIMARY_EMAIL" image and other actions
-    find_and_click_image(PRIMARY_EMAIL, 0, 0, None if number_of_interactions == 1 else "up")
-    find_and_click_image("windowstarget/personal_info.png")
-    find_and_click_image("windowstarget/personal_info_wait.png")
-    find_and_click_image("windowstarget/marked_deceased.png")
+    find_and_click_image(
+        PRIMARY_EMAIL, 0, 0, None if number_of_interactions == 1 else "up"
+    )
+    find_and_click_image("windowsTarget/personal_info.png")
+    find_and_click_image("windowsTarget/personal_info_wait.png")
+    find_and_click_image("windowsTarget/marked_deceased.png")
 
 
 def process_application(is_confirmed=True):
@@ -201,14 +208,14 @@ def process_application(is_confirmed=True):
     global initials, noted_date, FULL_DATE
 
     if is_confirmed:
-        find_and_click_image("windowstarget/tab_down_complete.png")
-        find_and_click_image("windowstarget/completed_form.png")
-        find_and_click_image("windowstarget/wait_for_complete.png")
+        find_and_click_image("windowsTarget/tab_down_complete.png")
+        find_and_click_image("windowsTarget/completed_form.png")
+        find_and_click_image("windowsTarget/wait_for_complete.png")
     else:
-        find_and_click_image("windowstarget/tab_down_complete.png")
-        find_and_click_image("windowstarget/declined.png")
-        find_and_click_image("windowstarget/wait_for_declined.png")
-        time.sleep(.05)
+        find_and_click_image("windowsTarget/tab_down_complete.png")
+        find_and_click_image("windowsTarget/declined.png")
+        find_and_click_image("windowsTarget/wait_for_declined.png")
+        time.sleep(0.05)
 
     tab_command(8)
     keyboard.write(FULL_DATE)
@@ -240,8 +247,10 @@ def process_application(is_confirmed=True):
         and "id=" not in found_text
         and "batch" not in found_text
     ):
-        noted_date = pyautogui.prompt(text="", title="Noted Date?", default="1/")
-        find_and_click_image("windowstarget/sites.png")
+        noted_date = pyautogui.prompt(
+            text="", title="Noted Date?", default=detect_dates(found_text)
+        )
+        find_and_click_image("windowsTarget/sites.png")
         tab_command(2)
 
     pyautogui.press("down")
@@ -262,7 +271,7 @@ def deceased_form():
     global noted_date, FORMATTED_DATE
 
     # Click on the "deceased_date" image
-    find_and_click_image("windowstarget/deceased_date.png")
+    find_and_click_image("windowsTarget/deceased_date.png")
 
     if noted_date == "1/":
         keyboard.write(FORMATTED_DATE)
@@ -270,21 +279,21 @@ def deceased_form():
         keyboard.write(noted_date)
         noted_date = "1/"
 
-    find_and_click_image("windowstarget/source_tab_down.png")
-    find_and_click_image("windowstarget/communication_from.png")
+    find_and_click_image("windowsTarget/source_tab_down.png")
+    find_and_click_image("windowsTarget/communication_from.png")
     pyautogui.press("enter")
 
 
 def move_to_communications():
     # Global variables used in this method
-    global PRIMIS
+    global IMPRIMIS
 
-    # Click on "constitute," PRIMIS, communications, and add
-    find_and_click_image("windowstarget/constitute.png")
-    find_and_click_image(PRIMIS)
-    time.sleep(.05)
-    find_and_click_image("windowstarget/communications.png")
-    find_and_click_image("windowstarget/add.png")
+    # Click on "constitute," IMPRIMIS, communications, and add
+    find_and_click_image("windowsTarget/constitute.png")
+    find_and_click_image(IMPRIMIS)
+    time.sleep(0.05)
+    find_and_click_image("windowsTarget/communications.png")
+    find_and_click_image("windowsTarget/add.png")
 
 
 def opt_out_form():
@@ -292,16 +301,16 @@ def opt_out_form():
     global FULL_DATE
 
     # Click on "solicit_code" and enter "Imprimis"
-    find_and_click_image("windowstarget/solicit_code.png")
+    find_and_click_image("windowsTarget/solicit_code.png")
     keyboard.write("Imprimis")
 
     # Click on "imprimis_three" and "imprimis_done"
-    find_and_click_image("windowstarget/imprimis_three.png")
-    find_and_click_image("windowstarget/source_wait.png")
-    find_and_click_image("windowstarget/opt_out_tab_down.png")
+    find_and_click_image("windowsTarget/imprimis_three.png")
+    find_and_click_image("windowsTarget/source_wait.png")
+    find_and_click_image("windowsTarget/opt_out_tab_down.png")
 
     # Click on "opt_out" and enter the FULL_DATE
-    find_and_click_image("windowstarget/opt_out.png")
+    find_and_click_image("windowsTarget/opt_out.png")
     pyautogui.press("tab")
     keyboard.write(FULL_DATE)
 
@@ -309,7 +318,7 @@ def opt_out_form():
 
     # Enter "Deceased" and click on "double_deceased"
     keyboard.write("Deceased")
-    find_and_click_image("windowstarget/double_deceased.png")
+    find_and_click_image("windowsTarget/double_deceased.png")
     pyautogui.press("enter")
 
 
@@ -383,7 +392,7 @@ def main():
     cutOffBottomY = screen_height
 
     # Find cutOffTopY and CRM_cords based on a specific image
-    cutOffTopY, CRM_cords = cutoff_section_of_screen("windowstarget/blackbaud_CRM.png")
+    cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
 
     # Continue processing until initials are "-1"
     while initials != "-1":

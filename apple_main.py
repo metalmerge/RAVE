@@ -185,7 +185,7 @@ def interactions_section(number_of_interactions):
 
 def process_application(is_confirmed=True):
     # Global variables used in this method
-    global noted_date, initials, FULL_DATE, CRM_cords
+    global noted_date, initials, FULL_DATE
 
     # Click on "tab_down_complete" image
     find_and_click_image("appleTarget/tab_down_complete.png")

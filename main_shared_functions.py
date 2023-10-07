@@ -61,6 +61,7 @@ def detect_dates(input_text):
 def extract_text_from_coordinates(x1, y1, x2, y2):
     # Path to the Tesseract executable, may need to use path to the .exe file depending on the operating system
     # path_to_tesseract = "tesseract.exe"
+    # pytesseract.tesseract_cmd = path_to_tesseract
 
     # Capture the current screen as a screenshot
     screenshot = pyautogui.screenshot()

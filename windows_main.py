@@ -123,10 +123,10 @@ def get_to_dead_page():
     # Check the value of COM_NUM to determine further actions
     if COM_NUM == 2:
         find_and_click_image("windowsTarget/third_page.png")
-        time.sleep(1 + delay * 5)
+        time.sleep(2 + delay * 5)
     if COM_NUM == 3:
         find_and_click_image("windowsTarget/fifth_page.png")
-        time.sleep(1 + delay * 5)
+        time.sleep(2 + delay * 5)
 
     # Click on the "name" image with a vertical bias
     find_and_click_image("windowsTarget/name.png", 0, round(25 * y_scale))

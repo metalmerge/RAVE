@@ -52,7 +52,6 @@ CURRENT_DATE = datetime.now()
 formatted_month = str(CURRENT_DATE.month)
 formatted_year = str(CURRENT_DATE.year)
 formatted_day = str(CURRENT_DATE.day)
-
 FORMATTED_DATE = f"{formatted_month}/{formatted_year}"
 FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 
@@ -126,10 +125,10 @@ def get_to_dead_page():
     find_and_click_image("windowsTarget/updates.png")
     if COM_NUM == 2:
         find_and_click_image("windowsTarget/third_page.png")
-        time.sleep(2 + delay * 5)
+        time.sleep(3 + delay * 5)
     if COM_NUM == 3:
         find_and_click_image("windowsTarget/fifth_page.png")
-        time.sleep(2 + delay * 5)
+        time.sleep(3 + delay * 5)
     # Click on the "name" image with a vertical bias
     find_and_click_image("windowsTarget/name.png", 0, round(25 * y_scale))
 

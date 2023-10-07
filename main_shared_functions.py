@@ -15,6 +15,7 @@ def detect_dates(input_text):
         r"\d{2}/\d{2}/\d{2}",  # MM/DD/YY
         r"\d{1,2}-[A-Za-z]{3}-\d{4}",  # DD-Mon-YYYY (e.g., 15-Jan-2023)
         r"\d{1,2} [A-Za-z]{3} \d{4}",  # DD Mon YYYY (e.g., 15 Jan 2023)
+        r"\d{4}",  # YYYY (e.g., 2023)
         r"[Jj]anuary|[Ff]ebruary|[Mm]arch|[Aa]pril|[Mm]ay|[Jj]une|[Jj]uly|[Aa]ugust|[Ss]eptember|[Oo]ctober|[Nn]ovember|[Dd]ecember",  # Month names
     ]
 
@@ -25,7 +26,10 @@ def detect_dates(input_text):
     matched_dates = re.findall(date_pattern, input_text)
 
     # Parse the matched dates using dateutil.parser and format them
-    DATE_FORMAT = "%-m/%Y"
+    CURRENT_DATE = datetime.now()
+    formatted_month = str(CURRENT_DATE.month)
+    formatted_year = str(CURRENT_DATE.year)
+    DATE_FORMAT = f"{formatted_month}/{formatted_year}"
     formatted_dates = []
 
     for date_str in matched_dates:

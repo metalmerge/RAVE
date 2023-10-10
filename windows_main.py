@@ -204,7 +204,7 @@ def process_application(is_confirmed=True):
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/declined.png")
         find_and_click_image("windowsTarget/wait_for_declined.png")
-    time.sleep(0.05)
+    time.sleep(0.1 + delay)
     tab_command(8)
     keyboard.write(FULL_DATE)
     tab_command(3)

@@ -184,7 +184,7 @@ def process_application(is_confirmed=True):
     pyperclip.copy("")
     tab_command(3)
     keyboard.press("command+A")
-    time.sleep(0.1)
+    time.sleep(0.1 + delay)
     keyboard.press_and_release("command+C")
     found_text = pyperclip.paste()
     # Check if the found text indicates a date

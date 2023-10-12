@@ -162,6 +162,7 @@ def click_on_top_interaction(number_of_interactions):
     # Click on the top interaction based on the number of interactions
     time.sleep(0.5)
     find_and_click_image(IMPRIMIS)
+    time.sleep(0.5)
     find_and_click_image(
         "windowsTarget/status_alone.png",
         0,
@@ -180,14 +181,14 @@ def interactions_section(number_of_interactions):
     process_application()
     if number_of_interactions > 1:
         for i in range(2, number_of_interactions + 1):
+            time.sleep(0.1 + delay)
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
+            time.sleep(0.1 + delay)
             find_and_click_image(LOAD_OWNER_WAIT)
             # Process the application for subsequent interactions (not confirmed)
             process_application(False)
-    find_and_click_image(
-        PRIMARY_EMAIL, 0, 0, None if number_of_interactions == 1 else "up"
-    )
+    find_and_click_image(PRIMARY_EMAIL, 0, 0, "up")
     find_and_click_image("windowsTarget/personal_info.png")
     find_and_click_image("windowsTarget/personal_info_wait.png")
     find_and_click_image("windowsTarget/marked_deceased.png")
@@ -211,7 +212,7 @@ def process_application(is_confirmed=True):
     pyperclip.copy("")
     keyboard.press_and_release("ctrl+a")
     keyboard.press_and_release("ctrl+c")
-    time.sleep(0.1 + delay)
+    time.sleep(0.25 + delay)
     found_text = pyperclip.paste()
     if (
         (
@@ -271,7 +272,7 @@ def move_to_communications():
 
     find_and_click_image("windowsTarget/constitute.png")
     find_and_click_image(IMPRIMIS)
-    time.sleep(0.05)
+    time.sleep(0.1)
     find_and_click_image("windowsTarget/communications.png")
     find_and_click_image("windowsTarget/add.png")
 

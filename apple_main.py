@@ -13,7 +13,7 @@ from main_shared_functions import (
     cord_click,
     tab_command,
     extract_digits_from_text,
-    detect_dates,
+    extract_date,
 )
 
 # TODO
@@ -211,7 +211,7 @@ def process_application(is_confirmed=True):
     ):
         # Prompt for the noted date and click on "sites"
         noted_date = pyautogui.prompt(
-            text="", title="Noted Date?", default=detect_dates(found_text)
+            text="", title="Noted Date?", default=extract_date(found_text)
         )
         find_and_click_image("appleTarget/sites.png")
     if found_text != "":

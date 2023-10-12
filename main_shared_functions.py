@@ -6,60 +6,105 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 
-def detect_dates(input_text):
-    # Define a list of common date formats as regular expressions
-    date_formats = [
-        r"\d{4}-\d{2}-\d{2}",  # YYYY-MM-DD
-        r"\d{2}/\d{2}/\d{4}",  # MM/DD/YYYY
-        r"\d{2}-\d{2}-\d{4}",  # MM-DD-YYYY
-        r"\d{2}/\d{2}/\d{2}",  # MM/DD/YY
-        r"\d{1,2}-[A-Za-z]{3}-\d{4}",  # DD-Mon-YYYY (e.g., 15-Jan-2023)
-        r"\d{1,2} [A-Za-z]{3} \d{4}",  # DD Mon YYYY (e.g., 15 Jan 2023)
-        r"\d{4}",  # YYYY (e.g., 2023)
-        r"[Jj]anuary|[Ff]ebruary|[Mm]arch|[Aa]pril|[Mm]ay|[Jj]une|[Jj]uly|[Aa]ugust|[Ss]eptember|[Oo]ctober|[Nn]ovember|[Dd]ecember",  # Month names
-    ]
+def extract_date(input_text):
+    months = {
+        "January": 1,
+        "February": 2,
+        "March": 3,
+        "April": 4,
+        "May": 5,
+        "June": 6,
+        "July": 7,
+        "August": 8,
+        "September": 9,
+        "October": 10,
+        "November": 11,
+        "December": 12,
+    }
+    day_month_year_result = day_month_year_only(input_text)
+    if day_month_year_result is not None:
+        return day_month_year_result
+    month_year_result = month_year_only(input_text, months)
+    if month_year_result is not None:
+        return month_year_result
+    year_only_result = year_only(input_text)
+    if year_only_result is not None:
+        return year_only_result
 
-    # Combine the date format regular expressions into a single pattern
-    date_pattern = "|".join(date_formats)
+    # Regular expression pattern to match different date formats.
+    date_pattern = r"\b(\d{1,2})[ /-](\d{4})\b|\b([A-Za-z]+)[ /-](\d{4})\b"
+    matches = re.findall(date_pattern, input_text)
 
-    # Use regular expression to find all matching dates in the input text
-    matched_dates = re.findall(date_pattern, input_text)
+    if matches:
+        for match in matches:
+            if match[0]:  # Matched day and year (e.g., 10/2023 or 10-2023)
+                month, year = match[0], match[1]
+                return f"{month}/{year}"
+            elif match[2] in months:  # Check if the matched text is a valid month name
+                month, year = months[match[2]], match[3]
+                return f"{month}/{year}"
 
-    # Parse the matched dates using dateutil.parser and format them
+    # Handle the case of "month YYYY"
+    month_year_pattern = r"\b([A-Za-z]+) (\d{4})\b"
+    month_year_match = re.search(month_year_pattern, input_text)
+    if month_year_match:
+        month, year = months[month_year_match.group(1)], month_year_match.group(2)
+        return f"{month:02d}/{year}"
+
+    # Handle special cases for phrases like "last month," "last year," and "this year."
+    return special_cases(input_text)
+
+
+def day_month_year_only(input_text):
+    date_pattern = r"\b(\d{1,2})[ /-](\d{1,2})[ /-](\d{4})\b"
+    matches = re.findall(date_pattern, input_text)
+    if matches:
+        for match in matches:
+            month, year = match[0], match[2]
+            if month.startswith("0"):
+                month = month[1]  # Remove leading zero
+            return f"{month}/{year}"
+    return None
+
+
+def year_only(input_text):
+    year_pattern = r"\b(\d{4})\b"
+    year_match = re.search(year_pattern, input_text)
+    if year_match:
+        year = year_match.group(1)
+        return f"1/{year}"
+    return None
+
+
+def month_year_only(input_text, months):
+    month_year_pattern = r"\b([A-Za-z]+)[ /-](\d{4})\b"
+    month_year_match = re.search(month_year_pattern, input_text)
+    if month_year_match:
+        month = months.get(month_year_match.group(1))
+        year = month_year_match.group(2)
+        if month:
+            return f"{month}/{year}"
+    return None
+
+
+def special_cases(input_text):
     CURRENT_DATE = datetime.now()
     formatted_month = str(CURRENT_DATE.month)
     formatted_year = str(CURRENT_DATE.year)
-    DATE_FORMAT = f"{formatted_month}/{formatted_year}"
-    formatted_dates = []
+    if "last month" in input_text:
+        last_month = int(formatted_month) - 1
+        return f"{last_month}/{formatted_year}"
 
-    for date_str in matched_dates:
-        try:
-            parsed_date = parse(date_str)
-            formatted_date = parsed_date.strftime(DATE_FORMAT)
-            formatted_dates.append(formatted_date)
-        except ValueError:
-            # Handle parsing errors (e.g., invalid date strings)
-            pass
+    if "last year" in input_text:
+        last_year = int(formatted_year) - 1
+        return f"1/{last_year}"
 
-    # Handle phrases like "last month," "next month," "last year," and "this year"
-    if re.search(r"\b[Ll]ast [Mm]onth\b", input_text):
-        last_month = datetime.now() - relativedelta(months=1)
-        formatted_dates[0] = last_month.strftime(DATE_FORMAT)
-    if re.search(r"\b[Nn]ext [Mm]onth\b", input_text):
-        next_month = datetime.now() + relativedelta(months=1)
-        formatted_dates[0] = next_month.strftime(DATE_FORMAT)
-    if re.search(r"\b[Ll]ast [Yy]ear\b", input_text):
-        last_year = datetime.now() - relativedelta(years=1)
-        formatted_dates[0] = last_year.strftime(DATE_FORMAT)
-    if re.search(r"\b[Tt]his [Yy]ear\b", input_text):
-        this_year = datetime.now()
-        formatted_dates[0] = this_year.strftime(DATE_FORMAT)
+    if "this year" in input_text:
+        return f"1/{formatted_year}"
+    if "this month" in input_text:
+        return f"{formatted_month}/{formatted_year}"
 
-    # Add the current month and year by default if no other dates are detected
-    if not formatted_dates:
-        formatted_dates.append(datetime.now().strftime(DATE_FORMAT))
-
-    return formatted_dates[0]
+    return "1/"
 
 
 def extract_text_from_coordinates(x1, y1, x2, y2):

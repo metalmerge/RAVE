@@ -212,7 +212,7 @@ def process_application(is_confirmed=True):
     pyperclip.copy("")
     keyboard.press_and_release("ctrl+a")
     keyboard.press_and_release("ctrl+c")
-    time.sleep(0.25 + delay)
+    time.sleep(0.5 + delay)
     found_text = pyperclip.paste()
     if (
         (

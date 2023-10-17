@@ -102,12 +102,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     x, y, width, height = box
     x = box.left + width / 2 + biasx
     y = box.top + height / 2 + biasy
-
-    if (
-        image_filename == "windowsTarget/status_alone.png"
-        or image_filename == "windowsTarget/communications.png"
-    ):
-        time.sleep(0.1 + delay)
     # Check if the image is not one of specific types
     if image_filename not in [
         IMPRIMIS,

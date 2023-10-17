@@ -115,7 +115,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         PRIMARY_EMAIL,
         LOAD_OPT_OUT_WAIT,
         LOAD_OWNER_WAIT,
-        "windowsTarget/wait_for_interactions.png",
         "windowsTarget/personal_info_wait.png",
         "windowsTarget/source_wait.png",
     ]:
@@ -165,8 +164,9 @@ def interactions_num_finder():
 
 def click_on_top_interaction(number_of_interactions):
     # Click on the top interaction based on the number of interactions
-    global LOAD_OWNER_WAIT
+    global IMPRIMIS, LOAD_OWNER_WAIT
     find_and_click_image(LOAD_OWNER_WAIT)
+    find_and_click_image(IMPRIMIS)
     find_and_click_image(
         "windowsTarget/status_alone.png",
         0,

@@ -103,6 +103,11 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     x = box.left + width / 2 + biasx
     y = box.top + height / 2 + biasy
 
+    if (
+        image_filename == "windowsTarget/status_alone.png"
+        or image_filename == "windowsTarget/communications.png"
+    ):
+        time.sleep(0.1 + delay)
     # Check if the image is not one of specific types
     if image_filename not in [
         IMPRIMIS,
@@ -110,10 +115,10 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         PRIMARY_EMAIL,
         LOAD_OPT_OUT_WAIT,
         LOAD_OWNER_WAIT,
+        "windowsTarget/wait_for_interactions.png",
         "windowsTarget/personal_info_wait.png",
         "windowsTarget/source_wait.png",
     ]:
-        # Call 'cord_click' function with the adjusted coordinates
         cord_click((x, y))
 
 
@@ -160,9 +165,8 @@ def interactions_num_finder():
 
 def click_on_top_interaction(number_of_interactions):
     # Click on the top interaction based on the number of interactions
-    time.sleep(0.5)
-    find_and_click_image(IMPRIMIS)
-    time.sleep(0.5)
+    global LOAD_OWNER_WAIT
+    find_and_click_image(LOAD_OWNER_WAIT)
     find_and_click_image(
         "windowsTarget/status_alone.png",
         0,
@@ -305,7 +309,6 @@ def end_time_recording(start_time):
 
 def cutoff_section_of_screen(image_filename):
     global delay, MAX_ATTEMPTS, x_scale, y_scale, confidence
-
     box = None
 
     # Loop until the image is found

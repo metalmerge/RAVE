@@ -13,6 +13,10 @@ Before using RAVE, make sure you have the following prerequisites installed:
 3. **Python Libraries**: Install the necessary Python libraries by running the following commands in your terminal or command prompt:
 
    ```bash
+   pip install pyperclip keyboard pyautogui pytesseract opencv-python-headless python-dateutil
+   ```
+   or 
+   ```bash
    pip install -r requirements.txt
    ```
 

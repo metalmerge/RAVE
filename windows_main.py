@@ -138,11 +138,16 @@ def interactions_num_finder():
         pretext = "Interactions: "
         try:
             text = extract_text_from_coordinates(
-                1188,
-                476,
-                1280,
-                498,
+                # 1188,
+                # 476,
+                # 1280,
+                # 498,
+                1196,
+                491,
+                1281,
+                517,
             )
+            print(text)
             if pretext in text:
                 num_index = text.index(pretext) + len(pretext)
                 num_text = text[num_index:].strip()
@@ -179,7 +184,7 @@ def interactions_section(number_of_interactions):
     process_application()
     if number_of_interactions > 1:
         for i in range(2, number_of_interactions + 1):
-            time.sleep(0.1 + delay)
+            time.sleep(0.25 + delay)
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
             time.sleep(0.1 + delay)
@@ -270,8 +275,8 @@ def move_to_communications():
 
     find_and_click_image("windowsTarget/constitute.png")
     find_and_click_image(IMPRIMIS)
-    time.sleep(0.1)
     find_and_click_image("windowsTarget/communications.png")
+    time.sleep(0.1)
     find_and_click_image("windowsTarget/add.png")
 
 

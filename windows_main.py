@@ -147,7 +147,6 @@ def interactions_num_finder():
                 1281,
                 517,
             )
-            print(text)
             if pretext in text:
                 num_index = text.index(pretext) + len(pretext)
                 num_text = text[num_index:].strip()
@@ -275,8 +274,8 @@ def move_to_communications():
 
     find_and_click_image("windowsTarget/constitute.png")
     find_and_click_image(IMPRIMIS)
-    find_and_click_image("windowsTarget/communications.png")
-    time.sleep(0.1)
+    # find_and_click_image("windowsTarget/communications.png")
+    # time.sleep(0.1)
     find_and_click_image("windowsTarget/add.png")
 
 

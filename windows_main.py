@@ -158,9 +158,13 @@ def interactions_num_finder():
 
 def click_on_top_interaction(number_of_interactions):
     # Click on the top interaction based on the number of interactions
-    global IMPRIMIS, LOAD_OWNER_WAIT
-    find_and_click_image(LOAD_OWNER_WAIT)
-    find_and_click_image(IMPRIMIS)
+    global IMPRIMIS, PRIMARY_EMAIL, LOAD_OWNER_WAIT
+    if number_of_interactions == 1:
+        find_and_click_image(LOAD_OWNER_WAIT)
+        find_and_click_image(IMPRIMIS)
+    else:
+        find_and_click_image(IMPRIMIS)
+        find_and_click_image(PRIMARY_EMAIL)
     find_and_click_image(
         "windowsTarget/status_alone.png",
         0,

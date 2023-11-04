@@ -1,5 +1,6 @@
 # @Dimitry Ermakov
 # @09/23/2023
+from playsound import playsound
 import time
 from datetime import datetime
 import pyperclip
@@ -237,6 +238,7 @@ def process_application(is_confirmed=True):
         and "id=" not in found_text
         and "batch" not in found_text
     ):
+        playsound("alert_notification.mp3")
         noted_date = pyautogui.prompt(
             text="", title="Noted Date?", default=extract_date(found_text)
         )

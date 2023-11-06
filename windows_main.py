@@ -1,8 +1,8 @@
 # @Dimitry Ermakov
 # @09/23/2023
-from playsound import playsound
 import time
 from datetime import datetime
+import pygame
 import pyperclip
 import keyboard
 import pyautogui
@@ -238,7 +238,11 @@ def process_application(is_confirmed=True):
         and "id=" not in found_text
         and "batch" not in found_text
     ):
-        playsound("alert_notification.mp3")
+        pygame.init()
+        sound = pygame.mixer.Sound("alert_notification.mp3")
+        sound.play()
+        sound.set_volume(1)
+        pygame.mixer.music.stop()
         noted_date = pyautogui.prompt(
             text="", title="Noted Date?", default=extract_date(found_text)
         )
@@ -331,7 +335,6 @@ def cutoff_section_of_screen(image_filename):
 
 def main():
     global initials, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, EDUCATION, COM_NUM, delay, PRIMARY_EMAIL
-
     # Prompt the user to enter initials, computer number, and delay time
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time -1 to quit",

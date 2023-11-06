@@ -90,7 +90,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
                 round(cutOffBottomY * 2 * y_scale),
             ),
         )
-        # Sleep to avoid excessive attempts
         time.sleep(delay * 5)
         # If the image is not found and 'up_or_down' is specified
         if box is None and up_or_down:
@@ -120,14 +119,14 @@ def get_to_dead_page():
     global COM_NUM, delay
 
     find_and_click_image("windowsTarget/constituents.png")
-    time.sleep(0.05 + delay)
+    # time.sleep(0.05 + delay)
     find_and_click_image("windowsTarget/updates.png")
     if COM_NUM == 2:
         find_and_click_image("windowsTarget/third_page.png")
-        time.sleep(3 + delay * 5)
+        time.sleep(5)
     if COM_NUM == 3:
         find_and_click_image("windowsTarget/fifth_page.png")
-        time.sleep(3 + delay * 5)
+        time.sleep(5)
     # Click on the "name" image with a vertical bias
     find_and_click_image("windowsTarget/name.png", 0, round(25 * y_scale))
 
@@ -169,7 +168,7 @@ def click_on_top_interaction(number_of_interactions):
     find_and_click_image(
         "windowsTarget/status_alone.png",
         0,
-        round(number_of_interactions * 30),
+        round(number_of_interactions * 25),
         "down",
     )
     find_and_click_image("windowsTarget/edit_interaction.png", 0, 0, "down")
@@ -178,18 +177,15 @@ def click_on_top_interaction(number_of_interactions):
 def interactions_section(number_of_interactions):
     global LOAD_OWNER_WAIT, PRIMARY_EMAIL
     find_and_click_image("windowsTarget/interactions.png")
-    # Click on the top interaction
     click_on_top_interaction(1)
-    # Process the application for the first interaction
     process_application()
     if number_of_interactions > 1:
         for i in range(2, number_of_interactions + 1):
-            time.sleep(0.25 + delay)
+            # time.sleep(.25+delay)
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
-            time.sleep(0.1 + delay)
+            # time.sleep(.1+delay)
             find_and_click_image(LOAD_OWNER_WAIT)
-            # Process the application for subsequent interactions (not confirmed)
             process_application(False)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "up")
     find_and_click_image("windowsTarget/personal_info.png")
@@ -199,7 +195,6 @@ def interactions_section(number_of_interactions):
 
 def process_application(is_confirmed=True):
     global initials, noted_date, FULL_DATE
-
     if is_confirmed:
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/completed_form.png")
@@ -208,14 +203,14 @@ def process_application(is_confirmed=True):
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/declined.png")
         find_and_click_image("windowsTarget/wait_for_declined.png")
-    time.sleep(1 + delay)
+    time.sleep(1)
     tab_command(8)
     keyboard.write(FULL_DATE)
     tab_command(3)
     pyperclip.copy("")
     keyboard.press_and_release("ctrl+a")
     keyboard.press_and_release("ctrl+c")
-    time.sleep(0.5 + delay)
+    time.sleep(0.5)
     found_text = pyperclip.paste()
     if (
         (
@@ -323,8 +318,6 @@ def cutoff_section_of_screen(image_filename):
             confidence=confidence,
             region=(0, 0, round(2880 * x_scale), round(1800 * y_scale)),
         )
-
-        # Sleep to avoid excessive attempts
         time.sleep(delay * 5)
     _, y, width, height = box
     image_cords_x = (box.left) + width / 2

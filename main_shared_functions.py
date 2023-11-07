@@ -22,6 +22,16 @@ def extract_date(input_text):
         "December": 12,
     }
     input_text = remove_phone_numbers(input_text)
+    input_text = remove_numbers_greater_than_current_year(input_text)
+    day_month_year_result = day_month_year_only(input_text)
+    if day_month_year_result is not None:
+        return day_month_year_result
+    month_year_result = month_year_only(input_text, months)
+    if month_year_result is not None:
+        return month_year_result
+    year_only_result = year_only(input_text)
+    if year_only_result is not None:
+        return year_only_result
 
     # Regular expression pattern to match different date formats.
     date_pattern = r"\b(\d{1,2})[ /-](\d{4})\b|\b([A-Za-z]+)[ /-](\d{4})\b"
@@ -40,23 +50,33 @@ def extract_date(input_text):
     month_year_pattern = r"\b([A-Za-z]+) (\d{4})\b"
     month_year_match = re.search(month_year_pattern, input_text)
     if month_year_match:
-        month, year = months.get(
-            month_year_match.group(1), None
-        ), month_year_match.group(2)
-        if month:
-            return f"{month:02d}/{year}"
-
-    # Use the month_year_only method
-    month_year_result = month_year_only(input_text, months)
-    if month_year_result is not None:
-        return month_year_result
-
-    year_only_result = year_only(input_text)
-    if year_only_result is not None:
-        return year_only_result
+        month, year = months[month_year_match.group(1)], month_year_match.group(2)
+        return f"{month:02d}/{year}"
 
     # Handle special cases for phrases like "last month," "last year," and "this year."
     return special_cases(input_text)
+
+
+def remove_numbers_greater_than_current_year(input_text):
+    current_year = datetime.now().year
+    # Regular expression pattern to match numbers in the input text
+    number_pattern = r"\b\d+\b"
+
+    def remove_numbers(match):
+        number = int(match.group(0))
+        if number <= current_year:
+            return str(number)
+        else:
+            return ""
+
+    return re.sub(number_pattern, remove_numbers, input_text)
+
+
+def remove_phone_numbers(text):
+    phone_pattern = (
+        r"\b(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)[-.\s]?\d{3}[-.\s]?\d{4})\b"
+    )
+    return re.sub(phone_pattern, "", text)
 
 
 def day_month_year_only(input_text):
@@ -69,13 +89,6 @@ def day_month_year_only(input_text):
                 month = month[1]  # Remove leading zero
             return f"{month}/{year}"
     return None
-
-
-def remove_phone_numbers(text):
-    phone_pattern = (
-        r"\b(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)[-.\s]?\d{3}[-.\s]?\d{4})\b"
-    )
-    return re.sub(phone_pattern, "", text)
 
 
 def year_only(input_text):

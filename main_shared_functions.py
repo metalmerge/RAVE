@@ -22,15 +22,6 @@ def extract_date(input_text):
         "December": 12,
     }
     input_text = remove_phone_numbers(input_text)
-    day_month_year_result = day_month_year_only(input_text)
-    if day_month_year_result is not None:
-        return day_month_year_result
-    month_year_result = month_year_only(input_text, months)
-    if month_year_result is not None:
-        return month_year_result
-    year_only_result = year_only(input_text)
-    if year_only_result is not None:
-        return year_only_result
 
     # Regular expression pattern to match different date formats.
     date_pattern = r"\b(\d{1,2})[ /-](\d{4})\b|\b([A-Za-z]+)[ /-](\d{4})\b"
@@ -49,8 +40,20 @@ def extract_date(input_text):
     month_year_pattern = r"\b([A-Za-z]+) (\d{4})\b"
     month_year_match = re.search(month_year_pattern, input_text)
     if month_year_match:
-        month, year = months[month_year_match.group(1)], month_year_match.group(2)
-        return f"{month:02d}/{year}"
+        month, year = months.get(
+            month_year_match.group(1), None
+        ), month_year_match.group(2)
+        if month:
+            return f"{month:02d}/{year}"
+
+    # Use the month_year_only method
+    month_year_result = month_year_only(input_text, months)
+    if month_year_result is not None:
+        return month_year_result
+
+    year_only_result = year_only(input_text)
+    if year_only_result is not None:
+        return year_only_result
 
     # Handle special cases for phrases like "last month," "last year," and "this year."
     return special_cases(input_text)

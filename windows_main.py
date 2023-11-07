@@ -334,7 +334,6 @@ def main():
         title="Enter Initials, which computer number this is, and delay time -1 to quit",
         default="DE, 1, 0.05",
     )
-
     # Split the input string into initials, computer_number, and delay
     initials, computer_number, delay = input_str.strip().split(",")
 

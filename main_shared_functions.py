@@ -21,6 +21,7 @@ def extract_date(input_text):
         "November": 11,
         "December": 12,
     }
+    input_text = remove_phone_numbers(input_text)
     day_month_year_result = day_month_year_only(input_text)
     if day_month_year_result is not None:
         return day_month_year_result
@@ -65,6 +66,13 @@ def day_month_year_only(input_text):
                 month = month[1]  # Remove leading zero
             return f"{month}/{year}"
     return None
+
+
+def remove_phone_numbers(text):
+    phone_pattern = (
+        r"\b(\d{3}[-.\s]?\d{3}[-.\s]?\d{4}|\(\d{3}\)[-.\s]?\d{3}[-.\s]?\d{4})\b"
+    )
+    return re.sub(phone_pattern, "", text)
 
 
 def year_only(input_text):

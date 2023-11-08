@@ -32,11 +32,9 @@ def extract_date(input_text):
     year_only_result = year_only(input_text)
     if year_only_result is not None:
         return year_only_result
-
     # Regular expression pattern to match different date formats.
     date_pattern = r"\b(\d{1,2})[ /-](\d{4})\b|\b([A-Za-z]+)[ /-](\d{4})\b"
     matches = re.findall(date_pattern, input_text)
-
     if matches:
         for match in matches:
             if match[0]:  # Matched day and year (e.g., 10/2023 or 10-2023)
@@ -45,14 +43,12 @@ def extract_date(input_text):
             elif match[2] in months:  # Check if the matched text is a valid month name
                 month, year = months[match[2]], match[3]
                 return f"{month}/{year}"
-
     # Handle the case of "month YYYY"
     month_year_pattern = r"\b([A-Za-z]+) (\d{4})\b"
     month_year_match = re.search(month_year_pattern, input_text)
     if month_year_match:
         month, year = months[month_year_match.group(1)], month_year_match.group(2)
         return f"{month:02d}/{year}"
-
     # Handle special cases for phrases like "last month," "last year," and "this year."
     return special_cases(input_text)
 

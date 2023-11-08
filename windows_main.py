@@ -111,6 +111,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         LOAD_OWNER_WAIT,
         "windowsTarget/personal_info_wait.png",
         "windowsTarget/source_wait.png",
+        "windowsTarget/codes.png",
     ]:
         cord_click((x, y))
 
@@ -162,9 +163,6 @@ def click_on_top_interaction(number_of_interactions):
     if number_of_interactions == 1:
         find_and_click_image(LOAD_OWNER_WAIT)
         find_and_click_image(IMPRIMIS)
-    else:
-        find_and_click_image(IMPRIMIS)
-        find_and_click_image(PRIMARY_EMAIL)
     find_and_click_image(
         "windowsTarget/status_alone.png",
         0,
@@ -181,11 +179,11 @@ def interactions_section(number_of_interactions):
     process_application()
     if number_of_interactions > 1:
         for i in range(2, number_of_interactions + 1):
-            # time.sleep(.25+delay)
+            find_and_click_image(IMPRIMIS)
+            find_and_click_image(PRIMARY_EMAIL)
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
-            # time.sleep(.1+delay)
-            find_and_click_image(LOAD_OWNER_WAIT)
+            # find_and_click_image(LOAD_OWNER_WAIT)
             process_application(False)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "up")
     find_and_click_image("windowsTarget/personal_info.png")
@@ -272,11 +270,10 @@ def deceased_form():
 
 def move_to_communications():
     global IMPRIMIS
-
     find_and_click_image("windowsTarget/constitute.png")
     find_and_click_image(IMPRIMIS)
     # find_and_click_image("windowsTarget/communications.png")
-    # time.sleep(0.1)
+    find_and_click_image("windowsTarget/codes.png")
     find_and_click_image("windowsTarget/add.png")
 
 

@@ -111,7 +111,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         LOAD_OWNER_WAIT,
         "windowsTarget/personal_info_wait.png",
         "windowsTarget/source_wait.png",
-        "windowsTarget/codes.png",
+        "windowsTarget/preference.png",
     ]:
         cord_click((x, y))
 
@@ -273,7 +273,7 @@ def move_to_communications():
     find_and_click_image("windowsTarget/constitute.png")
     find_and_click_image(IMPRIMIS)
     # find_and_click_image("windowsTarget/communications.png")
-    find_and_click_image("windowsTarget/codes.png")
+    find_and_click_image("windowsTarget/preference.png")
     find_and_click_image("windowsTarget/add.png")
 
 

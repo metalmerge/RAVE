@@ -19,6 +19,8 @@ from main_shared_functions import (
     tab_command,
     extract_digits_from_text,
     extract_date,
+    remove_numbers_greater_than_current_year,
+    remove_phone_numbers,
 )
 
 # TODO
@@ -210,26 +212,24 @@ def process_application(is_confirmed=True):
     keyboard.press_and_release("ctrl+c")
     time.sleep(0.5)
     found_text = pyperclip.paste()
+    found_text = remove_phone_numbers(found_text)
+    found_text = remove_numbers_greater_than_current_year(found_text)
     if (
-        (
-            extract_digits_from_text(found_text) != ""
-            or "year" in found_text
-            or "month" in found_text
-            or "January" in found_text
-            or "February" in found_text
-            or "March" in found_text
-            or "April" in found_text
-            or "May" in found_text
-            or "June" in found_text
-            or "July" in found_text
-            or "August" in found_text
-            or "September" in found_text
-            or "October" in found_text
-            or "November" in found_text
-            or "December" in found_text
-        )
-        and "id=" not in found_text
-        and "batch" not in found_text
+        extract_digits_from_text(found_text) != ""
+        or "year" in found_text
+        or "month" in found_text
+        or "January" in found_text
+        or "February" in found_text
+        or "March" in found_text
+        or "April" in found_text
+        or "May" in found_text
+        or "June" in found_text
+        or "July" in found_text
+        or "August" in found_text
+        or "September" in found_text
+        or "October" in found_text
+        or "November" in found_text
+        or "December" in found_text
     ):
         pygame.init()
         sound = pygame.mixer.Sound("alert_notification.mp3")
@@ -294,13 +294,13 @@ def opt_out_form():
     pyautogui.press("enter")
 
 
-def end_time_recording(start_time):
+def end_time_recording(start_time, num):
     global FULL_DATE
     end_time = time.time()
     duration = end_time - start_time
     log_file = "time_logs/windows_program_log.txt"
     with open(log_file, "a") as f:
-        f.write(f"{duration:.2f}\n")
+        f.write(f"{duration:.2f}-{num}\n")
 
 
 def cutoff_section_of_screen(image_filename):
@@ -363,7 +363,7 @@ def main():
         move_to_communications()
         opt_out_form()
         # Record the end time and write to a log file
-        end_time_recording(start_time)
+        end_time_recording(start_time, number_of_interactions)
         find_and_click_image(PRIMARY_EMAIL)
 
 

@@ -18,7 +18,7 @@ time_entries = [entry for entry in time_entries if entry <= dynamic_threshold]
 
 # Limit the graph to show only the most recent 100 entries
 entries = 100
-# time_entries = time_entries[-entries:]
+time_entries = time_entries[-entries:]
 
 # Create a plot
 plt.figure(figsize=(10, 6))  # You can adjust the figure size as needed

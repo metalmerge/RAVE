@@ -279,7 +279,6 @@ def move_to_communications():
 
 def opt_out_form():
     global FULL_DATE
-
     find_and_click_image("windowsTarget/solicit_code.png")
     keyboard.write("Imprimis")
     find_and_click_image("windowsTarget/imprimis_three.png")
@@ -294,13 +293,14 @@ def opt_out_form():
     pyautogui.press("enter")
 
 
-def end_time_recording(start_time, num):
-    global FULL_DATE
+def end_time_recording(start_time, interactions_number):
+    FULL_DATE = "%Y-%m-%d %H:%M:%S"
+    current_datetime = datetime.now().strftime(FULL_DATE)
     end_time = time.time()
     duration = end_time - start_time
     log_file = "time_logs/windows_program_log.txt"
     with open(log_file, "a") as f:
-        f.write(f"{duration:.2f}-{num}\n")
+        f.write(f"{duration:.2f}-{interactions_number}-{current_datetime}\n")
 
 
 def cutoff_section_of_screen(image_filename):

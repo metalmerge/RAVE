@@ -142,9 +142,9 @@ def interactions_num_finder():
         try:
             text = extract_text_from_coordinates(
                 1196,
-                491,
+                478,  # 491,
                 1281,
-                517,
+                499,  # 517,
             )
             if pretext in text:
                 num_index = text.index(pretext) + len(pretext)

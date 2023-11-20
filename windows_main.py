@@ -293,14 +293,12 @@ def opt_out_form():
     pyautogui.press("enter")
 
 
-def end_time_recording(start_time, interactions_number):
-    FULL_DATE = "%Y-%m-%d %H:%M:%S"
-    current_datetime = datetime.now().strftime(FULL_DATE)
+def end_time_recording(start_time):
     end_time = time.time()
     duration = end_time - start_time
     log_file = "time_logs/windows_program_log.txt"
     with open(log_file, "a") as f:
-        f.write(f"{duration:.2f}-{interactions_number}-{current_datetime}\n")
+        f.write(f"{duration:.2f}\n")
 
 
 def cutoff_section_of_screen(image_filename):
@@ -363,7 +361,7 @@ def main():
         move_to_communications()
         opt_out_form()
         # Record the end time and write to a log file
-        end_time_recording(start_time, number_of_interactions)
+        end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)
 
 

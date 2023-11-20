@@ -1,68 +1,50 @@
 import matplotlib.pyplot as plt
 import numpy as np
 
-# Read the time entries and interaction numbers from the file
-with open("windows_program_log.txt", "r") as file:
-    data = [line.strip().split("-") for line in file.readlines()]
+# Read data from the file
+file_path = "windows_program_log.txt"
+with open(file_path, "r") as file:
+    # Read lines and convert data to float
+    data = [float(line.strip()) for line in file.readlines()]
 
-# Separate data into lists
-durations = [float(entry[0]) for entry in data]
-interactions_numbers = [int(entry[1]) for entry in data]
-date_times = [entry[2] for entry in data]
+# Convert data to NumPy array
+data_array = np.array(data)
 
-# Calculate statistics
-average_time = np.mean(durations)
-std_deviation = np.std(durations)
+# Calculate mean, median, and standard deviation
+mean = np.mean(data_array)
+median = np.median(data_array)
+std_dev = np.std(data_array)
 
-# Define the dynamic threshold as a multiple of the standard deviation
-threshold_multiplier = 2  # You can adjust this multiplier as needed
-dynamic_threshold = average_time + threshold_multiplier * std_deviation
+# Remove outliers above 2 standard deviations
+two_std = 2 * std_dev
+filtered_data = data_array[abs(data_array - mean) < two_std]
 
-# Filter out outliers using the dynamic threshold
-filtered_data = [
-    (d, i, dt)
-    for d, i, dt in zip(durations, interactions_numbers, date_times)
-    if d <= dynamic_threshold
-]
+# Calculate 10-point moving average
+window = 10
+moving_avg = np.convolve(filtered_data, np.ones(window) / window, mode="valid")
 
-# Separate filtered data into lists
-filtered_durations, filtered_interactions_numbers, filtered_date_times = zip(
-    *filtered_data
-)
-
-# Limit the graph to show only the most recent 100 entries
-entries = 100
-filtered_durations = filtered_durations[-entries:]
-filtered_interactions_numbers = filtered_interactions_numbers[-entries:]
-filtered_date_times = filtered_date_times[-entries:]
-
-# Create a plot
-plt.figure(figsize=(10, 6))  # You can adjust the figure size as needed
-
-# Add a scatter plot with color-coded data points
+# Create a figure and plot the data
+plt.figure(figsize=(8, 6))
 plt.scatter(
-    filtered_date_times,
-    filtered_durations,
-    c=filtered_interactions_numbers,
-    cmap="viridis",
-    marker="o",
-    label="Time Entries",
+    range(len(filtered_data)), filtered_data, color="red", label="Filtered Data"
 )
-plt.colorbar(label="Interactions Number")  # Add colorbar
-plt.title("Windows Program Log (Outliers Ignored, Most Recent 100 Entries)")
-plt.xlabel("Date and Time")
-plt.ylabel("Time (seconds)")
+plt.plot(
+    range(window - 1, len(filtered_data)),
+    moving_avg,
+    color="blue",
+    label="Moving Average",
+)
+plt.axhline(y=mean, color="green", linestyle="--", label=f"Mean: {mean:.2f}")
+plt.axhline(y=median, color="purple", linestyle="--", label=f"Median: {median:.2f}")
+plt.axhline(y=mean + two_std, color="orange", linestyle="--", label="+2 SD")
+plt.xlabel("Index")
+plt.ylabel("Value")
+plt.title("Data with Moving Average and Outliers Removed")
 plt.legend()
-
-# Save the plot as a PNG file
-plt.savefig(f"windows_program_log_filtered{entries}_colorcoded.png")
-
-# Show the plot (optional)
+plt.savefig(f"program_time_trials{data_array.size}.png")
 plt.show()
 
-# Display statistics
-print("Statistics for the most recent 100 time entries:")
-print(f"Average: {average_time:.2f} seconds")
-print(
-    f"Dynamic Threshold ({threshold_multiplier} Std Dev): {dynamic_threshold:.2f} seconds"
-)
+# Display the mean, median, and standard deviation
+print(f"Mean: {mean:.2f}")
+print(f"Median: {median:.2f}")
+print(f"Standard Deviation: {std_dev:.2f}")

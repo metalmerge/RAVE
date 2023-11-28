@@ -189,7 +189,7 @@ def interactions_section(number_of_interactions):
             process_application(False)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "up")
     find_and_click_image("windowsTarget/personal_info.png")
-    find_and_click_image("windowsTarget/personal_info_wait.png", 0, 0, "down")
+    find_and_click_image("windowsTarget/personal_info_wait.png")  # , 0, 0, "down"
     find_and_click_image("windowsTarget/marked_deceased.png")
 
 

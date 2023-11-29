@@ -60,18 +60,6 @@ FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 
 
 def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
-    """
-    Locate an image on the screen and click on it.
-
-    Args:
-        image_filename (str): The filename of the image to locate and click.
-        biasx (int, optional): Horizontal bias to adjust the click position (default is 0).
-        biasy (int, optional): Vertical bias to adjust the click position (default is 0).
-        up_or_down (str, optional): Scroll the screen 'up' or 'down' if the image is not found (default is None).
-
-    Returns:
-        None
-    """
     global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, EDUCATION, LOAD_OPT_OUT_WAIT, LOAD_OWNER_WAIT
 
     box = None
@@ -130,7 +118,6 @@ def get_to_dead_page():
     if COM_NUM == 3:
         find_and_click_image("windowsTarget/fifth_page.png")
         time.sleep(5)
-    # Click on the "name" image with a vertical bias
     find_and_click_image("windowsTarget/name.png", 0, round(25 * y_scale))
 
 
@@ -160,7 +147,6 @@ def interactions_num_finder():
 
 
 def click_on_top_interaction(number_of_interactions):
-    # Click on the top interaction based on the number of interactions
     global IMPRIMIS, PRIMARY_EMAIL, LOAD_OWNER_WAIT
     if number_of_interactions == 1:
         find_and_click_image(LOAD_OWNER_WAIT)
@@ -304,10 +290,7 @@ def end_time_recording(start_time):
 def cutoff_section_of_screen(image_filename):
     global delay, MAX_ATTEMPTS, x_scale, y_scale, confidence
     box = None
-
-    # Loop until the image is found
     while box is None:
-        # Attempt to locate the image on the screen within specified region
         box = pyautogui.locateOnScreen(
             image_filename,
             confidence=confidence,
@@ -317,50 +300,32 @@ def cutoff_section_of_screen(image_filename):
     _, y, width, height = box
     image_cords_x = (box.left) + width / 2
     image_cords_y = (box.top) + height / 2
-    # Return the rounded y coordinate and a tuple with image center coordinates
     return round(y), (image_cords_x, image_cords_y)
 
 
 def main():
     global initials, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, EDUCATION, COM_NUM, delay, PRIMARY_EMAIL
-    # Prompt the user to enter initials, computer number, and delay time
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time -1 to quit",
         title="Enter Initials, which computer number this is, and delay time -1 to quit",
         default="DE, 1, 0.05",
     )
-    # Split the input string into initials, computer_number, and delay
     initials, computer_number, delay = input_str.strip().split(",")
-
-    # Get the screen width and height
     screen_width, screen_height = pyautogui.size()
-
-    # Calculate the scaling factors
     x_scale = screen_width / 1440
     y_scale = screen_height / 900
-    # Convert delay to a floating-point number
     delay = float(delay.strip())
-    # Convert computer_number to an integer
     COM_NUM = int(computer_number.strip())
-    # Set cutOffBottomY to the screen height
     cutOffBottomY = screen_height
-    # Find cutOffTopY and CRM_cords based on a specific image
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while initials != "-1":
-        # Record the start time
         start_time = time.time()
-        # Navigate to the deceased page
         get_to_dead_page()
-        # Determine the number of interactions
         number_of_interactions = interactions_num_finder()
-        # Process interactions
         interactions_section(number_of_interactions)
-        # Complete the deceased form
         deceased_form()
-        # Move to communications and process opt-out form
         move_to_communications()
         opt_out_form()
-        # Record the end time and write to a log file
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)
 

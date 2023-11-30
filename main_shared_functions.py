@@ -77,6 +77,10 @@ def remove_phone_numbers(text):
     return re.sub(phone_pattern, "", text)
 
 
+def remove_digits_next_to_letters(input_string):
+    return re.sub(r"([a-zA-Z])\d+|\d+([a-zA-Z])", r"\1\2", input_string)
+
+
 def day_month_year_only(input_text):
     date_pattern = r"\b(\d{1,2})[ /-](\d{1,2})[ /-](\d{4})\b"
     matches = re.findall(date_pattern, input_text)

@@ -21,6 +21,7 @@ from main_shared_functions import (
     extract_date,
     remove_numbers_greater_than_current_year,
     remove_phone_numbers,
+    remove_digits_next_to_letters,
 )
 
 # TODO
@@ -200,6 +201,7 @@ def process_application(is_confirmed=True):
     found_text = pyperclip.paste()
     found_text = remove_phone_numbers(found_text)
     found_text = remove_numbers_greater_than_current_year(found_text)
+    found_text = remove_digits_next_to_letters(found_text)
     if (
         extract_digits_from_text(found_text) != ""
         or "year" in found_text

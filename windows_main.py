@@ -64,9 +64,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, EDUCATION, LOAD_OPT_OUT_WAIT, LOAD_OWNER_WAIT
 
     box = None
-
-    # Special case: Adjust confidence for a specific image
-    if image_filename == "windowsTarget/source_file_tab_down.png":
+    if image_filename == "windowsTarget/source_file_tab_down.png" or image_filename == "windowsTarget/status_alone.png":
         confidence = 0.8
     # Loop until a valid bounding box is found
     while box is None:
@@ -150,8 +148,10 @@ def interactions_num_finder():
 def click_on_top_interaction(number_of_interactions):
     global IMPRIMIS, PRIMARY_EMAIL, LOAD_OWNER_WAIT
     if number_of_interactions == 1:
+        time.sleep(1)
         find_and_click_image(LOAD_OWNER_WAIT)
         find_and_click_image(IMPRIMIS)
+        time.sleep(.25)
     find_and_click_image(
         "windowsTarget/status_alone.png",
         0,
@@ -260,6 +260,7 @@ def move_to_communications():
     global IMPRIMIS
     find_and_click_image("windowsTarget/constitute.png")
     find_and_click_image(IMPRIMIS)
+    time.sleep(.25)
     # find_and_click_image("windowsTarget/communications.png")
     find_and_click_image("windowsTarget/preference.png")
     find_and_click_image("windowsTarget/add.png")

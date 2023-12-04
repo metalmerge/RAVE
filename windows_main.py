@@ -324,7 +324,6 @@ def main():
     COM_NUM = int(computer_number.strip())
     cutOffBottomY = screen_height
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
-    occurrences = 0
     while initials != "-1":
         start_time = time.time()
         get_to_dead_page()
@@ -334,9 +333,6 @@ def main():
         move_to_communications()
         opt_out_form()
         end_time_recording(start_time)
-        occurrences += 1
-        if occurrences == 9:
-            keyboard.press_and_release("ctrl+r")
         find_and_click_image(PRIMARY_EMAIL)
 
 

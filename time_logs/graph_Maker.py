@@ -12,15 +12,14 @@ data_array = np.array(data)
 
 # Calculate mean, median, and standard deviation
 mean = np.mean(data_array)
-median = np.median(data_array)
 std_dev = np.std(data_array)
 
-# Remove outliers above 2 standard deviations
 two_std = 2 * std_dev
 filtered_data = data_array[abs(data_array - mean) < two_std]
+median = np.median(filtered_data)
 
 # Calculate 10-point moving average
-window = 10
+window = 100
 moving_avg = np.convolve(filtered_data, np.ones(window) / window, mode="valid")
 
 # Create a figure and plot the data
@@ -34,7 +33,7 @@ plt.plot(
     color="blue",
     label="Moving Average",
 )
-plt.axhline(y=mean, color="green", linestyle="--", label=f"Mean: {mean:.2f}")
+# plt.axhline(y=mean, color="green", linestyle="--", label=f"Mean: {mean:.2f}")
 plt.axhline(y=median, color="purple", linestyle="--", label=f"Median: {median:.2f}")
 plt.axhline(y=mean + two_std, color="orange", linestyle="--", label="+2 SD")
 plt.xlabel("Index")

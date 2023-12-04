@@ -14,7 +14,7 @@ data_array = np.array(data)
 mean = np.mean(data_array)
 std_dev = np.std(data_array)
 
-two_std = 2 * std_dev
+two_std = 1 * std_dev
 filtered_data = data_array[abs(data_array - mean) < two_std]
 median = np.median(filtered_data)
 
@@ -35,7 +35,7 @@ plt.plot(
 )
 # plt.axhline(y=mean, color="green", linestyle="--", label=f"Mean: {mean:.2f}")
 plt.axhline(y=median, color="purple", linestyle="--", label=f"Median: {median:.2f}")
-plt.axhline(y=mean + two_std, color="orange", linestyle="--", label="+2 SD")
+plt.axhline(y=mean + two_std, color="orange", linestyle="--", label="+1 SD")
 plt.xlabel("Index")
 plt.ylabel("Value")
 plt.title("Data with Moving Average and Outliers Removed")

@@ -28,7 +28,6 @@ from main_shared_functions import (
 # Potential improvements:
 #   - Find a better way to know the number of interactions than using extract_text_from_coordinates
 #   - Use mss to take screenshots instead of pyautogui
-#   - Find workaround to receives imprints and waits
 
 # original_x_scale = 1440 / 2880
 # original_y_scale = 900 / 1800
@@ -71,7 +70,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         confidence = 0.8
     # Loop until a valid bounding box is found
     while box is None:
-        # Attempt to locate the image on the screen
         box = pyautogui.locateOnScreen(
             image_filename,
             confidence=confidence,
@@ -85,16 +83,13 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         time.sleep(delay * 5)
         # If the image is not found and 'up_or_down' is specified
         if box is None and up_or_down:
-            # Scroll the screen up or down based on 'up_or_down'
             factor = 14 if up_or_down == "up" else -14
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
 
-    # Extract coordinates and adjust for bias
     x, y, width, height = box
     x = box.left + width / 2 + biasx
     y = box.top + height / 2 + biasy
-    # Check if the image is not one of specific types
     if image_filename not in [
         IMPRIMIS,
         EDUCATION,

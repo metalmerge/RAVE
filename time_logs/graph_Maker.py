@@ -40,7 +40,7 @@ plt.xlabel("Index")
 plt.ylabel("Value")
 plt.title("Data with Moving Average and Outliers Removed")
 plt.legend()
-plt.savefig(f"program_time_trials{data_array.size}.png")
+plt.savefig(f"graphImages/program_time_trials{data_array.size}.png")
 plt.show()
 
 # Display the mean, median, and standard deviation

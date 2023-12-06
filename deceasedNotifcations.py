@@ -88,15 +88,13 @@ def main():
     cutOffBottomY = screen_height
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
-        input_str = pyautogui.prompt(
-            text="Enter date if there is one and then LookUp ID or full name (ex - 11/22/2023, Elizabeth Dolman)",
-            title="date, name, or LookUp ID",
-            default=f"{FULL_DATE},",
+        lookup_id_or_name = pyautogui.prompt(
+            text="Enter LookUp ID or full name:",
+            title="name or LookUp ID",
+            # default="(ex - 11/22/2023, Elizabeth Dolman)",
         )
-        if input_str == "-1":
+        if lookup_id_or_name == "-1":
             break
-        givendate, lookup_id_or_name = input_str.strip().split(",")
-        pyperclip.copy(givendate)
         start_time = time.time()
         find_and_click_image("windowsTarget/constituteSearch.png")
         time.sleep(delay * 5)
@@ -106,12 +104,18 @@ def main():
         find_and_click_image("windowsTarget/cityStateZIP.png")
         find_and_click_image(PRIMARY_EMAIL)
         find_and_click_image("windowsTarget/deceasedNotification.png")
+        givendate = pyautogui.prompt(
+            text="Enter date if there is one",
+            title="date, name, or LookUp ID",
+            default=f"{FULL_DATE}",
+        )
+        pyperclip.copy(givendate)
         find_and_click_image("windowsTarget/comments.png")
         pyautogui.press("tab")
         keyboard.write(f"Passed away {givendate}")
         pyautogui.press("tab")
         pyautogui.press("tab")
-        # pyautogui.press("tab")
+        pyautogui.press("tab")
         pyautogui.press("enter")
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)

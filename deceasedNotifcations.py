@@ -115,7 +115,7 @@ def main():
         keyboard.write(f"Passed away {givendate}")
         pyautogui.press("tab")
         pyautogui.press("tab")
-        pyautogui.press("tab")
+        # pyautogui.press("tab")
         pyautogui.press("enter")
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)

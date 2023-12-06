@@ -152,7 +152,7 @@ def click_on_top_interaction(number_of_interactions):
         time.sleep(0.25)
     find_and_click_image(
         "windowsTarget/status_alone.png",
-        0,
+        40,
         round(number_of_interactions * 25),
         "down",
     )
@@ -310,7 +310,7 @@ def main():
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time -1 to quit",
         title="Enter Initials, which computer number this is, and delay time -1 to quit",
-        default="DE, 1, 0.05",
+        default="DE, 1, 0.04",
     )
     initials, computer_number, delay = input_str.strip().split(",")
     screen_width, screen_height = pyautogui.size()

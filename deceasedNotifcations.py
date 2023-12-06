@@ -5,15 +5,7 @@ import pyperclip
 import keyboard
 import pyautogui
 from datetime import datetime
-
-
-from main_shared_functions import (
-    cord_click,
-)
-
-
-# original_x_scale = 1440 / 2880
-# original_y_scale = 900 / 1800
+from main_shared_functions import cord_click
 
 x_scale = 1
 y_scale = 1
@@ -35,10 +27,8 @@ FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 
 
 def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
-    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, EDUCATION, LOAD_OPT_OUT_WAIT, LOAD_OWNER_WAIT
-
+    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL
     box = None
-    # Loop until a valid bounding box is found
     if image_filename == "windowsTarget/constituteSearch.png":
         confidence = 0.8
     while box is None:
@@ -53,9 +43,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             ),
         )
         time.sleep(delay * 5)
-        # If the image is not found and 'up_or_down' is specified
         if box is None and up_or_down:
-            # Scroll the screen up or down based on 'up_or_down'
             factor = 14 if up_or_down == "up" else -14
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
@@ -77,7 +65,7 @@ def end_time_recording(start_time):
 
 
 def cutoff_section_of_screen(image_filename):
-    global delay, MAX_ATTEMPTS, x_scale, y_scale, confidence
+    global delay, x_scale, y_scale, confidence
     box = None
     while box is None:
         box = pyautogui.locateOnScreen(
@@ -93,7 +81,7 @@ def cutoff_section_of_screen(image_filename):
 
 
 def main():
-    global initials, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, EDUCATION, COM_NUM, delay, PRIMARY_EMAIL
+    global cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, delay, PRIMARY_EMAIL
     screen_width, screen_height = pyautogui.size()
     x_scale = screen_width / 1440
     y_scale = screen_height / 900
@@ -125,7 +113,6 @@ def main():
         pyautogui.press("tab")
         # pyautogui.press("tab")
         pyautogui.press("enter")
-
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)
 

@@ -338,7 +338,11 @@ def main():
         schedule.run_pending()
 
 
-schedule.every().day.at("2:57").do(play_sound("quittingTime.mp3"))
+def play_quitting_sound():
+    play_sound("quittingTime.mp3")
+
+
+schedule.every().day.at("02:57").do(play_quitting_sound)
 
 if __name__ == "__main__":
     main()

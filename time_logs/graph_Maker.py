@@ -22,6 +22,9 @@ median = np.median(filtered_data)
 window = 100
 moving_avg = np.convolve(filtered_data, np.ones(window) / window, mode="valid")
 
+# Sort data and get the lowest value
+lowest_value = np.min(filtered_data)
+
 # Create a figure and plot the data
 plt.figure(figsize=(8, 6))
 plt.scatter(
@@ -33,9 +36,14 @@ plt.plot(
     color="blue",
     label="Moving Average",
 )
-# plt.axhline(y=mean, color="green", linestyle="--", label=f"Mean: {mean:.2f}")
 plt.axhline(y=median, color="purple", linestyle="--", label=f"Median: {median:.2f}")
 plt.axhline(y=mean + two_std, color="orange", linestyle="--", label="+1 SD")
+plt.scatter(
+    np.where(filtered_data == lowest_value),
+    lowest_value,
+    color="green",
+    label="Lowest Value",
+)
 plt.xlabel("Index")
 plt.ylabel("Value")
 plt.title("Data with Moving Average and Outliers Removed")
@@ -43,7 +51,8 @@ plt.legend()
 plt.savefig(f"graphImages/program_time_trials{data_array.size}.png")
 plt.show()
 
-# Display the mean, median, and standard deviation
 print(f"Mean: {mean:.2f}")
 print(f"Median: {median:.2f}")
 print(f"Standard Deviation: {std_dev:.2f}")
+print(f"Lowest Value: {lowest_value:.2f}")
+print(moving_avg[-1])

@@ -1,5 +1,6 @@
 # @Dimitry Ermakov
 # @09/23/2023
+import schedule
 import time
 from datetime import datetime
 import pygame
@@ -218,11 +219,7 @@ def process_application(is_confirmed=True):
         or "November" in found_text
         or "December" in found_text
     ):
-        pygame.init()
-        sound = pygame.mixer.Sound("alert_notification.mp3")
-        sound.play()
-        sound.set_volume(1)
-        pygame.mixer.music.stop()
+        play_sound("alert_notification.mp3")
         noted_date = pyautogui.prompt(
             text="", title="Noted Date?", default=extract_date(found_text)
         )
@@ -240,6 +237,14 @@ def process_application(is_confirmed=True):
 
     tab_command(2)
     pyautogui.press("enter")
+
+
+def play_sound(music_file):
+    pygame.init()
+    sound = pygame.mixer.Sound(music_file)
+    sound.play()
+    sound.set_volume(1)
+    pygame.mixer.music.stop()
 
 
 def deceased_form():
@@ -330,7 +335,10 @@ def main():
         opt_out_form()
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)
+        schedule.run_pending()
 
+
+schedule.every().day.at("2:57").do(play_sound("Stein.mp3"))
 
 if __name__ == "__main__":
     main()

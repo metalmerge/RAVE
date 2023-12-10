@@ -100,8 +100,23 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         cord_click((x, y))
 
 
-def formatted_extract_date(text):
-    dates = extract_dates(text)
+def formatted_extract_date(input_text):
+    dates = extract_dates(input_text)
+    if dates:
+        CURRENT_DATE = datetime.now()
+        formatted_month = str(CURRENT_DATE.month)
+        formatted_year = str(CURRENT_DATE.year)
+        if "last month" in input_text:
+            last_month = int(formatted_month) - 1
+            return f"{last_month}/{formatted_year}"
+        if "last year" in input_text:
+            last_year = int(formatted_year) - 1
+            return f"1/{last_year}"
+        if "this year" in input_text:
+            return f"1/{formatted_year}"
+        if "this month" in input_text:
+            return f"{formatted_month}/{formatted_year}"
+        return "1/"
     try:
         date = dates[0]
         month = date.month

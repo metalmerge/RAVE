@@ -13,7 +13,7 @@ Before using RAVE, make sure you have the following prerequisites installed:
 3. **Python Libraries**: Install the necessary Python libraries by running the following commands in your terminal or command prompt:
 
    ```bash
-   pip install pyperclip keyboard pyautogui pytesseract opencv-python-headless python-dateutil pygame
+   pip install pyperclip keyboard pyautogui pytesseract opencv-python-headless python-dateutil pygame date-extractor
    ```
 
    ```bash
@@ -44,7 +44,7 @@ Before using RAVE, make sure you have the following prerequisites installed:
 
 ## Acknowledgments
 
-Special thanks to Coding 101 with Steve and Indently for their informative videos on Pyautogui:
+Special thanks to Coding 101 with Steve and Indently for their informative videos on Pyautogui. Also thank you 
 
 - [Coding 101 with Steve](https://www.youtube.com/watch?v=qIJpBz6R2Uw)
 - [Indently](https://www.youtube.com/watch?v=cZQDO0ktnrw)

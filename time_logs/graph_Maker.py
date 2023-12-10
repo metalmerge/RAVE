@@ -18,8 +18,7 @@ two_std = 1 * std_dev
 filtered_data = data_array[abs(data_array - mean) < two_std]
 median = np.median(filtered_data)
 
-# Calculate 10-point moving average
-window = 100
+window = 50
 moving_avg = np.convolve(filtered_data, np.ones(window) / window, mode="valid")
 
 # Sort data and get the lowest value

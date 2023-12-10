@@ -12,14 +12,13 @@ import re
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
-
+from date_extractor import extract_dates
 
 from main_shared_functions import (
     extract_text_from_coordinates,
     cord_click,
     tab_command,
     extract_digits_from_text,
-    extract_date,
     remove_numbers_greater_than_current_year,
     remove_phone_numbers,
     remove_digits_next_to_letters,
@@ -29,9 +28,6 @@ from main_shared_functions import (
 # Potential improvements:
 #   - Find a better way to know the number of interactions than using extract_text_from_coordinates
 #   - Use mss to take screenshots instead of pyautogui
-
-# original_x_scale = 1440 / 2880
-# original_y_scale = 900 / 1800
 
 x_scale = 1
 y_scale = 1
@@ -102,6 +98,17 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         "windowsTarget/preference.png",
     ]:
         cord_click((x, y))
+
+
+def formatted_extract_date(text):
+    dates = extract_dates(text)
+    try:
+        date = dates[0]
+        month = date.month
+        year = date.year
+        return f"{month}/{year}"
+    except IndexError:
+        return "1/"
 
 
 def get_to_dead_page():
@@ -202,26 +209,30 @@ def process_application(is_confirmed=True):
     found_text = remove_phone_numbers(found_text)
     found_text = remove_numbers_greater_than_current_year(found_text)
     found_text = remove_digits_next_to_letters(found_text)
-    if (
-        extract_digits_from_text(found_text) != ""
-        or "year" in found_text
-        or "month" in found_text
-        or "January" in found_text
-        or "February" in found_text
-        or "March" in found_text
-        or "April" in found_text
-        or "May" in found_text
-        or "June" in found_text
-        or "July" in found_text
-        or "August" in found_text
-        or "September" in found_text
-        or "October" in found_text
-        or "November" in found_text
-        or "December" in found_text
+    specific_words = [
+        "year",
+        "month",
+        "January",
+        "February",
+        "March",
+        "April",
+        "May",
+        "June",
+        "July",
+        "August",
+        "September",
+        "October",
+        "November",
+        "December",
+    ]
+
+    if any(
+        extract_digits_from_text(found_text) != "" or word in found_text
+        for word in specific_words
     ):
         play_sound("alert_notification.mp3")
         noted_date = pyautogui.prompt(
-            text="", title="Noted Date?", default=extract_date(found_text)
+            text="", title="Noted Date?", default=formatted_extract_date(found_text)
         )
         find_and_click_image("windowsTarget/sites.png")
         tab_command(2)
@@ -342,7 +353,7 @@ def play_quitting_sound():
     play_sound("quittingTime.mp3")
 
 
-schedule.every().day.at("02:57").do(play_quitting_sound)
-
 if __name__ == "__main__":
+    quit_time = pyautogui.prompt("Enter the quitting time in HH:MM format: ")
+    schedule.every().day.at(quit_time).do(play_quitting_sound)
     main()

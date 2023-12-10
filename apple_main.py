@@ -7,6 +7,8 @@ import keyboard
 import pyautogui
 import pytesseract
 import os
+from date_extractor import extract_dates
+
 
 from main_shared_functions import (
     extract_text_from_coordinates,
@@ -211,7 +213,7 @@ def process_application(is_confirmed=True):
     ):
         # Prompt for the noted date and click on "sites"
         noted_date = pyautogui.prompt(
-            text="", title="Noted Date?", default=extract_date(found_text)
+            text="", title="Noted Date?", default=extract_dates(found_text)
         )
         find_and_click_image("appleTarget/sites.png")
     if found_text != "":

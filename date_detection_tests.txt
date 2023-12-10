@@ -1,0 +1,36 @@
+Input Text: The meeting is scheduled for June 2017, please confirm. Next month's deadline is important.
+Expected Date: 6/2017
+
+Input Text: The event will take place on 2023-10-15. Don't forget!
+Expected Date: 10/2023
+
+Input Text: Please submit your report by 15-Jan-2023.
+Expected Date: 1/2023
+
+Input Text: She passed away last month
+Expected Date: [Current Month -1]/[Current Year]
+
+Input Text: 2017
+Expected Date: 1/2017
+
+Input Text: She passed away last year
+Expected Date: 1/[Current Year - 1]
+
+Input Text: She passed away this year
+Expected Date: 1/[Current Year]
+
+Input Text: Last year's budget review was in August 2022.
+Expected Date: 8/2022
+
+Input Text: The project is due on 20 December 2023.
+Expected Date: 12/2023
+
+Input Text: Please mark constituent as deceased -- Daughter called, informing us that her father recently passed away. - By user: swilliams1
+Expected Date: [Current Month]/[Current Year]
+
+Input Text: Please mark constituent as deceased -- https://www.legacy.com/us/obituaries/legacyremembers/charles-podorean-obituary?id=24405207
+Family member called to remove Mr. Podorean from mailing list - By user: jkorstange
+Expected Date: [Current Month]/[Current Year]
+
+Input Text: 12/2021
+Expected Date: 12/2021

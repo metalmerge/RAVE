@@ -48,14 +48,6 @@ def extract_text_from_coordinates(x1, y1, x2, y2):
     return extracted_text.strip()
 
 
-def cord_click(coordinates):
-    # Move the mouse pointer to the specified coordinates
-    pyautogui.moveTo(coordinates[0], coordinates[1])
-
-    # Perform a mouse click at the current position
-    pyautogui.click()
-
-
 def tab_command(number_of_interactions):
     # Simulate pressing the "Tab" key a specified number of times
     for _ in range(0, number_of_interactions):

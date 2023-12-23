@@ -97,7 +97,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         "windowsTarget/source_wait.png",
         "windowsTarget/preference.png",
     ]:
-        cord_click((x, y))
+        pyautogui.click(x, y)
 
 
 def formatted_extract_date(input_text):

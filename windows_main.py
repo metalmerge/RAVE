@@ -12,11 +12,12 @@ import re
 from dateutil.parser import parse
 from dateutil.relativedelta import relativedelta
 from datetime import datetime
-from date_extractor import extract_dates
+
+# from date_extractor import extract_dates
 
 from main_shared_functions import (
     extract_text_from_coordinates,
-    cord_click,
+    extract_dates,
     tab_command,
     extract_digits_from_text,
     remove_numbers_greater_than_current_year,
@@ -97,33 +98,34 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         "windowsTarget/source_wait.png",
         "windowsTarget/preference.png",
     ]:
-        pyautogui.click(x, y)
+        pyautogui.moveTo(x, y)
+        pyautogui.click()
 
 
-def formatted_extract_date(input_text):
-    dates = extract_dates(input_text)
-    if dates:
-        CURRENT_DATE = datetime.now()
-        formatted_month = str(CURRENT_DATE.month)
-        formatted_year = str(CURRENT_DATE.year)
-        if "last month" in input_text:
-            last_month = int(formatted_month) - 1
-            return f"{last_month}/{formatted_year}"
-        if "last year" in input_text:
-            last_year = int(formatted_year) - 1
-            return f"1/{last_year}"
-        if "this year" in input_text:
-            return f"1/{formatted_year}"
-        if "this month" in input_text:
-            return f"{formatted_month}/{formatted_year}"
-        return "1/"
-    try:
-        date = dates[0]
-        month = date.month
-        year = date.year
-        return f"{month}/{year}"
-    except IndexError:
-        return "1/"
+# def formatted_extract_date(input_text):
+#     dates = extract_dates(input_text)
+#     if dates:
+#         CURRENT_DATE = datetime.now()
+#         formatted_month = str(CURRENT_DATE.month)
+#         formatted_year = str(CURRENT_DATE.year)
+#         if "last month" in input_text:
+#             last_month = int(formatted_month) - 1
+#             return f"{last_month}/{formatted_year}"
+#         if "last year" in input_text:
+#             last_year = int(formatted_year) - 1
+#             return f"1/{last_year}"
+#         if "this year" in input_text:
+#             return f"1/{formatted_year}"
+#         if "this month" in input_text:
+#             return f"{formatted_month}/{formatted_year}"
+#         return "1/"
+#     try:
+#         date = dates[0]
+#         month = date.month
+#         year = date.year
+#         return f"{month}/{year}"
+#     except IndexError:
+#         return "1/"
 
 
 def get_to_dead_page():
@@ -247,7 +249,7 @@ def process_application(is_confirmed=True):
     ):
         play_sound("alert_notification.mp3")
         noted_date = pyautogui.prompt(
-            text="", title="Noted Date?", default=formatted_extract_date(found_text)
+            text="", title="Noted Date?", default=extract_dates(found_text)
         )
         find_and_click_image("windowsTarget/sites.png")
         tab_command(2)
@@ -275,15 +277,18 @@ def play_sound(music_file):
 
 def deceased_form():
     global noted_date, FORMATTED_DATE
+    find_and_click_image("windowsTarget/source_tab_down.png")
+    find_and_click_image("windowsTarget/communication_from.png")
     find_and_click_image("windowsTarget/deceased_date.png")
     if noted_date == "1/":
         keyboard.write(FORMATTED_DATE)
     elif noted_date != "1/":
         keyboard.write(noted_date)
         noted_date = "1/"
-    find_and_click_image("windowsTarget/source_tab_down.png")
-    find_and_click_image("windowsTarget/communication_from.png")
-    pyautogui.press("enter")
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.press("tab")
+    pyautogui.press("space")
 
 
 def move_to_communications():
@@ -369,6 +374,6 @@ def play_quitting_sound():
 
 
 if __name__ == "__main__":
-    quit_time = pyautogui.prompt("Enter the quitting time in HH:MM format: ")
-    schedule.every().day.at(quit_time).do(play_quitting_sound)
+    # quit_time = pyautogui.prompt("Enter the quitting time in HH:MM format: ")
+    # schedule.every().day.at(quit_time).do(play_quitting_sound)
     main()

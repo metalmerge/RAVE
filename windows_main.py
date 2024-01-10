@@ -56,8 +56,8 @@ FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 
 def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, EDUCATION, LOAD_OPT_OUT_WAIT, LOAD_OWNER_WAIT
-
     box = None
+    attempts = 0
     if (
         image_filename == "windowsTarget/source_file_tab_down.png"
         or image_filename == "windowsTarget/status_alone.png"
@@ -81,6 +81,9 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             factor = 14 if up_or_down == "up" else -14
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
+        attempts += 1
+        if attempts > 20:
+            play_sound("alert_notification.mp3")
 
     x, y, width, height = box
     x = box.left + width / 2 + biasx
@@ -267,7 +270,6 @@ def process_application(is_confirmed=True):
         "November",
         "December",
     ]
-
     if any(
         extract_digits_from_text(found_text) != "" or word in found_text
         for word in specific_words

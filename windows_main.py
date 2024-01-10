@@ -72,7 +72,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
         attempts += 1
-        if attempts > 20:
+        if attempts > 25:
             play_sound("alert_notification.mp3")
             time.sleep(2)
 
@@ -118,7 +118,7 @@ def month_year_only(input_text):
 
 def formatted_extract_date(input_text):
     dates = extract_dates(input_text)
-    print(dates)
+    print(f"{dates}:{input_text}")
     if dates:
         month_year_result = month_year_only(input_text)
         if month_year_result is not None:
@@ -143,6 +143,7 @@ def formatted_extract_date(input_text):
         year = date.year
         return f"{month}/{year}"
     except IndexError:
+        print("Fail")
         return "1/"
 
 
@@ -318,6 +319,7 @@ def move_to_communications():
 
 def opt_out_form():
     global FULL_DATE
+    time.sleep(0.01)
     find_and_click_image("windowsTarget/solicit_code.png")
     keyboard.write("Imprimis")
     find_and_click_image("windowsTarget/imprimis_three.png")
@@ -382,8 +384,8 @@ def main():
         opt_out_form()
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)
-        print(f"Deincrement: {deincrement}")
-        deincrement += 0.01
+        # print(f"Deincrement: {deincrement}")
+        # deincrement += 0.01
 
 
 if __name__ == "__main__":

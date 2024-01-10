@@ -24,7 +24,7 @@ x_scale = 1
 y_scale = 1
 COM_NUM = 1
 delay = 0.04
-deincrement = 0.02
+deincrement = 0.27
 confidence = 0.7
 CRM_cords = (0, 0)
 cutOffTopY = 0
@@ -190,7 +190,7 @@ def click_on_top_interaction(number_of_interactions):
         time.sleep(0.99 - deincrement)
         find_and_click_image(LOAD_OWNER_WAIT)
         find_and_click_image(IMPRIMIS)
-        time.sleep(0.25 - deincrement)
+        # time.sleep(0.25 - deincrement)
     find_and_click_image(
         "windowsTarget/status_alone.png",
         40,
@@ -310,7 +310,7 @@ def move_to_communications():
     global IMPRIMIS, deincrement
     find_and_click_image("windowsTarget/constitute.png")
     find_and_click_image(IMPRIMIS)
-    time.sleep(0.25 - deincrement)
+    # time.sleep(0.25 - deincrement)
     # find_and_click_image("windowsTarget/communications.png")
     find_and_click_image("windowsTarget/preference.png")
     find_and_click_image("windowsTarget/add.png")
@@ -361,7 +361,7 @@ def main():
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time; -1 to quit",
         title="Enter Initials, which computer number this is, and delay time; -1 to quit",
-        default="DE, 1, 0.04, 0.04",
+        default="DE, 1, 0.04, 0.27",
     )
     initials, computer_number, delay, deincrement = input_str.strip().split(",")
     COM_NUM = int(computer_number)

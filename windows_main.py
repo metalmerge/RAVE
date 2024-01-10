@@ -1,6 +1,5 @@
 # @Dimitry Ermakov
 # @09/23/2023
-import schedule
 import time
 from datetime import datetime
 import pygame
@@ -8,8 +7,6 @@ import pyperclip
 import keyboard
 import pyautogui
 import re
-from datetime import datetime
-
 from date_extractor import extract_dates
 
 from main_shared_functions import (
@@ -22,16 +19,12 @@ from main_shared_functions import (
     remove_digits_next_to_letters,
 )
 
-# TODO
-# Potential improvements:
-#   - Find a better way to know the number of interactions than using extract_text_from_coordinates
-#   - Use mss to take screenshots instead of pyautogui
 
 x_scale = 1
 y_scale = 1
 COM_NUM = 1
 delay = 0.04
-deincrement = 0.01
+deincrement = 0.02
 confidence = 0.7
 CRM_cords = (0, 0)
 cutOffTopY = 0
@@ -46,7 +39,7 @@ EDUCATION = "windowsTarget/education.png"
 LOAD_OPT_OUT_WAIT = "windowsTarget/wait_for_load_opt_out.png"
 LOAD_OWNER_WAIT = "windowsTarget/wait_for_load_owner.png"
 PRIMARY_EMAIL = "windowsTarget/primary_email.png"
-MAX_ATTEMPTS = round(1.25 / (delay * 5))
+MAX_ATTEMPTS = 20
 CURRENT_DATE = datetime.now()
 formatted_month = str(CURRENT_DATE.month)
 formatted_year = str(CURRENT_DATE.year)
@@ -83,7 +76,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
         attempts += 1
-        if attempts > 20:
+        if attempts > MAX_ATTEMPTS:
             play_sound("alert_notification.mp3")
 
     x, y, width, height = box
@@ -372,9 +365,10 @@ def main():
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time; -1 to quit",
         title="Enter Initials, which computer number this is, and delay time; -1 to quit",
-        default="DE, 1, 0.04, 0.01",
+        default="DE, 1, 0.04, 0.02",
     )
     initials, computer_number, delay, deincrement = input_str.strip().split(",")
+    deincrement = float(deincrement.strip())
     screen_width, screen_height = pyautogui.size()
     x_scale = screen_width / 1440
     y_scale = screen_height / 900
@@ -392,8 +386,8 @@ def main():
         opt_out_form()
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)
-        deincrement += 0.01
-        print(f"Deincrement: {deincrement}")
+        # deincrement += 0.01
+        # print(f"Deincrement: {deincrement}")
 
 
 if __name__ == "__main__":

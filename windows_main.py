@@ -7,17 +7,14 @@ import pygame
 import pyperclip
 import keyboard
 import pyautogui
-from pytesseract import pytesseract
 import re
-from dateutil.parser import parse
-from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
-# from date_extractor import extract_dates
+from date_extractor import extract_dates
 
 from main_shared_functions import (
     extract_text_from_coordinates,
-    extract_dates,
+    # extract_dates,
     tab_command,
     extract_digits_from_text,
     remove_numbers_greater_than_current_year,
@@ -102,30 +99,58 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         pyautogui.click()
 
 
-# def formatted_extract_date(input_text):
-#     dates = extract_dates(input_text)
-#     if dates:
-#         CURRENT_DATE = datetime.now()
-#         formatted_month = str(CURRENT_DATE.month)
-#         formatted_year = str(CURRENT_DATE.year)
-#         if "last month" in input_text:
-#             last_month = int(formatted_month) - 1
-#             return f"{last_month}/{formatted_year}"
-#         if "last year" in input_text:
-#             last_year = int(formatted_year) - 1
-#             return f"1/{last_year}"
-#         if "this year" in input_text:
-#             return f"1/{formatted_year}"
-#         if "this month" in input_text:
-#             return f"{formatted_month}/{formatted_year}"
-#         return "1/"
-#     try:
-#         date = dates[0]
-#         month = date.month
-#         year = date.year
-#         return f"{month}/{year}"
-#     except IndexError:
-#         return "1/"
+def month_year_only(input_text):
+    months = {
+        "January": 1,
+        "February": 2,
+        "March": 3,
+        "April": 4,
+        "May": 5,
+        "June": 6,
+        "July": 7,
+        "August": 8,
+        "September": 9,
+        "October": 10,
+        "November": 11,
+        "December": 12,
+    }
+    month_year_pattern = r"\b([A-Za-z]+)[ /-](\d{4})\b"
+    month_year_match = re.search(month_year_pattern, input_text)
+    if month_year_match:
+        month = months.get(month_year_match.group(1))
+        year = month_year_match.group(2)
+        if month:
+            return f"{month}/{year}"
+    return None
+
+
+def formatted_extract_date(input_text):
+    dates = extract_dates(input_text)
+    if dates:
+        month_year_result = month_year_only(input_text)
+        if month_year_result is not None:
+            return month_year_result
+        CURRENT_DATE = datetime.now()
+        formatted_month = str(CURRENT_DATE.month)
+        formatted_year = str(CURRENT_DATE.year)
+        if "last month" in input_text:
+            last_month = int(formatted_month) - 1
+            return f"{last_month}/{formatted_year}"
+        if "last year" in input_text:
+            last_year = int(formatted_year) - 1
+            return f"1/{last_year}"
+        if "this year" in input_text:
+            return f"1/{formatted_year}"
+        if "this month" in input_text:
+            return f"{formatted_month}/{formatted_year}"
+        return "1/"
+    try:
+        date = dates[0]
+        month = date.month
+        year = date.year
+        return f"{month}/{year}"
+    except IndexError:
+        return "1/"
 
 
 def get_to_dead_page():
@@ -151,9 +176,9 @@ def interactions_num_finder():
         try:
             text = extract_text_from_coordinates(
                 1196,
-                478,  # 491,
+                491,  # 478,
                 1281,
-                499,  # 517,
+                517,  # 499,
             )
             if pretext in text:
                 num_index = text.index(pretext) + len(pretext)
@@ -249,7 +274,7 @@ def process_application(is_confirmed=True):
     ):
         play_sound("alert_notification.mp3")
         noted_date = pyautogui.prompt(
-            text="", title="Noted Date?", default=extract_dates(found_text)
+            text="", title="Noted Date?", default=formatted_extract_date(found_text)
         )
         find_and_click_image("windowsTarget/sites.png")
         tab_command(2)

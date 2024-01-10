@@ -34,10 +34,8 @@ pyautogui.PAUSE = delay
 DEFAULT_PROMPT = "0"
 noted_date = "1/"
 IMPRIMIS = "windowsTarget/receives_imprimis.png"
-LOAD_OPT_OUT_WAIT = "windowsTarget/wait_for_load_opt_out.png"
 LOAD_OWNER_WAIT = "windowsTarget/wait_for_load_owner.png"
 PRIMARY_EMAIL = "windowsTarget/primary_email.png"
-MAX_ATTEMPTS = 20
 CURRENT_DATE = datetime.now()
 formatted_month = str(CURRENT_DATE.month)
 formatted_year = str(CURRENT_DATE.year)
@@ -47,7 +45,7 @@ FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 
 
 def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
-    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, LOAD_OPT_OUT_WAIT, LOAD_OWNER_WAIT
+    global cutOffTopY, delay, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, LOAD_OWNER_WAIT
     box = None
     attempts = 0
     if (
@@ -74,8 +72,9 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
         attempts += 1
-        if attempts > MAX_ATTEMPTS:
+        if attempts > 20:
             play_sound("alert_notification.mp3")
+            time.sleep(2)
 
     x, y, width, height = box
     x = box.left + width / 2 + biasx
@@ -83,7 +82,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     if image_filename not in [
         IMPRIMIS,
         PRIMARY_EMAIL,
-        LOAD_OPT_OUT_WAIT,
         LOAD_OWNER_WAIT,
         "windowsTarget/personal_info_wait.png",
         "windowsTarget/source_wait.png",
@@ -120,6 +118,7 @@ def month_year_only(input_text):
 
 def formatted_extract_date(input_text):
     dates = extract_dates(input_text)
+    print(dates)
     if dates:
         month_year_result = month_year_only(input_text)
         if month_year_result is not None:
@@ -362,7 +361,7 @@ def main():
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time; -1 to quit",
         title="Enter Initials, which computer number this is, and delay time; -1 to quit",
-        default="DE, 1, 0.04, 0.02",
+        default="DE, 1, 0.04, 0.04",
     )
     initials, computer_number, delay, deincrement = input_str.strip().split(",")
     COM_NUM = int(computer_number)
@@ -383,8 +382,8 @@ def main():
         opt_out_form()
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)
-        # deincrement += 0.01
-        # print(f"Deincrement: {deincrement}")
+        print(f"Deincrement: {deincrement}")
+        deincrement += 0.01
 
 
 if __name__ == "__main__":

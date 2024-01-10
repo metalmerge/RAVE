@@ -2,7 +2,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 # Read data from the file
-file_path = "windows_program_log.txt"
+file_path = "time_logs/windows_program_log.txt"
 with open(file_path, "r") as file:
     # Read lines and convert data to float
     data = [float(line.strip()) for line in file.readlines()]
@@ -11,10 +11,10 @@ with open(file_path, "r") as file:
 data_array = np.array(data)
 
 # Calculate mean, median, and standard deviation
-mean = np.mean(data_array)
 std_dev = np.std(data_array)
+mean = np.mean(data_array)
 
-two_std = 1 * std_dev
+two_std = std_dev * 1
 filtered_data = data_array[abs(data_array - mean) < two_std]
 median = np.median(filtered_data)
 
@@ -36,6 +36,7 @@ plt.plot(
     label="Moving Average",
 )
 plt.axhline(y=median, color="purple", linestyle="--", label=f"Median: {median:.2f}")
+# plt.axhline(y=mean, color="yellow", linestyle="--", label=f"Mean: {mean:.2f}")
 plt.axhline(y=mean + two_std, color="orange", linestyle="--", label="+1 SD")
 plt.scatter(
     np.where(filtered_data == lowest_value),
@@ -47,7 +48,8 @@ plt.xlabel("Index")
 plt.ylabel("Value")
 plt.title("Data with Moving Average and Outliers Removed")
 plt.legend()
-plt.savefig(f"graphImages/program_time_trials{data_array.size}.png")
+plt.grid(True)
+plt.savefig(f"time_logs/graphImages/program_time_trials{data_array.size}.png")
 plt.show()
 
 print(f"Mean: {mean:.2f}")

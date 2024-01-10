@@ -7,11 +7,12 @@ import pyperclip
 import keyboard
 import pyautogui
 import re
-from date_extractor import extract_dates
+
+# from date_extractor import extract_dates
 
 from main_shared_functions import (
     extract_text_from_coordinates,
-    # extract_dates,
+    extract_dates,
     tab_command,
     extract_digits_from_text,
     remove_numbers_greater_than_current_year,
@@ -31,7 +32,6 @@ cutOffTopY = 0
 cutOffBottomY = 900
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = delay
-DEFAULT_PROMPT = "0"
 noted_date = "1/"
 IMPRIMIS = "windowsTarget/receives_imprimis.png"
 LOAD_OWNER_WAIT = "windowsTarget/wait_for_load_owner.png"
@@ -53,7 +53,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         or image_filename == "windowsTarget/status_alone.png"
     ):
         confidence = 0.8
-    # Loop until a valid bounding box is found
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
@@ -265,7 +264,7 @@ def process_application(is_confirmed=True, initials="DE"):
     ):
         play_sound("alert_notification.mp3")
         noted_date = pyautogui.prompt(
-            text="", title="Noted Date?", default=formatted_extract_date(found_text)
+            text="", title="Noted Date?", default=extract_dates(found_text)
         )
         find_and_click_image("windowsTarget/sites.png")
         tab_command(2)

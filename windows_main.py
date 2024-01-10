@@ -32,10 +32,8 @@ cutOffBottomY = 900
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = delay
 DEFAULT_PROMPT = "0"
-initials = "DE"
 noted_date = "1/"
 IMPRIMIS = "windowsTarget/receives_imprimis.png"
-EDUCATION = "windowsTarget/education.png"
 LOAD_OPT_OUT_WAIT = "windowsTarget/wait_for_load_opt_out.png"
 LOAD_OWNER_WAIT = "windowsTarget/wait_for_load_owner.png"
 PRIMARY_EMAIL = "windowsTarget/primary_email.png"
@@ -49,7 +47,7 @@ FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 
 
 def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
-    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, EDUCATION, LOAD_OPT_OUT_WAIT, LOAD_OWNER_WAIT
+    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, LOAD_OPT_OUT_WAIT, LOAD_OWNER_WAIT
     box = None
     attempts = 0
     if (
@@ -84,7 +82,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     y = box.top + height / 2 + biasy
     if image_filename not in [
         IMPRIMIS,
-        EDUCATION,
         PRIMARY_EMAIL,
         LOAD_OPT_OUT_WAIT,
         LOAD_OWNER_WAIT,
@@ -204,11 +201,11 @@ def click_on_top_interaction(number_of_interactions):
     find_and_click_image("windowsTarget/edit_interaction.png", 0, 0, "down")
 
 
-def interactions_section(number_of_interactions):
+def interactions_section(number_of_interactions, initials):
     global LOAD_OWNER_WAIT, PRIMARY_EMAIL
     find_and_click_image("windowsTarget/interactions.png")
     click_on_top_interaction(1)
-    process_application()
+    process_application(True, initials)
     if number_of_interactions > 1:
         for i in range(2, number_of_interactions + 1):
             find_and_click_image(IMPRIMIS)
@@ -216,15 +213,15 @@ def interactions_section(number_of_interactions):
             find_and_click_image(LOAD_OWNER_WAIT)
             click_on_top_interaction(i)
             # find_and_click_image(LOAD_OWNER_WAIT)
-            process_application(False)
+            process_application(False, initials)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "up")
     find_and_click_image("windowsTarget/personal_info.png")
     find_and_click_image("windowsTarget/personal_info_wait.png")  # , 0, 0, "down"
     find_and_click_image("windowsTarget/marked_deceased.png")
 
 
-def process_application(is_confirmed=True):
-    global initials, noted_date, FULL_DATE, deincrement
+def process_application(is_confirmed=True, initials="DE"):
+    global noted_date, FULL_DATE, deincrement
     if is_confirmed:
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/completed_form.png")
@@ -345,7 +342,7 @@ def end_time_recording(start_time):
 
 
 def cutoff_section_of_screen(image_filename):
-    global delay, MAX_ATTEMPTS, x_scale, y_scale, confidence
+    global delay, x_scale, y_scale, confidence
     box = None
     while box is None:
         box = pyautogui.locateOnScreen(
@@ -361,26 +358,26 @@ def cutoff_section_of_screen(image_filename):
 
 
 def main():
-    global initials, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, EDUCATION, COM_NUM, delay, PRIMARY_EMAIL, deincrement
+    global cutOffTopY, cutOffBottomY, x_scale, y_scale, CRM_cords, COM_NUM, delay, deincrement, PRIMARY_EMAIL
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time; -1 to quit",
         title="Enter Initials, which computer number this is, and delay time; -1 to quit",
         default="DE, 1, 0.04, 0.02",
     )
     initials, computer_number, delay, deincrement = input_str.strip().split(",")
-    deincrement = float(deincrement.strip())
+    COM_NUM = int(computer_number)
+    delay = float(delay)
+    deincrement = float(deincrement)
     screen_width, screen_height = pyautogui.size()
     x_scale = screen_width / 1440
     y_scale = screen_height / 900
-    delay = float(delay.strip())
-    COM_NUM = int(computer_number.strip())
     cutOffBottomY = screen_height
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while initials != "-1":
         start_time = time.time()
         get_to_dead_page()
         number_of_interactions = interactions_num_finder()
-        interactions_section(number_of_interactions)
+        interactions_section(number_of_interactions, initials)
         deceased_form()
         move_to_communications()
         opt_out_form()

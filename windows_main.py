@@ -30,7 +30,8 @@ from main_shared_functions import (
 x_scale = 1
 y_scale = 1
 COM_NUM = 1
-delay = 0.05
+delay = 0.04
+deincrement = 0.01
 confidence = 0.7
 CRM_cords = (0, 0)
 cutOffTopY = 0
@@ -160,7 +161,6 @@ def get_to_dead_page():
     global COM_NUM, delay
 
     find_and_click_image("windowsTarget/constituents.png")
-    # time.sleep(0.05 + delay)
     find_and_click_image("windowsTarget/updates.png")
     if COM_NUM == 2:
         find_and_click_image("windowsTarget/third_page.png")
@@ -173,7 +173,6 @@ def get_to_dead_page():
 
 def interactions_num_finder():
     global delay
-
     while True:
         pretext = "Interactions: "
         try:
@@ -197,12 +196,12 @@ def interactions_num_finder():
 
 
 def click_on_top_interaction(number_of_interactions):
-    global IMPRIMIS, PRIMARY_EMAIL, LOAD_OWNER_WAIT
+    global IMPRIMIS, PRIMARY_EMAIL, LOAD_OWNER_WAIT, deincrement
     if number_of_interactions == 1:
-        time.sleep(1)
+        time.sleep(0.99 - deincrement)
         find_and_click_image(LOAD_OWNER_WAIT)
         find_and_click_image(IMPRIMIS)
-        time.sleep(0.25)
+        time.sleep(0.25 - deincrement)
     find_and_click_image(
         "windowsTarget/status_alone.png",
         40,
@@ -232,7 +231,7 @@ def interactions_section(number_of_interactions):
 
 
 def process_application(is_confirmed=True):
-    global initials, noted_date, FULL_DATE
+    global initials, noted_date, FULL_DATE, deincrement
     if is_confirmed:
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/completed_form.png")
@@ -241,7 +240,7 @@ def process_application(is_confirmed=True):
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/declined.png")
         find_and_click_image("windowsTarget/wait_for_declined.png")
-    time.sleep(1)
+    time.sleep(0.99 - deincrement)
     find_and_click_image("windowsTarget/actual_date.png")
     keyboard.press_and_release("ctrl+a")
     keyboard.write(FULL_DATE)
@@ -249,7 +248,7 @@ def process_application(is_confirmed=True):
     pyperclip.copy("")
     keyboard.press_and_release("ctrl+a")
     keyboard.press_and_release("ctrl+c")
-    time.sleep(0.5)
+    time.sleep(0.5 - deincrement)
     found_text = pyperclip.paste()
     found_text = remove_phone_numbers(found_text)
     found_text = remove_numbers_greater_than_current_year(found_text)
@@ -319,10 +318,10 @@ def deceased_form():
 
 
 def move_to_communications():
-    global IMPRIMIS
+    global IMPRIMIS, deincrement
     find_and_click_image("windowsTarget/constitute.png")
     find_and_click_image(IMPRIMIS)
-    time.sleep(0.25)
+    time.sleep(0.25 - deincrement)
     # find_and_click_image("windowsTarget/communications.png")
     find_and_click_image("windowsTarget/preference.png")
     find_and_click_image("windowsTarget/add.png")
@@ -369,13 +368,13 @@ def cutoff_section_of_screen(image_filename):
 
 
 def main():
-    global initials, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, EDUCATION, COM_NUM, delay, PRIMARY_EMAIL
+    global initials, cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, EDUCATION, COM_NUM, delay, PRIMARY_EMAIL, deincrement
     input_str = pyautogui.prompt(
-        text="Enter Initials, which computer number this is, and delay time -1 to quit",
-        title="Enter Initials, which computer number this is, and delay time -1 to quit",
-        default="DE, 1, 0.04",
+        text="Enter Initials, which computer number this is, and delay time; -1 to quit",
+        title="Enter Initials, which computer number this is, and delay time; -1 to quit",
+        default="DE, 1, 0.04, 0.01",
     )
-    initials, computer_number, delay = input_str.strip().split(",")
+    initials, computer_number, delay, deincrement = input_str.strip().split(",")
     screen_width, screen_height = pyautogui.size()
     x_scale = screen_width / 1440
     y_scale = screen_height / 900
@@ -393,14 +392,9 @@ def main():
         opt_out_form()
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)
-        schedule.run_pending()
-
-
-def play_quitting_sound():
-    play_sound("quittingTime.mp3")
+        deincrement += 0.01
+        print(f"Deincrement: {deincrement}")
 
 
 if __name__ == "__main__":
-    # quit_time = pyautogui.prompt("Enter the quitting time in HH:MM format: ")
-    # schedule.every().day.at(quit_time).do(play_quitting_sound)
     main()

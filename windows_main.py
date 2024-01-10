@@ -25,7 +25,7 @@ x_scale = 1
 y_scale = 1
 COM_NUM = 1
 delay = 0.04
-deincrement = 0.27
+deincrement = 0.43
 confidence = 0.7
 CRM_cords = (0, 0)
 cutOffTopY = 0
@@ -148,7 +148,7 @@ def formatted_extract_date(input_text):
 
 def get_to_dead_page():
     global COM_NUM, delay
-
+    time.sleep(0.01)
     find_and_click_image("windowsTarget/constituents.png")
     find_and_click_image("windowsTarget/updates.png")
     if COM_NUM == 2:
@@ -237,7 +237,7 @@ def process_application(is_confirmed=True, initials="DE"):
     pyperclip.copy("")
     keyboard.press_and_release("ctrl+a")
     keyboard.press_and_release("ctrl+c")
-    time.sleep(0.5 - deincrement)
+    time.sleep(0.5)
     found_text = pyperclip.paste()
     found_text = remove_phone_numbers(found_text)
     found_text = remove_numbers_greater_than_current_year(found_text)
@@ -292,11 +292,11 @@ def play_sound(music_file):
 
 def deceased_form():
     global noted_date, FORMATTED_DATE
-    time.sleep(.01)
+    time.sleep(0.01)
     find_and_click_image("windowsTarget/source_tab_down.png")
     find_and_click_image("windowsTarget/communication_from.png")
     find_and_click_image("windowsTarget/deceased_date.png")
-    time.sleep(.01)
+    time.sleep(0.01)
     if noted_date == "1/":
         keyboard.write(FORMATTED_DATE)
     elif noted_date != "1/":
@@ -309,10 +309,9 @@ def deceased_form():
 
 
 def move_to_communications():
-    global IMPRIMIS, deincrement
+    global IMPRIMIS
     find_and_click_image("windowsTarget/constitute.png")
     find_and_click_image(IMPRIMIS)
-    # time.sleep(0.25 - deincrement)
     # find_and_click_image("windowsTarget/communications.png")
     find_and_click_image("windowsTarget/preference.png")
     find_and_click_image("windowsTarget/add.png")
@@ -320,7 +319,7 @@ def move_to_communications():
 
 def opt_out_form():
     global FULL_DATE
-    time.sleep(0.01)
+    time.sleep(0.02)
     find_and_click_image("windowsTarget/solicit_code.png")
     keyboard.write("Imprimis")
     find_and_click_image("windowsTarget/imprimis_three.png")
@@ -364,7 +363,7 @@ def main():
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time; -1 to quit",
         title="Enter Initials, which computer number this is, and delay time; -1 to quit",
-        default="DE, 1, 0.04, 0.27",
+        default="DE, 1, 0.04, 0.43",
     )
     initials, computer_number, delay, deincrement = input_str.strip().split(",")
     COM_NUM = int(computer_number)
@@ -385,8 +384,8 @@ def main():
         opt_out_form()
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)
-        # print(f"Deincrement: {deincrement}")
-        # deincrement += 0.01
+        print(f"Deincrement: {deincrement}")
+        deincrement += 0.01
 
 
 if __name__ == "__main__":

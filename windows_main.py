@@ -71,7 +71,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
         attempts += 1
-        if attempts > 25:
+        if attempts > 50:
             play_sound("alert_notification.mp3")
             time.sleep(2)
 
@@ -292,9 +292,11 @@ def play_sound(music_file):
 
 def deceased_form():
     global noted_date, FORMATTED_DATE
+    time.sleep(.01)
     find_and_click_image("windowsTarget/source_tab_down.png")
     find_and_click_image("windowsTarget/communication_from.png")
     find_and_click_image("windowsTarget/deceased_date.png")
+    time.sleep(.01)
     if noted_date == "1/":
         keyboard.write(FORMATTED_DATE)
     elif noted_date != "1/":

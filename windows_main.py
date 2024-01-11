@@ -25,7 +25,6 @@ x_scale = 1
 y_scale = 1
 COM_NUM = 1
 delay = 0.04
-deincrement = 0.43
 confidence = 0.7
 CRM_cords = (0, 0)
 cutOffTopY = 0
@@ -162,8 +161,13 @@ def get_to_dead_page():
 
 def interactions_num_finder():
     global delay
+    attempts = 0
     while True:
         pretext = "Interactions: "
+        attempts += 1
+        if attempts > 50:
+            play_sound("alert_notification.mp3")
+            time.sleep(2)
         try:
             text = extract_text_from_coordinates(
                 1196,
@@ -185,12 +189,10 @@ def interactions_num_finder():
 
 
 def click_on_top_interaction(number_of_interactions):
-    global IMPRIMIS, PRIMARY_EMAIL, LOAD_OWNER_WAIT, deincrement
+    global IMPRIMIS, PRIMARY_EMAIL, LOAD_OWNER_WAIT
     if number_of_interactions == 1:
-        time.sleep(0.99 - deincrement)
         find_and_click_image(LOAD_OWNER_WAIT)
         find_and_click_image(IMPRIMIS)
-        # time.sleep(0.25 - deincrement)
     find_and_click_image(
         "windowsTarget/status_alone.png",
         40,
@@ -220,7 +222,7 @@ def interactions_section(number_of_interactions, initials):
 
 
 def process_application(is_confirmed=True, initials="DE"):
-    global noted_date, FULL_DATE, deincrement
+    global noted_date, FULL_DATE
     if is_confirmed:
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/completed_form.png")
@@ -229,7 +231,7 @@ def process_application(is_confirmed=True, initials="DE"):
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/declined.png")
         find_and_click_image("windowsTarget/wait_for_declined.png")
-    time.sleep(0.99 - deincrement)
+    time.sleep(0.01)
     find_and_click_image("windowsTarget/actual_date.png")
     keyboard.press_and_release("ctrl+a")
     keyboard.write(FULL_DATE)
@@ -237,7 +239,7 @@ def process_application(is_confirmed=True, initials="DE"):
     pyperclip.copy("")
     keyboard.press_and_release("ctrl+a")
     keyboard.press_and_release("ctrl+c")
-    time.sleep(0.5)
+    time.sleep(0.25)
     found_text = pyperclip.paste()
     found_text = remove_phone_numbers(found_text)
     found_text = remove_numbers_greater_than_current_year(found_text)
@@ -314,6 +316,7 @@ def move_to_communications():
     find_and_click_image(IMPRIMIS)
     # find_and_click_image("windowsTarget/communications.png")
     find_and_click_image("windowsTarget/preference.png")
+    time.sleep(0.01)
     find_and_click_image("windowsTarget/add.png")
 
 
@@ -338,6 +341,7 @@ def end_time_recording(start_time):
     end_time = time.time()
     duration = end_time - start_time
     log_file = "time_logs/windows_program_log.txt"
+    print(f"{duration:.2f}")
     with open(log_file, "a") as f:
         f.write(f"{duration:.2f}\n")
 
@@ -359,16 +363,15 @@ def cutoff_section_of_screen(image_filename):
 
 
 def main():
-    global cutOffTopY, cutOffBottomY, x_scale, y_scale, CRM_cords, COM_NUM, delay, deincrement, PRIMARY_EMAIL
+    global cutOffTopY, cutOffBottomY, x_scale, y_scale, CRM_cords, COM_NUM, delay, PRIMARY_EMAIL
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time; -1 to quit",
         title="Enter Initials, which computer number this is, and delay time; -1 to quit",
-        default="DE, 1, 0.04, 0.43",
+        default="DE, 1, 0.04",
     )
-    initials, computer_number, delay, deincrement = input_str.strip().split(",")
+    initials, computer_number, delay = input_str.strip().split(",")
     COM_NUM = int(computer_number)
     delay = float(delay)
-    deincrement = float(deincrement)
     screen_width, screen_height = pyautogui.size()
     x_scale = screen_width / 1440
     y_scale = screen_height / 900
@@ -384,8 +387,6 @@ def main():
         opt_out_form()
         end_time_recording(start_time)
         find_and_click_image(PRIMARY_EMAIL)
-        print(f"Deincrement: {deincrement}")
-        deincrement += 0.01
 
 
 if __name__ == "__main__":

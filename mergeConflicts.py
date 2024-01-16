@@ -32,9 +32,9 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     box = None
     if first_half and image_filename == "windowsTarget/constituteSearch.png":
         start = 0
-        finish = 1920 / 2
+        finish = 960
     if first_half == False and image_filename != "windowsTarget/constituteSearch.png":
-        start = (1920 - 100) / 2
+        start = 910
         finish = 1920
     else:
         start = 0
@@ -102,7 +102,7 @@ def main():
             text="Enter LookUp IDs:",
             title="LookUp IDs",
             # default="(ex - 11/22/2023, Elizabeth Dolman)",
-        ).split("\n")
+        ).split(" ")
 
         # Convert to integers
         lookup_idOne = int(lookup_idOne)
@@ -113,12 +113,13 @@ def main():
             lookup_idOne, lookup_idTwo = lookup_idTwo, lookup_idOne
         if lookup_idOne == "-1" or lookup_idTwo == "-1":
             break
+        print(f"{lookup_idOne} : {lookup_idTwo}")
 
         start_time = time.time()
         # part 1
         find_and_click_image("windowsTarget/constituteSearch.png")
         time.sleep(1)
-        find_and_click_image("mergeConflictImages\lookupID.png")
+        find_and_click_image("mergeConflictImages/lookupID.png")
         time.sleep(0.25)
         keyboard.press_and_release("ctrl+a")
         time.sleep(0.25)
@@ -150,11 +151,11 @@ def main():
         first_half = False
         find_and_click_image("windowsTarget/constituteSearch.png")
         time.sleep(1)
-        find_and_click_image("mergeConflictImages\lookupID.png")
+        find_and_click_image("mergeConflictImages/lookupID.png")
         time.sleep(0.25)
         keyboard.press_and_release("ctrl+a")
         time.sleep(0.25)
-        keyboard.write(str(lookup_idOne))
+        keyboard.write(str(lookup_idTwo))
         pyautogui.press("enter")
         find_and_click_image("windowsTarget/cityStateZIP.png")
         find_and_click_image(PRIMARY_EMAIL)

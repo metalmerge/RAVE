@@ -38,12 +38,12 @@ plt.plot(
 plt.axhline(y=median, color="purple", linestyle="--", label=f"Median: {median:.2f}")
 # plt.axhline(y=mean, color="yellow", linestyle="--", label=f"Mean: {mean:.2f}")
 plt.axhline(y=mean + two_std, color="orange", linestyle="--", label="+1 SD")
-plt.scatter(
-    np.where(filtered_data == lowest_value),
-    lowest_value,
-    color="green",
-    label="Lowest Value",
-)
+# plt.scatter(
+#     np.where(filtered_data == lowest_value),
+#     lowest_value,
+#     color="green",
+#     label="Lowest Value",
+# )
 plt.xlabel("Index")
 plt.ylabel("Value")
 plt.title("Data with Moving Average and Outliers Removed")

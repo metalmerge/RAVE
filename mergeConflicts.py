@@ -30,15 +30,15 @@ first_half = True
 def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, first_half
     box = None
-    if first_half and image_filename == "windowsTarget/constituteSearch.png":
+    if first_half:
         start = 0
         finish = 960
-    if first_half == False and image_filename != "windowsTarget/constituteSearch.png":
+    if first_half == False:
         start = 910
         finish = 1920
-    else:
-        start = 0
-        finish = 1920
+    # else:
+    #     start = 0
+    #     finish = 1920
     if image_filename == "windowsTarget/constituteSearch.png":
         confidence = 0.8
     while box is None:
@@ -53,6 +53,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             ),
         )
         time.sleep(delay * 5)
+        print(image_filename)
         if box is None and up_or_down:
             factor = 14 if up_or_down == "up" else -14
             pyautogui.scroll(factor)
@@ -64,14 +65,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
 
     if image_filename != PRIMARY_EMAIL:
         cord_click((x, y))
-
-
-def end_time_recording(start_time):
-    end_time = time.time()
-    duration = end_time - start_time
-    log_file = "time_logs/notifcationsLog.txt"
-    with open(log_file, "a") as f:
-        f.write(f"{duration:.2f}\n")
 
 
 def cutoff_section_of_screen(image_filename):
@@ -98,15 +91,13 @@ def main():
     cutOffBottomY = screen_height
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
-        lookup_idOne, lookup_idTwo = pyautogui.prompt(
-            text="Enter LookUp IDs:",
-            title="LookUp IDs",
-            # default="(ex - 11/22/2023, Elizabeth Dolman)",
-        ).split(" ")
+        lookup_idOne, lookup_idTwo = get_lookup_ids()
 
         # Convert to integers
         lookup_idOne = int(lookup_idOne)
         lookup_idTwo = int(lookup_idTwo)
+        saveOne = lookup_idOne
+        saveTwo = lookup_idTwo
 
         # lookup_idTwo is on the right and is the smaller target
         if lookup_idOne < lookup_idTwo:
@@ -115,8 +106,8 @@ def main():
             break
         print(f"{lookup_idOne} : {lookup_idTwo}")
 
-        start_time = time.time()
         # part 1
+        first_half = True
         find_and_click_image("windowsTarget/constituteSearch.png")
         time.sleep(1)
         find_and_click_image("mergeConflictImages/lookupID.png")
@@ -162,9 +153,38 @@ def main():
         for _ in range(12):
             pyautogui.press("down")
 
-        end_time_recording(start_time)
-        with open("lookup_ids.txt", "a") as f:
-            f.write(f"{lookup_idOne}\n{lookup_idTwo}\n")
+        answer = pyautogui.prompt(
+            text="Confirm IDs",
+            title="Continue",
+            default="y",
+        )
+        if answer == "y":
+            with open("lookup_ids.txt", "a") as f:
+                f.write(f"{saveOne}\n{saveTwo}\n")
+
+
+def get_lookup_ids():
+    try:
+        with open("input.txt", "r+") as f:
+            lines = f.readlines()
+            if not lines:
+                return pyautogui.prompt(
+                    text="Enter LookUp IDs:",
+                    title="LookUp IDs",
+                    # default="(ex - 11/22/2023, Elizabeth Dolman)",
+                ).split(" ")
+            lookup_idOne, lookup_idTwo = lines[:2]
+            f.seek(0)
+            f.writelines(lines[2:])
+            f.truncate()
+    except FileNotFoundError:
+        return pyautogui.prompt(
+            text="Enter LookUp IDs:",
+            title="LookUp IDs",
+            # default="(ex - 11/22/2023, Elizabeth Dolman)",
+        ).split(" ")
+
+    return lookup_idOne.strip(), lookup_idTwo.strip()
 
 
 if __name__ == "__main__":

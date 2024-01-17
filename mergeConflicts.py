@@ -65,7 +65,7 @@ def find_and_click_image(
         time.sleep(delay * 5)
         print(image_filename)
         if box is None and up_or_down and up_or_down != "NULL":
-            factor = 40 if up_or_down == "up" else -40
+            factor = 100 if up_or_down == "up" else -100
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
 
@@ -162,7 +162,7 @@ def main():
         answer = None
         while answer != "y" and answer != "n":
             response = pyautogui.prompt(
-                text="n = no; i = opt in; o = opt out; c = no contact",
+                text="n = no; i = opt in; o = opt out; c = no contact; dnc",
                 title="Confirm IDs",
                 default="y",
             )
@@ -184,7 +184,13 @@ def main():
                 opt_form(start_date, end_date, False)
             elif answer == "c":
                 no_contact_form(start_date, end_date)
-
+            elif answer == "dnc":
+                find_and_click_image(
+                    "mergeConflictImages/noContact.png", 0, 0, None, False
+                )
+                find_and_click_image("mergeConflictImages/delete.png", 0, 0, None, True)
+                find_and_click_image("mergeConflictImages/yes.png", 0, 0, None, True)
+                time.sleep(1)
         if answer == "y":
             delete_form()
             find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", True)
@@ -229,6 +235,7 @@ def opt_form(start_date, end_date, opt_in):
     keyboard.write("Constituent")
     find_and_click_image("mergeConflictImages/consit_menu.png")
     pyautogui.press("enter")
+    time.sleep(1)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
     for _ in range(12):
         pyautogui.press("down")

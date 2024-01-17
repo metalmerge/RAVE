@@ -71,7 +71,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             time.sleep(delay * 2)
         attempts += 1
         if attempts > 50:
-            play_sound("alert_notification.mp3")
+            play_sound("audio/alert_notification.mp3")
             time.sleep(2)
 
     x, y, width, height = box
@@ -166,7 +166,7 @@ def interactions_num_finder():
         pretext = "Interactions: "
         attempts += 1
         if attempts > 50:
-            play_sound("alert_notification.mp3")
+            play_sound("audio/alert_notification.mp3")
             time.sleep(2)
         try:
             text = extract_text_from_coordinates(
@@ -264,7 +264,7 @@ def process_application(is_confirmed=True, initials="DE"):
         extract_digits_from_text(found_text) != "" or word in found_text
         for word in specific_words
     ):
-        play_sound("alert_notification.mp3")
+        play_sound("audio/alert_notification.mp3")
         noted_date = pyautogui.prompt(
             text="", title="Noted Date?", default=extract_dates(found_text)
         )

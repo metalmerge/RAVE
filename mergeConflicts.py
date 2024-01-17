@@ -5,7 +5,14 @@ import pyperclip
 import keyboard
 import pyautogui
 from datetime import datetime
-from main_shared_functions import cord_click
+from main_shared_functions import (
+    cord_click,
+    tab_command,
+    play_sound,
+    extract_text_from_coordinates,
+    extract_digits_from_text,
+)
+import sys
 
 x_scale = 1
 y_scale = 1
@@ -24,23 +31,26 @@ formatted_year = str(CURRENT_DATE.year)
 formatted_day = str(CURRENT_DATE.day)
 FORMATTED_DATE = f"{formatted_month}/{formatted_year}"
 FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
-first_half = True
+namesOne = None
+namesTwo = None
 
 
-def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
-    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, first_half
+def find_and_click_image(
+    image_filename, biasx=0, biasy=0, up_or_down=None, first_half=None
+):
+    global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence
     box = None
     if first_half:
         start = 0
         finish = 960
-    if first_half == False:
-        start = 910
+    elif first_half == False:
+        start = 700
         finish = 1920
-    # else:
-    #     start = 0
-    #     finish = 1920
+    elif first_half == None:
+        start = 0
+        finish = 1920
     if image_filename == "windowsTarget/constituteSearch.png":
-        confidence = 0.8
+        confidence = 0.75
     while box is None:
         box = pyautogui.locateOnScreen(
             image_filename,
@@ -63,8 +73,9 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     x = box.left + width / 2 + biasx
     y = box.top + height / 2 + biasy
 
-    if image_filename != PRIMARY_EMAIL:
+    if up_or_down != "NULL":
         cord_click((x, y))
+    return x, y
 
 
 def cutoff_section_of_screen(image_filename):
@@ -83,8 +94,17 @@ def cutoff_section_of_screen(image_filename):
     return round(y), (image_cords_x, image_cords_y)
 
 
+def convert_date(date_str):
+    if date_str is None:
+        return None
+    # Convert the date string to a datetime object
+    date = datetime.strptime(date_str, "%m%d%Y")
+    # Convert the date back to a string in the desired format
+    return date.strftime("%-m/%-d/%Y")
+
+
 def main():
-    global cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, delay, PRIMARY_EMAIL, first_half
+    global cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, delay, PRIMARY_EMAIL, namesOne, namesTwo
     screen_width, screen_height = pyautogui.size()
     x_scale = screen_width / 1440
     y_scale = screen_height / 900
@@ -92,13 +112,10 @@ def main():
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
         lookup_idOne, lookup_idTwo = get_lookup_ids()
-
-        # Convert to integers
         lookup_idOne = int(lookup_idOne)
         lookup_idTwo = int(lookup_idTwo)
         saveOne = lookup_idOne
         saveTwo = lookup_idTwo
-
         # lookup_idTwo is on the right and is the smaller target
         if lookup_idOne < lookup_idTwo:
             lookup_idOne, lookup_idTwo = lookup_idTwo, lookup_idOne
@@ -107,8 +124,7 @@ def main():
         print(f"{lookup_idOne} : {lookup_idTwo}")
 
         # part 1
-        first_half = True
-        find_and_click_image("windowsTarget/constituteSearch.png")
+        find_and_click_image("windowsTarget/constituteSearch.png", 0, 0, None, True)
         time.sleep(1)
         find_and_click_image("mergeConflictImages/lookupID.png")
         time.sleep(0.25)
@@ -117,30 +133,19 @@ def main():
         keyboard.write(str(lookup_idOne))
         pyautogui.press("enter")
         find_and_click_image("windowsTarget/cityStateZIP.png")
-        find_and_click_image(PRIMARY_EMAIL)
+        find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", True)
         for _ in range(12):
             pyautogui.press("down")
-        # TODO old code
-        # copy and paste into prompt ID's
-        # break into half screens
         # Size(width=1920, height=1080)
-        # give a buffer of 100
 
-        # get to page and then down 12
-        # image.png
         # find & get all details and then try to make timeline
         # -710
         # 27 height whole, so 13 up and down
-
         # opt = -645 to -580
         # start = -540 to -360
         # end = -348 to -254
 
-        # log the numbers in txt
-        # Wait for imprintis before down
-        # control a before typing ID
-        first_half = False
-        find_and_click_image("windowsTarget/constituteSearch.png")
+        find_and_click_image("windowsTarget/constituteSearch.png", 0, 0, None, False)
         time.sleep(1)
         find_and_click_image("mergeConflictImages/lookupID.png")
         time.sleep(0.25)
@@ -149,21 +154,122 @@ def main():
         keyboard.write(str(lookup_idTwo))
         pyautogui.press("enter")
         find_and_click_image("windowsTarget/cityStateZIP.png")
-        find_and_click_image(PRIMARY_EMAIL)
+        find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
         for _ in range(12):
             pyautogui.press("down")
+        answer = None
+        while answer != "y" and answer != "n":
+            response = pyautogui.prompt(
+                text="Confirm IDs",
+                title="Continue",
+                default="y",
+            )
+            parts = response.split(" ")
+            # Assign parts to variables, using None for missing parts
+            answer = parts[0] if len(parts) > 0 else None
+            start_date = convert_date(parts[1]) if len(parts) > 1 else None
+            end_date = convert_date(parts[2]) if len(parts) > 2 else None
+            if answer == "n":
+                with open("lookup_ids.txt", "a") as f:
+                    f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")
+            elif answer == "":
+                with open("input.txt", "a") as f:
+                    f.write(f"{saveOne}\n{saveTwo}\n")
+                sys.exit()
+            elif answer == "in":
+                opt_form(start_date, end_date, True)
+            elif answer == "out":
+                opt_form(start_date, end_date, False)
+            elif answer == "con":
+                no_contact_form(start_date, end_date)
 
-        answer = pyautogui.prompt(
-            text="Confirm IDs",
-            title="Continue",
-            default="y",
+        delete_form()
+        with open("lookup_ids.txt", "a") as f:
+            f.write(f"{saveOne}\n{saveTwo}\n")
+        with open("lookup_ids_with_names.txt", "a") as f:
+            f.write(f"{saveOne} - {namesOne}\n{saveTwo} - {namesTwo}\n")
+
+
+def codes_num_finder():
+    x, y = find_and_click_image("windowsTarget/add.png", 0, 0, "NULL", True)
+    x = int(x)
+    y = int(y)
+    amount = None
+    while not amount:
+        amount = extract_digits_from_text(
+            extract_text_from_coordinates(x - 60, y - 15, x - 35, y + 15)
         )
-        if answer == "y":
-            with open("lookup_ids.txt", "a") as f:
-                f.write(f"{saveOne}\n{saveTwo}\n")
+    return int(amount)
+    # attempts = 0
+    # while True:
+    #     pretext = "Solicit Codes: ("
+    #     attempts += 1
+    #     if attempts > 50:
+    #         play_sound("audio/alert_notification.mp3")
+    #         time.sleep(2)
+    #     try:
+    #         text = extract_text_from_coordinates(212, 684, 336, 712)
+    #         if pretext in text:
+    #             number_of_interactions = int(extract_digits_from_text(text))
+    #             break
+    #         else:
+    #             time.sleep(delay)
+    #             continue
+    #     except ValueError:
+    #         continue
+    # return number_of_interactions
+
+
+def opt_form(start_date, end_date, opt_in):
+    find_and_click_image("windowsTarget/add.png", 0, 0, None, False)
+    time.sleep(0.02)
+    find_and_click_image("windowsTarget/solicit_code.png", 0, 0, None, False)
+    keyboard.write("Imprimis")
+    find_and_click_image("windowsTarget/imprimis_three.png", 0, 0, None, False)
+    find_and_click_image("windowsTarget/source_wait.png", 0, 0, None, False)
+    find_and_click_image("windowsTarget/opt_out_tab_down.png", 0, 0, None, False)
+    if opt_in:
+        find_and_click_image("mergeConflictImages/opt_in_menu.png", 0, 0, None, False)
+    else:
+        find_and_click_image("windowsTarget/opt_out.png", 0, 0, None, False)
+    pyautogui.press("tab")
+    if start_date is not None:
+        keyboard.write(start_date)
+    tab_command(1)
+    if end_date is not None:
+        keyboard.write(end_date)
+    tab_command(2)
+    keyboard.write("Constituent")
+    find_and_click_image("mergeConflictImages/consit_menu.png")
+    pyautogui.press("enter")
+
+
+def no_contact_form(start_date, end_date):
+    find_and_click_image("windowsTarget/add.png", 0, 0, None, False)
+    time.sleep(0.02)
+    find_and_click_image("windowsTarget/solicit_code.png", 0, 0, None, False)
+    keyboard.write("No Contact")
+    find_and_click_image("mergeConflictImages/no_contact_menu.png", 0, 0, None, False)
+    pyautogui.press("tab")
+    if start_date is not None:
+        keyboard.write(start_date)
+    tab_command(1)
+    if end_date is not None:
+        keyboard.write(end_date)
+    tab_command(2)
+    pyautogui.press("enter")
+
+
+def delete_form():
+    for _ in range(codes_num_finder()):
+        find_and_click_image("mergeConflictImages/code pref delete.png", 0, -25, True)
+        find_and_click_image("mergeConflictImages/delete.png", 0, 0, None, True)
+        find_and_click_image("mergeConflictImages/yes.png", 0, 0, None, True)
+        time.sleep(1)
 
 
 def get_lookup_ids():
+    global namesOne, namesTwo
     try:
         with open("input.txt", "r+") as f:
             lines = f.readlines()
@@ -171,9 +277,12 @@ def get_lookup_ids():
                 return pyautogui.prompt(
                     text="Enter LookUp IDs:",
                     title="LookUp IDs",
-                    # default="(ex - 11/22/2023, Elizabeth Dolman)",
                 ).split(" ")
             lookup_idOne, lookup_idTwo = lines[:2]
+            lookup_idOne = namesOne
+            lookup_idTwo = namesTwo
+            lookup_idOne = extract_digits_from_text(lookup_idOne)
+            lookup_idTwo = extract_digits_from_text(lookup_idTwo)
             f.seek(0)
             f.writelines(lines[2:])
             f.truncate()
@@ -181,7 +290,6 @@ def get_lookup_ids():
         return pyautogui.prompt(
             text="Enter LookUp IDs:",
             title="LookUp IDs",
-            # default="(ex - 11/22/2023, Elizabeth Dolman)",
         ).split(" ")
 
     return lookup_idOne.strip(), lookup_idTwo.strip()

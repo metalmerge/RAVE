@@ -65,7 +65,7 @@ def find_and_click_image(
         time.sleep(delay * 5)
         print(image_filename)
         if box is None and up_or_down and up_or_down != "NULL":
-            factor = 100 if up_or_down == "up" else -100
+            factor = 200 if up_or_down == "up" else -200
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
 
@@ -123,7 +123,7 @@ def main():
             lookup_idOne, lookup_idTwo = lookup_idTwo, lookup_idOne
         if lookup_idOne == "-1" or lookup_idTwo == "-1":
             break
-        print(f"{lookup_idOne} : {lookup_idTwo}")
+        print(f"{saveOne}\n{saveTwo}")
 
         # part 1
         find_and_click_image("windowsTarget/constituteSearch.png", 0, 0, None, True)
@@ -134,74 +134,104 @@ def main():
         time.sleep(0.25)
         keyboard.write(str(lookup_idOne))
         pyautogui.press("enter")
-        find_and_click_image("windowsTarget/cityStateZIP.png")
+        find_and_click_image("windowsTarget/cityStateZIP.png", 0, 2)
         find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", True)
         for _ in range(12):
             pyautogui.press("down")
-        # Size(width=1920, height=1080)
-
-        # find & get all details and then try to make timeline
-        # -710
-        # 27 height whole, so 13 up and down
-        # opt = -645 to -580
-        # start = -540 to -360
-        # end = -348 to -254
-
-        find_and_click_image("windowsTarget/constituteSearch.png", 0, 0, None, False)
         time.sleep(1)
-        find_and_click_image("mergeConflictImages/lookupID.png")
-        time.sleep(0.25)
-        keyboard.press_and_release("ctrl+a")
-        time.sleep(0.25)
-        keyboard.write(str(lookup_idTwo))
-        pyautogui.press("enter")
-        find_and_click_image("windowsTarget/cityStateZIP.png")
-        find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
-        for _ in range(12):
-            pyautogui.press("down")
-        answer = None
-        while answer != "y" and answer != "n":
-            response = pyautogui.prompt(
-                text="n = no; i = opt in; o = opt out; c = no contact; dnc",
-                title="Confirm IDs",
-                default="y",
+        if codes_num_finder() != 0:
+            # Size(width=1920, height=1080)
+
+            # find & get all details and then try to make timeline
+            # -710
+            # 27 height whole, so 13 up and down
+            # opt = -645 to -580
+            # start = -540 to -360
+            # end = -348 to -254
+
+            find_and_click_image(
+                "windowsTarget/constituteSearch.png", 0, 0, None, False
             )
-            parts = response.split(" ")
-            answer = parts[0] if len(parts) > 0 else None
-            start_date = convert_date(parts[1]) if len(parts) > 1 else None
-            end_date = convert_date(parts[2]) if len(parts) > 2 else None
-            if answer == "n":
-                with open("lookup_ids.txt", "a") as f:
-                    f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")
-            elif answer == "":
-                delete_form()
-                with open("input.txt", "a") as f:
-                    f.write(f"{saveOne}\n{saveTwo}\n")
-                sys.exit()
-            elif answer == "i":
-                opt_form(start_date, end_date, True)
-            elif answer == "o":
-                opt_form(start_date, end_date, False)
-            elif answer == "c":
-                no_contact_form(start_date, end_date)
-            elif answer == "dnc":
-                find_and_click_image(
-                    "mergeConflictImages/noContact.png", 0, 0, None, False
+            time.sleep(1)
+            find_and_click_image("mergeConflictImages/lookupID.png")
+            time.sleep(0.25)
+            keyboard.press_and_release("ctrl+a")
+            time.sleep(0.25)
+            keyboard.write(str(lookup_idTwo))
+            pyautogui.press("enter")
+            find_and_click_image("windowsTarget/cityStateZIP.png", 0, 2)
+            find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
+            for _ in range(12):
+                pyautogui.press("down")
+            time.sleep(1)
+            answer = None
+            x1, y1 = find_and_click_image(
+                "mergeConflictImages/start_date.png", 0, 0, "NULL", True
+            )
+            guess = extract_text_from_coordinates(x1 - 40, y1 + 11, x1 + 40, y1 + 40)
+            x2, y2 = find_and_click_image(
+                "mergeConflictImages/end_date.png", 0, 0, "NULL", True
+            )
+            guessTwo = extract_text_from_coordinates(
+                x2 - 40, y2 + 11, x2 + 40, y2 + 40
+            )  # TODO untested
+            defaultGuess = f"i {guess}"
+            if guessTwo != "":
+                defaultGuess = f"i {guess} {guessTwo}"
+            while answer != "" and answer != "n":
+                response = pyautogui.prompt(
+                    text="n = no; i = opt in; o = opt out; c = no contact; dnc; q = stop",
+                    title="Confirm IDs",
+                    default=defaultGuess,
                 )
-                find_and_click_image("mergeConflictImages/delete.png", 0, 0, None, True)
-                find_and_click_image("mergeConflictImages/yes.png", 0, 0, None, True)
-                time.sleep(1)
-        if answer == "y":
-            delete_form()
-            find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", True)
+                parts = response.split(" ")
+                answer = parts[0] if len(parts) > 0 else None
+                start_date = (parts[1]) if len(parts) > 1 else None
+                end_date = (parts[2]) if len(parts) > 2 else None
+                if answer == "n":
+                    with open("lookup_ids.txt", "a") as f:
+                        f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")
+                elif answer == "q":
+                    delete_form()
+                    with open("input.txt", "a") as f:
+                        f.write(f"{saveOne}\n{saveTwo}\n")
+                    sys.exit()
+                elif answer == "i":
+                    opt_form(start_date, end_date, True)
+                elif answer == "o":
+                    opt_form(start_date, end_date, False)
+                elif answer == "c":
+                    no_contact_form(start_date, end_date)
+                elif answer == "dnc":
+                    find_and_click_image(
+                        "mergeConflictImages/noContact.png", 0, 0, None, False
+                    )
+                    time.sleep(1)
+                    find_and_click_image(
+                        "mergeConflictImages/delete.png", 0, 0, None, False
+                    )
+                    find_and_click_image(
+                        "mergeConflictImages/yes.png", 0, 0, None, False
+                    )
+                    time.sleep(1)
+                    find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
+                    for _ in range(12):
+                        pyautogui.press("down")
+                defaultGuess = ""
+            if answer == "":
+                delete_form()
+                with open("lookup_ids.txt", "a") as f:
+                    f.write(f"{saveOne}\n{saveTwo}\n")
+                with open("lookup_ids_with_names.txt", "a") as f:
+                    f.write(f"{saveOne} - {namesOne}\n{saveTwo} - {namesTwo}\n")
+        else:
             with open("lookup_ids.txt", "a") as f:
-                f.write(f"{saveOne}\n{saveTwo}\n")
-            with open("lookup_ids_with_names.txt", "a") as f:
-                f.write(f"{saveOne} - {namesOne}\n{saveTwo} - {namesTwo}\n")
+                f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")
 
 
 def codes_num_finder():
     x, y = find_and_click_image("mergeConflictImages/add.png", 0, 0, "NULL", True)
+    print(x, y)
     x = int(x)
     y = int(y)
     amount = None
@@ -209,7 +239,7 @@ def codes_num_finder():
         amount = extract_digits_from_text(
             extract_text_from_coordinates(x - 60, y - 20, x - 35, y + 20)
         )
-        print(amount)
+        print(f"Solicit Codes: {amount}")
     return int(amount)
 
 
@@ -219,6 +249,7 @@ def opt_form(start_date, end_date, opt_in):
     find_and_click_image("windowsTarget/solicit_code.png", 0, 0, None, False)
     keyboard.write("Imprimis")
     find_and_click_image("windowsTarget/imprimis_three.png", 0, 0, None, False)
+    time.sleep(0.3)
     # find_and_click_image("windowsTarget/source_wait.png", 0, 0, None, False)
     find_and_click_image("windowsTarget/opt_out_tab_down.png", 0, 0, None, False)
     if opt_in:
@@ -255,6 +286,7 @@ def no_contact_form(start_date, end_date):
         keyboard.write(end_date)
     tab_command(2)
     pyautogui.press("enter")
+    time.sleep(1)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
     for _ in range(12):
         pyautogui.press("down")
@@ -263,10 +295,14 @@ def no_contact_form(start_date, end_date):
 def delete_form():
     for _ in range(codes_num_finder()):
         find_and_click_image(
-            "mergeConflictImages/code pref delete.png", 0, 25, "down", True
+            "mergeConflictImages/code pref delete.png", 0, 25, None, True
         )
         find_and_click_image("mergeConflictImages/delete.png", 0, 0, None, True)
         find_and_click_image("mergeConflictImages/yes.png", 0, 0, None, True)
+        time.sleep(1)
+        find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", True)
+        for _ in range(12):
+            pyautogui.press("down")
         time.sleep(1)
 
 
@@ -284,7 +320,7 @@ def get_lookup_ids():
             f.seek(0)
             f.writelines(lines[2:])
             f.truncate()
-            # lookup_idOne = namesOne
+            # lookup_idOne = namesOne # TODO incorporate names?
             # lookup_idTwo = namesTwo
             # print(lookup_idOne)
             # lookup_idOne = extract_digits_from_text(lookup_idOne)
@@ -292,7 +328,7 @@ def get_lookup_ids():
     except FileNotFoundError:
         return pyautogui.prompt(
             text="Enter LookUp IDs:",
-            title="LookUp IDs",
+            title="FileNotFoundError",
         ).split(" ")
 
     return lookup_idOne.strip(), lookup_idTwo.strip()

@@ -36,10 +36,11 @@ namesTwo = None
 
 
 def find_and_click_image(
-    image_filename, biasx=0, biasy=0, up_or_down=None, first_half=None
+    image_filename, biasx=0, biasy=0, up_or_down=None, first_half=None, max_attempts=50
 ):
     global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence
     box = None
+    attempts = 0
     if first_half:
         start = 0
         finish = 960
@@ -51,7 +52,7 @@ def find_and_click_image(
         finish = 1920
     if image_filename == "windowsTarget/constituteSearch.png":
         confidence = 0.75
-    while box is None:
+    while box is None and attempts < max_attempts:
         box = pyautogui.locateOnScreen(
             image_filename,
             confidence=confidence,
@@ -63,19 +64,25 @@ def find_and_click_image(
             ),
         )
         time.sleep(delay * 5)
-        print(image_filename)
+        # print(image_filename)
+        if attempts > max_attempts:
+            play_sound("audio/alert_notification.mp3")
+            time.sleep(2)
         if box is None and up_or_down and up_or_down != "NULL":
             factor = 200 if up_or_down == "up" else -200
             pyautogui.scroll(factor)
             time.sleep(delay * 2)
+        attempts += 1
 
-    x, y, width, height = box
-    x = box.left + width / 2 + biasx
-    y = box.top + height / 2 + biasy
-
-    if up_or_down != "NULL":
-        cord_click((x, y))
-    return x, y
+    if box is not None:
+        x, y, width, height = box
+        x = box.left + width / 2 + biasx
+        y = box.top + height / 2 + biasy
+        if up_or_down != "NULL":
+            cord_click((x, y))
+        return x, y
+    else:
+        return None, None
 
 
 def cutoff_section_of_screen(image_filename):
@@ -136,12 +143,15 @@ def main():
         pyautogui.press("enter")
         find_and_click_image("windowsTarget/cityStateZIP.png", 0, 2)
         find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", True)
+        xC, yC = find_and_click_image(
+            "mergeConflictImages/donor.png", 0, 0, "NULL", True, 5
+        )
+        print(xC, yC)
         for _ in range(12):
             pyautogui.press("down")
         time.sleep(1)
-        if codes_num_finder() != 0:
+        if codes_num_finder() != 0 and xC is None and yC is None:
             # Size(width=1920, height=1080)
-
             # find & get all details and then try to make timeline
             # -710
             # 27 height whole, so 13 up and down
@@ -161,69 +171,83 @@ def main():
             pyautogui.press("enter")
             find_and_click_image("windowsTarget/cityStateZIP.png", 0, 2)
             find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
-            for _ in range(12):
-                pyautogui.press("down")
-            time.sleep(1)
-            answer = None
-            x1, y1 = find_and_click_image(
-                "mergeConflictImages/start_date.png", 0, 0, "NULL", True
+            xC, yC = find_and_click_image(
+                "mergeConflictImages/donor.png", 0, 0, "NULL", False, 5
             )
-            guess = extract_text_from_coordinates(x1 - 40, y1 + 11, x1 + 40, y1 + 40)
-            x2, y2 = find_and_click_image(
-                "mergeConflictImages/end_date.png", 0, 0, "NULL", True
-            )
-            guessTwo = extract_text_from_coordinates(
-                x2 - 40, y2 + 11, x2 + 40, y2 + 40
-            )  # TODO untested
-            defaultGuess = f"i {guess}"
-            if guessTwo != "":
-                defaultGuess = f"i {guess} {guessTwo}"
-            while answer != "" and answer != "n":
-                response = pyautogui.prompt(
-                    text="n = no; i = opt in; o = opt out; c = no contact; dnc; q = stop",
-                    title="Confirm IDs",
-                    default=defaultGuess,
+            print(xC, yC)
+            if xC is None and yC is None:
+                for _ in range(12):
+                    pyautogui.press("down")
+                time.sleep(1)
+                answer = None
+                x1, y1 = find_and_click_image(
+                    "mergeConflictImages/start_date.png", 0, 0, "NULL", True
                 )
-                parts = response.split(" ")
-                answer = parts[0] if len(parts) > 0 else None
-                start_date = (parts[1]) if len(parts) > 1 else None
-                end_date = (parts[2]) if len(parts) > 2 else None
-                if answer == "n":
-                    with open("lookup_ids.txt", "a") as f:
-                        f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")
-                elif answer == "q":
+                guess = extract_text_from_coordinates(
+                    x1 - 40, y1 + 11, x1 + 40, y1 + 40
+                )
+                x2, y2 = find_and_click_image(
+                    "mergeConflictImages/end_date.png", 0, 0, "NULL", True
+                )
+                guessTwo = extract_text_from_coordinates(
+                    x2 - 40, y2 + 11, x2 + 40, y2 + 40
+                )
+                defaultGuess = f"i {guess}"
+                if guessTwo != "":
+                    defaultGuess = f"i {guess} {guessTwo}"
+                while answer != "" and answer != "n":
+                    # TODO No NDO Direct Mail Fundraising
+                    # Write all commands in one prompt
+                    # Refactor code
+                    # if the last command is not end then prompt
+                    response = pyautogui.prompt(
+                        text="n = no; i = opt in; o = opt out; c = no contact; dnc; q = stop",
+                        title="Command",
+                        default=defaultGuess,
+                    )
+                    parts = response.split(" ")
+                    answer = parts[0] if len(parts) > 0 else None
+                    start_date = (parts[1]) if len(parts) > 1 else None
+                    end_date = (parts[2]) if len(parts) > 2 else None
+                    if answer == "n":
+                        with open("lookup_ids.txt", "a") as f:
+                            f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")
+                    elif answer == "q":
+                        delete_form()
+                        with open("input.txt", "a") as f:
+                            f.write(f"{saveOne}\n{saveTwo}\n")
+                        sys.exit()
+                    elif answer == "i":
+                        opt_form(start_date, end_date, True)
+                    elif answer == "o":
+                        opt_form(start_date, end_date, False)
+                    elif answer == "c":
+                        no_contact_form(start_date, end_date)
+                    elif answer == "dnc":
+                        find_and_click_image(
+                            "mergeConflictImages/noContact.png", 0, 0, None, False
+                        )
+                        time.sleep(1)
+                        find_and_click_image(
+                            "mergeConflictImages/delete.png", 0, 0, None, False
+                        )
+                        find_and_click_image(
+                            "mergeConflictImages/yes.png", 0, 0, None, False
+                        )
+                        time.sleep(1)
+                        find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
+                        for _ in range(12):
+                            pyautogui.press("down")
+                    defaultGuess = ""
+                if answer == "":
                     delete_form()
-                    with open("input.txt", "a") as f:
+                    with open("lookup_ids.txt", "a") as f:
                         f.write(f"{saveOne}\n{saveTwo}\n")
-                    sys.exit()
-                elif answer == "i":
-                    opt_form(start_date, end_date, True)
-                elif answer == "o":
-                    opt_form(start_date, end_date, False)
-                elif answer == "c":
-                    no_contact_form(start_date, end_date)
-                elif answer == "dnc":
-                    find_and_click_image(
-                        "mergeConflictImages/noContact.png", 0, 0, None, False
-                    )
-                    time.sleep(1)
-                    find_and_click_image(
-                        "mergeConflictImages/delete.png", 0, 0, None, False
-                    )
-                    find_and_click_image(
-                        "mergeConflictImages/yes.png", 0, 0, None, False
-                    )
-                    time.sleep(1)
-                    find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
-                    for _ in range(12):
-                        pyautogui.press("down")
-                defaultGuess = ""
-            if answer == "":
-                delete_form()
+                    with open("lookup_ids_with_names.txt", "a") as f:
+                        f.write(f"{saveOne} - {namesOne}\n{saveTwo} - {namesTwo}\n")
+            else:
                 with open("lookup_ids.txt", "a") as f:
-                    f.write(f"{saveOne}\n{saveTwo}\n")
-                with open("lookup_ids_with_names.txt", "a") as f:
-                    f.write(f"{saveOne} - {namesOne}\n{saveTwo} - {namesTwo}\n")
+                    f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")
         else:
             with open("lookup_ids.txt", "a") as f:
                 f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")

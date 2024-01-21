@@ -269,7 +269,7 @@ def process_application(is_confirmed=True, initials="DE"):
             text="", title="Noted Date?", default=extract_dates(found_text)
         )
         find_and_click_image("windowsTarget/sites.png")
-        tab_command(2)
+        pyautogui.press("tab", presses=2)
     if found_text != "":
         pyautogui.press("down")
         pyautogui.press("enter")
@@ -280,7 +280,7 @@ def process_application(is_confirmed=True, initials="DE"):
     else:
         keyboard.write("Note: Duplicate - " + initials)
 
-    tab_command(2)
+    pyautogui.press("tab", presses=2)
     pyautogui.press("enter")
 
 

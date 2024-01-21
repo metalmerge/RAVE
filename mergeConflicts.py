@@ -108,16 +108,76 @@ def convert_date(date_str):
     # date = datetime.strptime(date_str, "%m%d%Y")
     # Convert the date back to a string in the desired format
     string = date_str
+    if len(string) == 6:
+        print(string[:2] + "/" + string[2:4] + "/20" + string[4:])
+        return string[:2] + "/" + string[2:4] + "/20" + string[4:]
     print(string[:2] + "/" + string[2] + string[3] + "/" + string[4:])
     return string[:2] + "/" + string[2] + string[3] + "/" + string[4:]
+    # TODO No NDO Direct Mail Fundraising
+    # Write all commands in one prompt
+    # Refactor code
+    # if the last command is not e then prompt
+    # Size(width=1920, height=1080)
+    # find & get all details and then try to make timeline
+    # -710
+    # 27 height whole, so 13 up and down
+    # opt = -645 to -580
+    # start = -540 to -360
+    # e = -348 to -254
+
+
+def get_screen_dimensions():
+    screen_width, screen_height = pyautogui.size()
+    return screen_width / 1440, screen_height / 900, screen_height
+
+
+def process_lookup_id(lookup_id, opt_in=True):
+    find_and_click_image("windowsTarget/constituateSearch.png", 0, 0, None, opt_in)
+    time.sleep(1)
+    find_and_click_image("mergeConflictImages/lookupID.png")
+    time.sleep(0.25)
+    keyboard.press_and_release("ctrl+a")
+    time.sleep(0.25)
+    keyboard.write(str(lookup_id))
+    pyautogui.press("enter")
+    find_and_click_image("windowsTarget/cityStateZIP.png", 0, 2)
+    find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", opt_in)
+    return find_and_click_image(
+        "mergeConflictImages/donor.png", 0, 0, "NULL", opt_in, 5
+    )
+
+
+def write_to_file(filename, content):
+    with open(filename, "a") as f:
+        f.write(content)
+
+
+def process_answer(answer, start_date, end_date, saveOne, saveTwo):
+    if answer == "n":
+        write_to_file("lookup_ids.txt", f"{saveOne} XXX\n{saveTwo} XXX\n")
+    elif answer == "q":
+        delete_form()
+        write_to_file("input.txt", f"{saveOne}\n{saveTwo}\n")
+        sys.exit()
+    elif answer == "i":
+        opt_form(start_date, end_date, True)
+    elif answer == "o":
+        opt_form(start_date, end_date, False)
+    elif answer == "c":
+        no_contact_form(start_date, end_date)
+    elif answer == "dnc":
+        find_and_click_image("mergeConflictImages/noContact.png", 0, 0, None, False)
+        time.sleep(1)
+        find_and_click_image("mergeConflictImages/delete.png", 0, 0, None, False)
+        find_and_click_image("mergeConflictImages/yes.png", 0, 0, None, False)
+        time.sleep(1)
+        find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
+        pyautogui.press("down", presses=12)
 
 
 def main():
-    global cutOffTopY, x_scale, y_scale, CRM_cords, cutOffBottomY, delay, PRIMARY_EMAIL, namesOne, namesTwo
-    screen_width, screen_height = pyautogui.size()
-    x_scale = screen_width / 1440
-    y_scale = screen_height / 900
-    cutOffBottomY = screen_height
+    global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords, namesOne, namesTwo
+    x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
         lookup_idOne, lookup_idTwo = get_lookup_ids()
@@ -125,59 +185,19 @@ def main():
         lookup_idTwo = int(lookup_idTwo)
         saveOne = lookup_idOne
         saveTwo = lookup_idTwo
-        # lookup_idTwo is on the right and is the smaller target
         if lookup_idOne < lookup_idTwo:
             lookup_idOne, lookup_idTwo = lookup_idTwo, lookup_idOne
         if lookup_idOne == "-1" or lookup_idTwo == "-1":
             break
         print(f"{saveOne}\n{saveTwo}")
 
-        # part 1
-        find_and_click_image("windowsTarget/constituteSearch.png", 0, 0, None, True)
-        time.sleep(1)
-        find_and_click_image("mergeConflictImages/lookupID.png")
-        time.sleep(0.25)
-        keyboard.press_and_release("ctrl+a")
-        time.sleep(0.25)
-        keyboard.write(str(lookup_idOne))
-        pyautogui.press("enter")
-        find_and_click_image("windowsTarget/cityStateZIP.png", 0, 2)
-        find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", True)
-        xC, yC = find_and_click_image(
-            "mergeConflictImages/donor.png", 0, 0, "NULL", True, 5
-        )
-        print(xC, yC)
-        for _ in range(12):
-            pyautogui.press("down")
+        xC, yC = process_lookup_id(lookup_idOne)
+        pyautogui.press("down", presses=12)
         time.sleep(1)
         if codes_num_finder() != 0 and xC is None and yC is None:
-            # Size(width=1920, height=1080)
-            # find & get all details and then try to make timeline
-            # -710
-            # 27 height whole, so 13 up and down
-            # opt = -645 to -580
-            # start = -540 to -360
-            # end = -348 to -254
-
-            find_and_click_image(
-                "windowsTarget/constituteSearch.png", 0, 0, None, False
-            )
-            time.sleep(1)
-            find_and_click_image("mergeConflictImages/lookupID.png")
-            time.sleep(0.25)
-            keyboard.press_and_release("ctrl+a")
-            time.sleep(0.25)
-            keyboard.write(str(lookup_idTwo))
-            pyautogui.press("enter")
-            find_and_click_image("windowsTarget/cityStateZIP.png", 0, 2)
-            find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
-            xC, yC = find_and_click_image(
-                "mergeConflictImages/donor.png", 0, 0, "NULL", False, 5
-            )
-            print(xC, yC)
+            xC, yC = process_lookup_id(lookup_idTwo, False)
             if xC is None and yC is None:
-                for _ in range(12):
-                    pyautogui.press("down")
+                pyautogui.press("down", presses=12)
                 time.sleep(1)
                 answer = None
                 x1, y1 = find_and_click_image(
@@ -195,62 +215,36 @@ def main():
                 defaultGuess = f"i {guess}"
                 if guessTwo != "":
                     defaultGuess = f"i {guess} {guessTwo}"
-                while answer != "" and answer != "n":
-                    # TODO No NDO Direct Mail Fundraising
-                    # Write all commands in one prompt
-                    # Refactor code
-                    # if the last command is not end then prompt
+                while True:
                     response = pyautogui.prompt(
-                        text="n = no; i = opt in; o = opt out; c = no contact; dnc; q = stop",
+                        text="n = no; i = opt in; o = opt out; c = no contact; dnc; q = stop; e",
                         title="Command",
                         default=defaultGuess,
                     )
-                    parts = response.split(" ")
-                    answer = parts[0] if len(parts) > 0 else None
-                    start_date = (parts[1]) if len(parts) > 1 else None
-                    end_date = (parts[2]) if len(parts) > 2 else None
-                    if answer == "n":
-                        with open("lookup_ids.txt", "a") as f:
-                            f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")
-                    elif answer == "q":
+                    commands = response.split(",")
+                    for command in commands:
+                        parts = command.strip().split(" ")
+                        answer = parts[0] if len(parts) > 0 else None
+                        start_date = parts[1] if len(parts) > 1 else None
+                        end_date = parts[2] if len(parts) > 2 else None
+                        process_answer(answer, start_date, end_date, saveOne, saveTwo)
+                    if commands[-1].strip().split(" ")[0] == "n":
+                        break
+                    if commands[-1].strip().split(" ")[0] != "e":
+                        defaultGuess = "e"
+                        continue
+                    if commands[-1].strip().split(" ")[0] == "e":
                         delete_form()
-                        with open("input.txt", "a") as f:
-                            f.write(f"{saveOne}\n{saveTwo}\n")
-                        sys.exit()
-                    elif answer == "i":
-                        opt_form(start_date, end_date, True)
-                    elif answer == "o":
-                        opt_form(start_date, end_date, False)
-                    elif answer == "c":
-                        no_contact_form(start_date, end_date)
-                    elif answer == "dnc":
-                        find_and_click_image(
-                            "mergeConflictImages/noContact.png", 0, 0, None, False
+                        write_to_file("lookup_ids.txt", f"{saveOne}\n{saveTwo}\n")
+                        write_to_file(
+                            "lookup_ids_with_names.txt",
+                            f"{saveOne} - {namesOne}\n{saveTwo} - {namesTwo}\n",
                         )
-                        time.sleep(1)
-                        find_and_click_image(
-                            "mergeConflictImages/delete.png", 0, 0, None, False
-                        )
-                        find_and_click_image(
-                            "mergeConflictImages/yes.png", 0, 0, None, False
-                        )
-                        time.sleep(1)
-                        find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
-                        for _ in range(12):
-                            pyautogui.press("down")
-                    defaultGuess = ""
-                if answer == "":
-                    delete_form()
-                    with open("lookup_ids.txt", "a") as f:
-                        f.write(f"{saveOne}\n{saveTwo}\n")
-                    with open("lookup_ids_with_names.txt", "a") as f:
-                        f.write(f"{saveOne} - {namesOne}\n{saveTwo} - {namesTwo}\n")
+                    break
             else:
-                with open("lookup_ids.txt", "a") as f:
-                    f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")
+                write_to_file("lookup_ids.txt", f"{saveOne} XXX\n{saveTwo} XXX\n")
         else:
-            with open("lookup_ids.txt", "a") as f:
-                f.write(f"{saveOne} XXX\n{saveTwo} XXX\n")
+            write_to_file("lookup_ids.txt", f"{saveOne} XXX\n{saveTwo} XXX\n")
 
 
 def codes_num_finder():

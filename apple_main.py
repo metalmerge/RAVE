@@ -224,7 +224,7 @@ def process_application(is_confirmed=True):
         keyboard.write("Note: Not Researched - " + initials)
     else:
         keyboard.write("Note: Duplicate - " + initials)
-    tab_command(2)
+    pyautogui.press("tab", presses=2)
     pyautogui.press("enter")
 
 

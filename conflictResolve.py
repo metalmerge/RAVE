@@ -289,6 +289,7 @@ def opt_form(start_date, end_date, opt_in):
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
     for _ in range(12):
         pyautogui.press("down")
+    time.sleep(1)
 
 
 def no_contact_form(start_date, end_date):

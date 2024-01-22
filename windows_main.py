@@ -84,9 +84,11 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         "windowsTarget/personal_info_wait.png",
         "windowsTarget/source_wait.png",
         "windowsTarget/preference.png",
+        "windowsTarget/interactionsExtract.png",
     ]:
         pyautogui.moveTo(x, y)
         pyautogui.click()
+    return x, y
 
 
 def month_year_only(input_text):
@@ -149,6 +151,7 @@ def get_to_dead_page():
     global COM_NUM, delay
     time.sleep(0.01)
     find_and_click_image("windowsTarget/constituents.png")
+    time.sleep(0.01)
     find_and_click_image("windowsTarget/updates.png")
     if COM_NUM == 2:
         find_and_click_image("windowsTarget/third_page.png")
@@ -160,21 +163,26 @@ def get_to_dead_page():
 
 
 def interactions_num_finder():
+    find_and_click_image(PRIMARY_EMAIL)
+    x, y = find_and_click_image("windowsTarget/interactionsExtract.png")
+    # print(x,y)
     global delay
     attempts = 0
     while True:
         pretext = "Interactions: "
         attempts += 1
+        print(attempts)
         if attempts > 50:
             play_sound("audio/alert_notification.mp3")
             time.sleep(2)
         try:
             text = extract_text_from_coordinates(
-                1196,
-                491,  # 478,
-                1281,
-                517,  # 499,
+                x - 44,  # 1196,
+                y - 10,  # 491,  # 478,
+                x + 55,  # 1281,
+                y + 10,  # 517,  # 499,
             )
+            # print(text)
             if pretext in text:
                 num_index = text.index(pretext) + len(pretext)
                 num_text = text[num_index:].strip()

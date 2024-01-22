@@ -132,7 +132,7 @@ def get_screen_dimensions():
 
 
 def process_lookup_id(lookup_id, opt_in=True):
-    find_and_click_image("windowsTarget/constituateSearch.png", 0, 0, None, opt_in)
+    find_and_click_image("windowsTarget/constituteSearch.png", 0, 0, None, opt_in)
     time.sleep(1)
     find_and_click_image("mergeConflictImages/lookupID.png")
     time.sleep(0.25)
@@ -143,7 +143,7 @@ def process_lookup_id(lookup_id, opt_in=True):
     find_and_click_image("windowsTarget/cityStateZIP.png", 0, 2)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", opt_in)
     return find_and_click_image(
-        "mergeConflictImages/donor.png", 0, 0, "NULL", opt_in, 5
+        "mergeConflictImages/donor.png", 0, 0, "NULL", opt_in, 3
     )
 
 
@@ -173,6 +173,7 @@ def process_answer(answer, start_date, end_date, saveOne, saveTwo):
         time.sleep(1)
         find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
         pyautogui.press("down", presses=12)
+        time.sleep(1)
 
 
 def main():

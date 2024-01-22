@@ -92,10 +92,10 @@ def day_month_year_only(input_text):
     matches = re.findall(date_pattern, input_text)
     if matches:
         for match in matches:
-            month, year = match[0], match[2]
-            if month.startswith("0"):
-                month = month[1]  # Remove leading zero
-            return f"{month}/{year}"
+            day, month, year = match[0], match[1], match[2]
+            if day and (month.startswith("0") or month):
+                month = month[1] if month.startswith("0") else month
+                return f"{month}/{year}"
     return None
 
 

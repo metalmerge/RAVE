@@ -32,22 +32,16 @@ def extract_dates(input_text):
         return year_only_result
 
     # Regular expression pattern to match different date formats.
-
-    date_pattern = (
-        r"\b(\d{1,2})[ /-](\d{1,2})[ /-](\d{2,4})\b|\b([A-Za-z]+)[ /-](\d{4})\b"
-    )
+    date_pattern = r"\b(\d{1,2})[ /-](\d{4})\b|\b([A-Za-z]+)[ /-](\d{4})\b"
     matches = re.findall(date_pattern, input_text)
 
     if matches:
         for match in matches:
-            if match[0]:  # Matched day, month, and year (e.g., 10/30/23)
-                _, month, year = match[0], match[1], match[2]
-                # If year is in YY format, convert it to YYYY
-                if len(year) == 2:
-                    year = "20" + year
+            if match[0]:  # Matched day and year (e.g., 10/2023 or 10-2023)
+                month, year = match[0], match[1]
                 return f"{month}/{year}"
-            elif match[3] in months:  # Check if the matched text is a valid month name
-                month, year = months[match[3]], match[4]
+            elif match[2] in months:  # Check if the matched text is a valid month name
+                month, year = months[match[2]], match[3]
                 return f"{month}/{year}"
 
     # Handle the case of "month YYYY"
@@ -92,10 +86,10 @@ def day_month_year_only(input_text):
     matches = re.findall(date_pattern, input_text)
     if matches:
         for match in matches:
-            day, month, year = match[0], match[1], match[2]
-            if day and (month.startswith("0") or month):
-                month = month[1] if month.startswith("0") else month
-                return f"{month}/{year}"
+            month, year = match[0], match[2]
+            if month.startswith("0"):
+                month = month[1]  # Remove leading zero
+            return f"{month}/{year}"
     return None
 
 

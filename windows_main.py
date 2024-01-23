@@ -6,6 +6,7 @@ import pygame
 import pyperclip
 import keyboard
 import pyautogui
+from pyautogui import ImageNotFoundException
 import re
 
 # from date_extractor import extract_dates
@@ -53,22 +54,25 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     ):
         confidence = 0.8
     while box is None:
-        box = pyautogui.locateOnScreen(
-            image_filename,
-            confidence=confidence,
-            region=(
-                0,
-                cutOffTopY,
-                round(2880 * x_scale),
-                round(cutOffBottomY * 2 * y_scale),
-            ),
-        )
+        try:
+            box = pyautogui.locateOnScreen(
+                image_filename,
+                confidence=confidence,
+                region=(
+                    0,
+                    cutOffTopY,
+                    round(2880 * x_scale),
+                    round(cutOffBottomY * 2 * y_scale),
+                ),
+            )
+        except ImageNotFoundException:
+            if box is None and up_or_down:
+                factor = 14 if up_or_down == "up" else -14
+                pyautogui.scroll(factor)
+            time.sleep(0.5)
+            continue
         time.sleep(delay * 5)
         # If the image is not found and 'up_or_down' is specified
-        if box is None and up_or_down:
-            factor = 14 if up_or_down == "up" else -14
-            pyautogui.scroll(factor)
-            time.sleep(delay * 2)
         attempts += 1
         if attempts > 50:
             play_sound("audio/alert_notification.mp3")

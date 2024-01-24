@@ -243,7 +243,7 @@ def process_application(is_confirmed=True, initials="DE"):
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/declined.png")
         find_and_click_image("windowsTarget/wait_for_declined.png")
-    time.sleep(0.01)
+    time.sleep(0.02)
     find_and_click_image("windowsTarget/actual_date.png")
     keyboard.press_and_release("ctrl+a")
     keyboard.write(FULL_DATE)
@@ -306,9 +306,11 @@ def play_sound(music_file):
 
 def deceased_form():
     global noted_date, FORMATTED_DATE
-    time.sleep(0.01)
+    time.sleep(0.02)
     find_and_click_image("windowsTarget/source_tab_down.png")
+    time.sleep(0.01)
     find_and_click_image("windowsTarget/communication_from.png")
+    time.sleep(0.01)
     find_and_click_image("windowsTarget/deceased_date.png")
     time.sleep(0.01)
     if noted_date == "1/":

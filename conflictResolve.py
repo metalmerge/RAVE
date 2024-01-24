@@ -157,7 +157,7 @@ def process_answer(answer, start_date, end_date, saveOne, saveTwo):
         write_to_file("lookup_ids.txt", f"{saveOne} XXX\n{saveTwo} XXX\n")
     elif answer == "q":
         delete_form()
-        write_to_file("input.txt", f"{saveOne}\n{saveTwo}\n")
+        write_to_file("lookup_ids.txt", f"{saveOne}\n{saveTwo}\n")
         sys.exit()
     elif answer == "i":
         opt_form(start_date, end_date, True)

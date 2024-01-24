@@ -4,6 +4,7 @@ import time
 import pyperclip
 import keyboard
 import pyautogui
+from pyautogui import ImageNotFoundException
 from datetime import datetime
 from main_shared_functions import (
     cord_click,
@@ -53,26 +54,29 @@ def find_and_click_image(
     if image_filename == "windowsTarget/constituteSearch.png":
         confidence = 0.75
     while box is None and attempts < max_attempts:
-        box = pyautogui.locateOnScreen(
-            image_filename,
-            confidence=confidence,
-            region=(
-                start,
-                cutOffTopY,
-                finish,
-                round(cutOffBottomY * 2 * y_scale),
-            ),
-        )
+        try:
+            box = pyautogui.locateOnScreen(
+                image_filename,
+                confidence=confidence,
+                region=(
+                    start,
+                    cutOffTopY,
+                    finish,
+                    round(cutOffBottomY * 2 * y_scale),
+                ),
+            )
+        except ImageNotFoundException:
+            if attempts > max_attempts:
+                play_sound("audio/alert_notification.mp3")
+                time.sleep(2)
+            attempts += 1
+            if box is None and up_or_down and up_or_down != "NULL":
+                factor = 200 if up_or_down == "up" else -200
+                pyautogui.scroll(factor)
+                time.sleep(delay * 2)
+            continue
         time.sleep(delay * 5)
         # print(image_filename)
-        if attempts > max_attempts:
-            play_sound("audio/alert_notification.mp3")
-            time.sleep(2)
-        if box is None and up_or_down and up_or_down != "NULL":
-            factor = 200 if up_or_down == "up" else -200
-            pyautogui.scroll(factor)
-            time.sleep(delay * 2)
-        attempts += 1
 
     if box is not None:
         x, y, width, height = box
@@ -140,7 +144,7 @@ def process_lookup_id(lookup_id, opt_in=True):
     time.sleep(0.25)
     keyboard.write(str(lookup_id))
     pyautogui.press("enter")
-    find_and_click_image("windowsTarget/cityStateZIP.png", 0, 2)
+    find_and_click_image("windowsTarget/cityStateZIP.png", 0, 5)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", opt_in)
     return find_and_click_image(
         "mergeConflictImages/donor.png", 0, 0, "NULL", opt_in, 3
@@ -157,7 +161,7 @@ def process_answer(answer, start_date, end_date, saveOne, saveTwo):
         write_to_file("lookup_ids.txt", f"{saveOne} XXX\n{saveTwo} XXX\n")
     elif answer == "q":
         delete_form()
-        write_to_file("lookup_ids.txt", f"{saveOne}\n{saveTwo}\n")
+        write_to_file("input.txt", f"{saveOne}\n{saveTwo}\n")
         sys.exit()
     elif answer == "i":
         opt_form(start_date, end_date, True)

@@ -66,6 +66,10 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
                 ),
             )
         except ImageNotFoundException:
+            attempts += 1
+            if attempts > 50:
+                play_sound("audio/alert_notification.mp3")
+                time.sleep(2)
             if box is None and up_or_down:
                 factor = 14 if up_or_down == "up" else -14
                 pyautogui.scroll(factor)
@@ -73,10 +77,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             continue
         time.sleep(delay * 5)
         # If the image is not found and 'up_or_down' is specified
-        attempts += 1
-        if attempts > 50:
-            play_sound("audio/alert_notification.mp3")
-            time.sleep(2)
 
     x, y, width, height = box
     x = box.left + width / 2 + biasx
@@ -312,7 +312,7 @@ def deceased_form():
     find_and_click_image("windowsTarget/communication_from.png")
     time.sleep(0.01)
     find_and_click_image("windowsTarget/deceased_date.png")
-    time.sleep(0.01)
+    time.sleep(0.02)
     if noted_date == "1/":
         keyboard.write(FORMATTED_DATE)
     elif noted_date != "1/":
@@ -338,6 +338,7 @@ def opt_out_form():
     global FULL_DATE
     time.sleep(0.02)
     find_and_click_image("windowsTarget/solicit_code.png")
+    time.sleep(0.01)
     keyboard.write("Imprimis")
     find_and_click_image("windowsTarget/imprimis_three.png")
     find_and_click_image("windowsTarget/source_wait.png")

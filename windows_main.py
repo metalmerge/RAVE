@@ -5,6 +5,7 @@ from datetime import datetime
 import pygame
 import pyperclip
 import keyboard
+import os
 import pyautogui
 from pyautogui import ImageNotFoundException
 import re
@@ -327,6 +328,17 @@ def deceased_form():
 def move_to_communications():
     global IMPRIMIS
     find_and_click_image("windowsTarget/constitute.png")
+    if not os.path.exists("refresh_counter.txt"):
+        refresh_counter = 0
+    else:
+        with open("refresh_counter.txt", "r") as f:
+            refresh_counter = int(f.read())
+    refresh_counter += 1
+    if refresh_counter % 10 == 0:
+        keyboard.press_and_release("ctrl+r")
+        refresh_counter = 0
+    with open("refresh_counter.txt", "w") as f:
+        f.write(str(refresh_counter))
     find_and_click_image(IMPRIMIS)
     # find_and_click_image("windowsTarget/communications.png")
     find_and_click_image("windowsTarget/preference.png")

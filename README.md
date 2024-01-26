@@ -33,7 +33,7 @@ Before using RAVE, make sure you have the following prerequisites installed:
    ```
 
    ```bash
-   python windows_main.py
+   python Downloads/RAVE-main/windows_main.py
    ```
 
 ## Troubleshooting
@@ -48,3 +48,4 @@ Special thanks to Coding 101 with Steve and Indently for their informative video
 
 - [Coding 101 with Steve](https://www.youtube.com/watch?v=qIJpBz6R2Uw)
 - [Indently](https://www.youtube.com/watch?v=cZQDO0ktnrw)
+- [RAVE Example](https://youtu.be/OKPScOcVeew)

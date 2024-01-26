@@ -4,6 +4,7 @@ import time
 import pyperclip
 import keyboard
 import pyautogui
+import os
 from pyautogui import ImageNotFoundException
 from datetime import datetime
 from main_shared_functions import (
@@ -152,6 +153,13 @@ def process_lookup_id(lookup_id, opt_in=True):
 
 
 def write_to_file(filename, content):
+    if not os.path.exists(filename):
+        with open("input.txt", "w") as f:
+            f.write("")
+    pyautogui.alert(
+        text="Please enter LookUp IDs in the input.txt file",
+        title="LookUp IDs",
+    )
     with open(filename, "a") as f:
         f.write(content)
 
@@ -332,6 +340,13 @@ def delete_form():
 
 def get_lookup_ids():
     global namesOne, namesTwo
+    if not os.path.exists("input.txt"):
+        with open("input.txt", "w") as f:
+            f.write("")
+        pyautogui.alert(
+            text="Please enter LookUp IDs in the input.txt file",
+            title="LookUp IDs",
+        )
     try:
         with open("input.txt", "r+") as f:
             lines = f.readlines()

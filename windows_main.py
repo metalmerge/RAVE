@@ -123,7 +123,7 @@ def month_year_only(input_text):
 
 def formatted_extract_date(input_text):
     dates = extract_dates(input_text)
-    print(f"{dates}:{input_text}")
+    # print(f"{dates}:{input_text}")
     if dates:
         month_year_result = month_year_only(input_text)
         if month_year_result is not None:
@@ -148,7 +148,6 @@ def formatted_extract_date(input_text):
         year = date.year
         return f"{month}/{year}"
     except IndexError:
-        print("Fail")
         return "1/"
 
 
@@ -170,13 +169,11 @@ def get_to_dead_page():
 def interactions_num_finder():
     find_and_click_image(PRIMARY_EMAIL)
     x, y = find_and_click_image("windowsTarget/interactionsExtract.png")
-    # print(x,y)
     global delay
     attempts = 0
     while True:
         pretext = "Interactions: "
         attempts += 1
-        print(attempts)
         if attempts > 50:
             play_sound("audio/alert_notification.mp3")
             time.sleep(2)
@@ -244,7 +241,7 @@ def process_application(is_confirmed=True, initials="DE"):
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/declined.png")
         find_and_click_image("windowsTarget/wait_for_declined.png")
-    time.sleep(0.03)
+    time.sleep(0.04)
     find_and_click_image("windowsTarget/actual_date.png")
     keyboard.press_and_release("ctrl+a")
     keyboard.write(FULL_DATE)
@@ -339,6 +336,7 @@ def move_to_communications():
         refresh_counter = 0
     with open("refresh_counter.txt", "w") as f:
         f.write(str(refresh_counter))
+    print(refresh_counter)
     find_and_click_image(IMPRIMIS)
     # find_and_click_image("windowsTarget/communications.png")
     find_and_click_image("windowsTarget/preference.png")

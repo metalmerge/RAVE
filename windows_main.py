@@ -241,7 +241,7 @@ def process_application(is_confirmed=True, initials="DE"):
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/declined.png")
         find_and_click_image("windowsTarget/wait_for_declined.png")
-    time.sleep(0.04)
+    time.sleep(0.08)
     find_and_click_image("windowsTarget/actual_date.png")
     keyboard.press_and_release("ctrl+a")
     keyboard.write(FULL_DATE)
@@ -304,7 +304,7 @@ def play_sound(music_file):
 
 def deceased_form():
     global noted_date, FORMATTED_DATE
-    time.sleep(0.02)
+    time.sleep(0.04)
     find_and_click_image("windowsTarget/source_tab_down.png")
     time.sleep(0.01)
     find_and_click_image("windowsTarget/communication_from.png")
@@ -332,6 +332,7 @@ def move_to_communications():
             refresh_counter = int(f.read())
     refresh_counter += 1
     if refresh_counter % 10 == 0:
+        time.sleep(.5)
         keyboard.press_and_release("ctrl+r")
         refresh_counter = 0
     with open("refresh_counter.txt", "w") as f:

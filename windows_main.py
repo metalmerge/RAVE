@@ -10,11 +10,11 @@ import pyautogui
 from pyautogui import ImageNotFoundException
 import re
 
-# from date_extractor import extract_dates
+from date_extractor import extract_dates
 
 from main_shared_functions import (
     extract_text_from_coordinates,
-    extract_dates,
+    extract_dates_custom,
     tab_command,
     extract_digits_from_text,
     remove_numbers_greater_than_current_year,
@@ -274,10 +274,11 @@ def process_application(is_confirmed=True, initials="DE"):
         extract_digits_from_text(found_text) != "" or word in found_text
         for word in specific_words
     ):
+        date_guess = extract_dates_custom(found_text)
+        if date_guess == "1/":
+            date_guess = formatted_extract_date(found_text)
         play_sound("audio/alert_notification.mp3")
-        noted_date = pyautogui.prompt(
-            text="", title="Noted Date?", default=extract_dates(found_text)
-        )
+        noted_date = pyautogui.prompt(text="", title="Noted Date?", default=date_guess)
         find_and_click_image("windowsTarget/sites.png")
         pyautogui.press("tab", presses=2)
     if found_text != "":
@@ -332,7 +333,7 @@ def move_to_communications():
             refresh_counter = int(f.read())
     refresh_counter += 1
     if refresh_counter % 10 == 0:
-        time.sleep(.5)
+        time.sleep(0.5)
         keyboard.press_and_release("ctrl+r")
         refresh_counter = 0
     with open("refresh_counter.txt", "w") as f:

@@ -6,7 +6,7 @@ from dateutil.relativedelta import relativedelta
 from datetime import datetime
 
 
-def extract_dates(input_text):
+def extract_dates_custom(input_text):
     months = {
         "January": 1,
         "February": 2,

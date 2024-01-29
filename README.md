@@ -33,7 +33,8 @@ Before using RAVE, make sure you have the following prerequisites installed:
    ```
 
    ```bash
-   python Downloads/RAVE-main/windows_main.py
+   cd Downloads/RAVE-main
+   python windows_main.py
    ```
 
 ## Troubleshooting

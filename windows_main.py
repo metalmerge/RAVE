@@ -91,8 +91,8 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         "windowsTarget/preference.png",
         "windowsTarget/interactionsExtract.png",
     ]:
-        pyautogui.moveTo(x, y)
-        pyautogui.click()
+        # pyautogui.moveTo(x, y)
+        pyautogui.click(x, y)
     return x, y
 
 
@@ -153,10 +153,8 @@ def formatted_extract_date(input_text):
 
 def get_to_dead_page():
     global COM_NUM, delay
-    time.sleep(0.01)
-    find_and_click_image("windowsTarget/constituents.png")
-    time.sleep(0.01)
-    find_and_click_image("windowsTarget/updates.png")
+    # time.sleep(0.01)
+    find_and_click_image("windowsTarget/updates.png")  # ,-60, -5)
     if COM_NUM == 2:
         find_and_click_image("windowsTarget/third_page.png")
         time.sleep(5)

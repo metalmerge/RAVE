@@ -15,7 +15,6 @@ from date_extractor import extract_dates
 from main_shared_functions import (
     extract_text_from_coordinates,
     extract_dates_custom,
-    tab_command,
     extract_digits_from_text,
     remove_numbers_greater_than_current_year,
     remove_phone_numbers,
@@ -239,11 +238,8 @@ def process_application(is_confirmed=True, initials="DE"):
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/declined.png")
         find_and_click_image("windowsTarget/wait_for_declined.png")
-    time.sleep(0.09)
-    find_and_click_image("windowsTarget/actual_date.png")
-    keyboard.press_and_release("ctrl+a")
-    keyboard.write(FULL_DATE)
-    tab_command(3)
+    find_and_click_image("windowsTarget/sites.png")
+    pyautogui.press("tab", presses=2)
     pyperclip.copy("")
     keyboard.press_and_release("ctrl+a")
     keyboard.press_and_release("ctrl+c")
@@ -289,7 +285,10 @@ def process_application(is_confirmed=True, initials="DE"):
     else:
         keyboard.write("Note: Duplicate - " + initials)
 
-    pyautogui.press("tab", presses=2)
+    find_and_click_image("windowsTarget/actual_date.png")
+    keyboard.press_and_release("ctrl+a")
+    keyboard.write(FULL_DATE)
+    pyautogui.press("tab", presses=5)
     pyautogui.press("enter")
 
 
@@ -356,7 +355,7 @@ def opt_out_form():
     find_and_click_image("windowsTarget/opt_out.png")
     pyautogui.press("tab")
     keyboard.write(FULL_DATE)
-    tab_command(3)
+    pyautogui.press("tab", presses=3)
     keyboard.write("Deceased")
     find_and_click_image("windowsTarget/double_deceased.png")
     pyautogui.press("enter")

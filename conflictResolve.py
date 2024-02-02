@@ -147,9 +147,18 @@ def process_lookup_id(lookup_id, opt_in=True):
     pyautogui.press("enter")
     find_and_click_image("windowsTarget/cityStateZIP.png", 0, 5)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", opt_in)
-    return find_and_click_image(
+    donor = find_and_click_image(
         "mergeConflictImages/donor.png", 0, 0, "NULL", opt_in, 3
     )
+    if donor is None:
+        other = pyautogui.prompt(
+            text="Trustee, Student, Staff, Planned Giver, Parent, Major Donor, Grandparent, Faculty, Academy Student, Alumnus - Graduated, Alumnus - Not Graduated",
+            title="Other?",
+            default="No",
+        )
+        if other != "No":
+            donor = 1, 1, other
+    return donor
 
 
 def write_to_file(filename, content):
@@ -203,12 +212,18 @@ def main():
         if lookup_idOne == "-1" or lookup_idTwo == "-1":
             break
         print(f"{saveOne}\n{saveTwo}")
-
-        xC, yC = process_lookup_id(lookup_idOne)
+        left = True
+        text = ""
+        (
+            xC,
+            yC,
+            text,
+        ) = process_lookup_id(lookup_idOne)
         pyautogui.press("down", presses=12)
         time.sleep(1)
         if codes_num_finder() != 0 and xC is None and yC is None:
-            xC, yC = process_lookup_id(lookup_idTwo, False)
+            xC, yC, text = process_lookup_id(lookup_idTwo, False)
+            left = False
             if xC is None and yC is None:
                 pyautogui.press("down", presses=12)
                 time.sleep(1)
@@ -255,9 +270,15 @@ def main():
                         )
                     break
             else:
-                write_to_file("lookup_ids.txt", f"{saveOne} XXX\n{saveTwo} XXX\n")
+                write_to_file(
+                    "lookup_ids.txt",
+                    f"{saveOne} {text} {left}\n{saveTwo} {text} {left}\n",
+                )
         else:
-            write_to_file("lookup_ids.txt", f"{saveOne} XXX\n{saveTwo} XXX\n")
+            write_to_file(
+                "lookup_ids.txt",
+                f"{saveOne} {text} {left}\n{saveTwo} {text} {left}\n",
+            )
 
 
 def codes_num_finder():

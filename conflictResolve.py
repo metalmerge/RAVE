@@ -147,28 +147,59 @@ def process_lookup_id(lookup_id, opt_in=True):
     pyautogui.press("enter")
     find_and_click_image("windowsTarget/cityStateZIP.png", 0, 5)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", opt_in)
-    donor = find_and_click_image(
-        "mergeConflictImages/donor.png", 0, 0, "NULL", opt_in, 3
+    # x1, y1 = find_and_click_image(
+    #     "mergeConflictImages/donor.png", 0, 0, "NULL", opt_in, 3
+    # )
+    x2, y2 = find_and_click_image(
+        "mergeConflictImages/constitencies.png", 0, 0, "NULL", opt_in, 5
     )
-    if donor is None:
-        other = pyautogui.prompt(
-            text="Trustee, Student, Staff, Planned Giver, Parent, Major Donor, Grandparent, Faculty, Academy Student, Alumnus - Graduated, Alumnus - Not Graduated",
-            title="Other?",
-            default="No",
-        )
-        if other != "No":
-            donor = 1, 1, other
-    return donor
+    print(x2, y2)
+    if x2 == None:
+        return None, None
+    x = int(x2)
+    y = int(y2)
+    amount = None
+    while not amount:
+        amount = extract_text_from_coordinates(x + 45, y - 10, x + 450, y + 10)
+        print(f"Text: {amount}")
+
+    text = [
+        "Trustee",
+        "Student",
+        "Staff",
+        "Planned Giver",
+        "Parent",
+        "Major Donor",
+        "Grandparent",
+        "Faculty",
+        "Academy Student",
+        "Alumnus - Graduated",
+        "Alumnus - Not Graduated",
+        "Donor",
+    ]
+    for word in text:
+        if word in amount:
+            return word, 1
+
+    # other = pyautogui.prompt(
+    #         text="Trustee, Student, Staff, Planned Giver, Parent, Major Donor, Grandparent, Faculty, Academy Student, Alumnus - Graduated, Alumnus - Not Graduated",
+    #         title="Other?",
+    #         default="No",
+    #     )
+    # if other != "No":
+    #     return 1, 1
+    return None, None
 
 
 def write_to_file(filename, content):
-    if not os.path.exists(filename):
-        with open("input.txt", "w") as f:
-            f.write("")
-    pyautogui.alert(
-        text="Please enter LookUp IDs in the input.txt file",
-        title="LookUp IDs",
-    )
+    # if not os.path.exists(filename):
+    #     print("No exist")
+    #     with open("input.txt", "w") as f:
+    #         f.write("")
+    # pyautogui.alert(
+    #     text="Please enter LookUp IDs in the input.txt file",
+    #     title="LookUp IDs",
+    # )
     with open(filename, "a") as f:
         f.write(content)
 
@@ -178,7 +209,7 @@ def process_answer(answer, start_date, end_date, saveOne, saveTwo):
         write_to_file("lookup_ids.txt", f"{saveOne} XXX\n{saveTwo} XXX\n")
     elif answer == "q":
         delete_form()
-        write_to_file("loopup_ids.txt", f"{saveOne}\n{saveTwo}\n")
+        write_to_file("lookup_ids.txt", f"{saveOne}\n{saveTwo}\n")
         sys.exit()
     elif answer == "i":
         opt_form(start_date, end_date, True)
@@ -193,8 +224,8 @@ def process_answer(answer, start_date, end_date, saveOne, saveTwo):
         find_and_click_image("mergeConflictImages/yes.png", 0, 0, None, False)
         time.sleep(1)
         find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
-        pyautogui.press("down", presses=12)
-        time.sleep(1)
+        # pyautogui.press("down", presses=12)
+        # time.sleep(1)
 
 
 def main():
@@ -212,21 +243,15 @@ def main():
         if lookup_idOne == "-1" or lookup_idTwo == "-1":
             break
         print(f"{saveOne}\n{saveTwo}")
-        left = True
-        text = ""
-        (
-            xC,
-            yC,
-            text,
-        ) = process_lookup_id(lookup_idOne)
-        pyautogui.press("down", presses=12)
-        time.sleep(1)
+
+        xC, yC = process_lookup_id(lookup_idOne)
+        # pyautogui.press("down", presses=12)
+        # time.sleep(1)
         if codes_num_finder() != 0 and xC is None and yC is None:
-            xC, yC, text = process_lookup_id(lookup_idTwo, False)
-            left = False
+            xC, yC = process_lookup_id(lookup_idTwo, False)
             if xC is None and yC is None:
-                pyautogui.press("down", presses=12)
-                time.sleep(1)
+                # pyautogui.press("down", presses=12)
+                # time.sleep(1)
                 answer = None
                 x1, y1 = find_and_click_image(
                     "mergeConflictImages/start_date.png", 0, 0, "NULL", True
@@ -270,15 +295,9 @@ def main():
                         )
                     break
             else:
-                write_to_file(
-                    "lookup_ids.txt",
-                    f"{saveOne} {text} {left}\n{saveTwo} {text} {left}\n",
-                )
+                write_to_file("lookup_ids.txt", f"{saveOne} {xC}\n{saveTwo} {xC}\n")
         else:
-            write_to_file(
-                "lookup_ids.txt",
-                f"{saveOne} {text} {left}\n{saveTwo} {text} {left}\n",
-            )
+            write_to_file("lookup_ids.txt", f"{saveOne} {xC}\n{saveTwo} {xC}\n")
 
 
 def codes_num_finder():
@@ -320,9 +339,8 @@ def opt_form(start_date, end_date, opt_in):
     pyautogui.press("enter")
     time.sleep(1)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
-    for _ in range(12):
-        pyautogui.press("down")
-    time.sleep(1)
+    # pyautogui.press("down", presses=12)
+    # time.sleep(1)
 
 
 def no_contact_form(start_date, end_date):
@@ -341,8 +359,7 @@ def no_contact_form(start_date, end_date):
     pyautogui.press("enter")
     time.sleep(1)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
-    for _ in range(12):
-        pyautogui.press("down")
+    # pyautogui.press("down", presses=12)
 
 
 def delete_form():
@@ -354,28 +371,29 @@ def delete_form():
         find_and_click_image("mergeConflictImages/yes.png", 0, 0, None, True)
         time.sleep(1)
         find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", True)
-        for _ in range(12):
-            pyautogui.press("down")
-        time.sleep(1)
+        # pyautogui.press("down", presses=12)
+        # time.sleep(1)
 
 
 def get_lookup_ids():
     global namesOne, namesTwo
-    if not os.path.exists("input.txt"):
-        with open("input.txt", "w") as f:
-            f.write("")
-        pyautogui.alert(
-            text="Please enter LookUp IDs in the input.txt file",
-            title="LookUp IDs",
-        )
+    # if not os.path.exists("input.txt"):
+    #     print("No existing")
+    #     with open("input.txt", "w") as f:
+    #         f.write("")
+    # pyautogui.alert(
+    #     text="Please enter LookUp IDs in the input.txt file",
+    #     title="LookUp IDs",
+    # )
     try:
         with open("input.txt", "r+") as f:
             lines = f.readlines()
             if not lines:
-                return pyautogui.prompt(
+                pyautogui.alert(
                     text="Enter LookUp IDs:",
                     title="LookUp IDs",
-                ).split(" ")
+                )
+                sys.exit()
             lookup_idOne, lookup_idTwo = lines[:2]
             f.seek(0)
             f.writelines(lines[2:])

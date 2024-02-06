@@ -150,7 +150,7 @@ def process_lookup_id(lookup_id, opt_in=True):
     # x1, y1 = find_and_click_image(
     #     "mergeConflictImages/donor.png", 0, 0, "NULL", opt_in, 3
     # )
-    x2, y2 = find_and_click_image(
+    x2,y2=find_and_click_image(
         "mergeConflictImages/constitencies.png", 0, 0, "NULL", opt_in, 5
     )
     print(x2, y2)
@@ -160,23 +160,12 @@ def process_lookup_id(lookup_id, opt_in=True):
     y = int(y2)
     amount = None
     while not amount:
-        amount = extract_text_from_coordinates(x + 45, y - 10, x + 450, y + 10)
+        amount = (
+            extract_text_from_coordinates(x + 45, y - 10, x + 450, y + 10)
+        )
         print(f"Text: {amount}")
-
-    text = [
-        "Trustee",
-        "Student",
-        "Staff",
-        "Planned Giver",
-        "Parent",
-        "Major Donor",
-        "Grandparent",
-        "Faculty",
-        "Academy Student",
-        "Alumnus - Graduated",
-        "Alumnus - Not Graduated",
-        "Donor",
-    ]
+    
+    text=["Trustee", "Student", "Staff", "Planned Giver", "Parent", "Major Donor", "Grandparent", "Faculty", "Academy Student", "Alumnus - Graduated", "Alumnus - Not Graduated","Donor",]
     for word in text:
         if word in amount:
             return word, 1
@@ -243,6 +232,7 @@ def main():
         if lookup_idOne == "-1" or lookup_idTwo == "-1":
             break
         print(f"{saveOne}\n{saveTwo}")
+        pyperclip.copy(f"{saveOne}\n{saveTwo}")
 
         xC, yC = process_lookup_id(lookup_idOne)
         # pyautogui.press("down", presses=12)
@@ -281,6 +271,7 @@ def main():
                         start_date = parts[1] if len(parts) > 1 else None
                         end_date = parts[2] if len(parts) > 2 else None
                         process_answer(answer, start_date, end_date, saveOne, saveTwo)
+                        #No NDO Direct Mail Fundraising
                     if commands[-1].strip().split(" ")[0] == "n":
                         break
                     if commands[-1].strip().split(" ")[0] != "e":
@@ -381,10 +372,10 @@ def get_lookup_ids():
     #     print("No existing")
     #     with open("input.txt", "w") as f:
     #         f.write("")
-    # pyautogui.alert(
-    #     text="Please enter LookUp IDs in the input.txt file",
-    #     title="LookUp IDs",
-    # )
+        # pyautogui.alert(
+        #     text="Please enter LookUp IDs in the input.txt file",
+        #     title="LookUp IDs",
+        # )
     try:
         with open("input.txt", "r+") as f:
             lines = f.readlines()

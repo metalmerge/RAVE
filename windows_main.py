@@ -245,6 +245,7 @@ def process_application(is_confirmed=True, initials="DE"):
     keyboard.press_and_release("ctrl+c")
     time.sleep(0.25)
     found_text = pyperclip.paste()
+    print(found_text)
     found_text = remove_phone_numbers(found_text)
     found_text = remove_numbers_greater_than_current_year(found_text)
     found_text = remove_digits_next_to_letters(found_text)
@@ -400,7 +401,7 @@ def main():
     x_scale = screen_width / 1440
     y_scale = screen_height / 900
     cutOffBottomY = screen_height
-    cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
+    cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/constituents.png")
     while initials != "-1":
         start_time = time.time()
         get_to_dead_page()

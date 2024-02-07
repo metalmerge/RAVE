@@ -420,6 +420,11 @@ def get_lookup_ids():
     try:
         with open("input.txt", "r+") as f:
             lines = f.readlines()
+            if len(lines) % 2 != 0:
+                pyautogui.alert(
+                    text="NEED EVEN NUMBER",
+                )
+                sys.exit()
             if not lines:
                 pyautogui.alert(
                     text="Enter LookUp IDs:",

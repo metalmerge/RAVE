@@ -18,7 +18,7 @@ two_std = std_dev * 1
 filtered_data = data_array[data_array - mean < two_std]
 median = np.median(filtered_data)
 
-window = 50
+window = 86
 moving_avg = np.convolve(filtered_data, np.ones(window) / window, mode="valid")
 
 # Sort data and get the lowest value

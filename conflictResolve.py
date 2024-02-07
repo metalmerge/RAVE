@@ -150,7 +150,7 @@ def process_lookup_id(lookup_id, opt_in=True):
     # x1, y1 = find_and_click_image(
     #     "mergeConflictImages/donor.png", 0, 0, "NULL", opt_in, 3
     # )
-    x2,y2=find_and_click_image(
+    x2, y2 = find_and_click_image(
         "mergeConflictImages/constitencies.png", 0, 0, "NULL", opt_in, 5
     )
     print(x2, y2)
@@ -160,12 +160,23 @@ def process_lookup_id(lookup_id, opt_in=True):
     y = int(y2)
     amount = None
     while not amount:
-        amount = (
-            extract_text_from_coordinates(x + 45, y - 10, x + 450, y + 10)
-        )
+        amount = extract_text_from_coordinates(x + 45, y - 10, x + 450, y + 10)
         print(f"Text: {amount}")
-    
-    text=["Trustee", "Student", "Staff", "Planned Giver", "Parent", "Major Donor", "Grandparent", "Faculty", "Academy Student", "Alumnus - Graduated", "Alumnus - Not Graduated","Donor",]
+
+    text = [
+        "Trustee",
+        "Student",
+        "Staff",
+        "Planned Giver",
+        "Parent",
+        "Major Donor",
+        "Grandparent",
+        "Faculty",
+        "Academy Student",
+        "Alumnus - Graduated",
+        "Alumnus - Not Graduated",
+        "Donor",
+    ]
     for word in text:
         if word in amount:
             return word, 1
@@ -206,8 +217,19 @@ def process_answer(answer, start_date, end_date, saveOne, saveTwo):
         opt_form(start_date, end_date, False)
     elif answer == "c":
         no_contact_form(start_date, end_date)
+    elif answer == "ndo":
+        ndo_form(start_date, end_date)
     elif answer == "dnc":
         find_and_click_image("mergeConflictImages/noContact.png", 0, 0, None, False)
+        time.sleep(1)
+        find_and_click_image("mergeConflictImages/delete.png", 0, 0, None, False)
+        find_and_click_image("mergeConflictImages/yes.png", 0, 0, None, False)
+        time.sleep(1)
+        find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
+        # pyautogui.press("down", presses=12)
+        # time.sleep(1)
+    elif answer == "dnn":
+        find_and_click_image("mergeConflictImages/noNDO.png", 0, 0, None, False)
         time.sleep(1)
         find_and_click_image("mergeConflictImages/delete.png", 0, 0, None, False)
         find_and_click_image("mergeConflictImages/yes.png", 0, 0, None, False)
@@ -271,7 +293,7 @@ def main():
                         start_date = parts[1] if len(parts) > 1 else None
                         end_date = parts[2] if len(parts) > 2 else None
                         process_answer(answer, start_date, end_date, saveOne, saveTwo)
-                        #No NDO Direct Mail Fundraising
+                        # No NDO Direct Mail Fundraising
                     if commands[-1].strip().split(" ")[0] == "n":
                         break
                     if commands[-1].strip().split(" ")[0] != "e":
@@ -353,6 +375,25 @@ def no_contact_form(start_date, end_date):
     # pyautogui.press("down", presses=12)
 
 
+def ndo_form(start_date, end_date):
+    find_and_click_image("windowsTarget/add.png", 0, 0, "down", False)
+    time.sleep(0.02)
+    find_and_click_image("windowsTarget/solicit_code.png", 0, 0, None, False)
+    keyboard.write("No NDO Direct Mail Fundraising")
+    find_and_click_image("mergeConflictImages/noNDOForm.png", 0, 0, None, False)
+    pyautogui.press("tab")
+    if start_date is not None:
+        keyboard.write(start_date)
+    tab_command(1)
+    if end_date is not None:
+        keyboard.write(end_date)
+    tab_command(2)
+    pyautogui.press("enter")
+    time.sleep(1)
+    find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL", False)
+    # pyautogui.press("down", presses=12)
+
+
 def delete_form():
     for _ in range(codes_num_finder()):
         find_and_click_image(
@@ -372,10 +413,10 @@ def get_lookup_ids():
     #     print("No existing")
     #     with open("input.txt", "w") as f:
     #         f.write("")
-        # pyautogui.alert(
-        #     text="Please enter LookUp IDs in the input.txt file",
-        #     title="LookUp IDs",
-        # )
+    # pyautogui.alert(
+    #     text="Please enter LookUp IDs in the input.txt file",
+    #     title="LookUp IDs",
+    # )
     try:
         with open("input.txt", "r+") as f:
             lines = f.readlines()

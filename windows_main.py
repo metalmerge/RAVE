@@ -238,6 +238,7 @@ def process_application(is_confirmed=True, initials="DE"):
         find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/declined.png")
         find_and_click_image("windowsTarget/wait_for_declined.png")
+    # time.sleep(0.09)
     find_and_click_image("windowsTarget/sites.png")
     pyautogui.press("tab", presses=2)
     pyperclip.copy("")
@@ -330,7 +331,7 @@ def move_to_communications():
         with open("refresh_counter.txt", "r") as f:
             refresh_counter = int(f.read())
     refresh_counter += 1
-    if refresh_counter % 10 == 0:
+    if refresh_counter % 20 == 0:
         time.sleep(0.5)
         keyboard.press_and_release("ctrl+r")
         refresh_counter = 0

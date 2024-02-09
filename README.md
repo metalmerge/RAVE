@@ -41,6 +41,8 @@ Before using RAVE, make sure you have the following prerequisites installed:
 
 - If you encounter a 'TypeError: `<' not supported between instances of 'str' and 'int''` error when running pyautogui, you can find a solution [here](https://stackoverflow.com/questions/76361049/how-to-fix-typeerror-not-supported-between-instances-of-str-and-int-wh/76383784#76383784).
 
+- Make sure to filter for only pending interactions.
+
 ## Acknowledgments
 
 Special thanks to Coding 101 with Steve and Indently for their informative videos on Pyautogui. Also thank you 

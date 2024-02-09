@@ -67,7 +67,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             )
         except ImageNotFoundException:
             attempts += 1
-            if attempts > 50:
+            if attempts > 12:
                 play_sound("audio/alert_notification.mp3")
                 time.sleep(2)
             if box is None and up_or_down:
@@ -163,64 +163,44 @@ def get_to_dead_page():
     find_and_click_image("windowsTarget/name.png", 0, round(25 * y_scale))
 
 
-def interactions_num_finder():
-    find_and_click_image(PRIMARY_EMAIL)
-    x, y = find_and_click_image("windowsTarget/interactionsExtract.png")
-    global delay
-    attempts = 0
-    while True:
-        pretext = "Interactions: "
-        attempts += 1
-        if attempts > 50:
-            play_sound("audio/alert_notification.mp3")
-            time.sleep(2)
-        try:
-            text = extract_text_from_coordinates(
-                x - 44,  # 1196,
-                y - 10,  # 491,  # 478,
-                x + 55,  # 1281,
-                y + 10,  # 517,  # 499,
-            )
-            # print(text)
-            if pretext in text:
-                num_index = text.index(pretext) + len(pretext)
-                num_text = text[num_index:].strip()
-                number_of_interactions = int(extract_digits_from_text(num_text))
-                break
-            else:
-                time.sleep(delay)
-                continue
-        except ValueError:
-            continue
-    return number_of_interactions
-
-
 def click_on_top_interaction(number_of_interactions):
-    global IMPRIMIS, PRIMARY_EMAIL, LOAD_OWNER_WAIT
-    if number_of_interactions == 1:
-        find_and_click_image(LOAD_OWNER_WAIT)
-        find_and_click_image(IMPRIMIS)
     find_and_click_image(
-        "windowsTarget/status_alone.png",
-        40,
-        round(number_of_interactions * 25),
+        "windowsTarget/pending.png",
+        0,
+        0,
         "down",
     )
     find_and_click_image("windowsTarget/edit_interaction.png", 0, 0, "down")
 
 
-def interactions_section(number_of_interactions, initials):
+def codes_num_finder():
+    x, y = find_and_click_image("windowsTarget/interactionsBASED.png")
+    print(x, y)
+    x = int(x)
+    y = int(y)
+    amount = None
+    while not amount:
+        amount = extract_digits_from_text(
+            extract_text_from_coordinates(x - 60, y - 20, x + 60, y + 20)
+        )
+        print(f"Interactions: {amount}")
+    return int(amount)
+
+
+def interactions_section(initials):
     global LOAD_OWNER_WAIT, PRIMARY_EMAIL
     find_and_click_image("windowsTarget/interactions.png")
+    find_and_click_image(LOAD_OWNER_WAIT)
+    find_and_click_image(IMPRIMIS)
+    number_of_interactions = codes_num_finder()
     click_on_top_interaction(1)
     process_application(True, initials)
     if number_of_interactions > 1:
         for i in range(2, number_of_interactions + 1):
-            find_and_click_image(IMPRIMIS)
-            find_and_click_image(PRIMARY_EMAIL)
+            # find_and_click_image(PRIMARY_EMAIL)
             find_and_click_image(LOAD_OWNER_WAIT)
+            find_and_click_image(IMPRIMIS)
             click_on_top_interaction(i)
-            # find_and_click_image(LOAD_OWNER_WAIT)
             process_application(False, initials)
     find_and_click_image(PRIMARY_EMAIL, 0, 0, "up")
     find_and_click_image("windowsTarget/personal_info.png")
@@ -278,7 +258,10 @@ def process_application(is_confirmed=True, initials="DE"):
         find_and_click_image("windowsTarget/sites.png")
         pyautogui.press("tab", presses=2)
     if found_text != "":
+        time.sleep(0.1)
         pyautogui.press("down")
+        time.sleep(0.1)
+
         pyautogui.press("enter")
         pyautogui.press("enter")
 
@@ -348,7 +331,7 @@ def move_to_communications():
 def opt_out_form():
     global FULL_DATE
     time.sleep(0.02)
-    find_and_click_image("windowsTarget/solicit_code.png")
+    find_and_click_image("windowsTarget/solicit_code.png", 100)
     time.sleep(0.01)
     keyboard.write("Imprimis")
     find_and_click_image("windowsTarget/imprimis_three.png")
@@ -406,8 +389,7 @@ def main():
     while initials != "-1":
         start_time = time.time()
         get_to_dead_page()
-        number_of_interactions = interactions_num_finder()
-        interactions_section(number_of_interactions, initials)
+        interactions_section(initials)
         deceased_form()
         move_to_communications()
         opt_out_form()

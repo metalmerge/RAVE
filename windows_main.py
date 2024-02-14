@@ -67,7 +67,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             )
         except ImageNotFoundException:
             attempts += 1
-            if attempts > 12:
+            if attempts > 15:
                 play_sound("audio/alert_notification.mp3")
                 time.sleep(2)
             if box is None and up_or_down:
@@ -197,7 +197,7 @@ def interactions_section(initials):
     process_application(True, initials)
     if number_of_interactions > 1:
         for i in range(2, number_of_interactions + 1):
-            # find_and_click_image(PRIMARY_EMAIL)
+            find_and_click_image(PRIMARY_EMAIL)
             find_and_click_image(LOAD_OWNER_WAIT)
             find_and_click_image(IMPRIMIS)
             click_on_top_interaction(i)
@@ -270,7 +270,8 @@ def process_application(is_confirmed=True, initials="DE"):
     else:
         keyboard.write("Note: Duplicate - " + initials)
 
-    find_and_click_image("windowsTarget/actual_date.png")
+    find_and_click_image("windowsTarget/actual_date.png",150)
+    time.sleep(.1)
     keyboard.press_and_release("ctrl+a")
     keyboard.write(FULL_DATE)
     pyautogui.press("tab", presses=5)
@@ -330,9 +331,9 @@ def move_to_communications():
 
 def opt_out_form():
     global FULL_DATE
-    time.sleep(0.02)
-    find_and_click_image("windowsTarget/solicit_code.png", 100)
-    time.sleep(0.01)
+    # time.sleep(0.1)
+    find_and_click_image("windowsTarget/solicit_code.png",100)
+    time.sleep(0.25)
     keyboard.write("Imprimis")
     find_and_click_image("windowsTarget/imprimis_three.png")
     find_and_click_image("windowsTarget/source_wait.png")

@@ -166,12 +166,10 @@ def get_to_dead_page():
 def click_on_top_interaction(number_of_interactions):
     find_and_click_image(
         "windowsTarget/pending.png",
-        0,
-        0,
+        0,0,
         "down",
     )
     find_and_click_image("windowsTarget/edit_interaction.png", 0, 0, "down")
-
 
 def codes_num_finder():
     x, y = find_and_click_image("windowsTarget/interactionsBASED.png")
@@ -185,7 +183,6 @@ def codes_num_finder():
         )
         print(f"Interactions: {amount}")
     return int(amount)
-
 
 def interactions_section(initials):
     global LOAD_OWNER_WAIT, PRIMARY_EMAIL
@@ -258,10 +255,10 @@ def process_application(is_confirmed=True, initials="DE"):
         find_and_click_image("windowsTarget/sites.png")
         pyautogui.press("tab", presses=2)
     if found_text != "":
-        time.sleep(0.1)
+        time.sleep(.1)
         pyautogui.press("down")
-        time.sleep(0.1)
-
+        time.sleep(.1)
+        
         pyautogui.press("enter")
         pyautogui.press("enter")
 
@@ -270,8 +267,8 @@ def process_application(is_confirmed=True, initials="DE"):
     else:
         keyboard.write("Note: Duplicate - " + initials)
 
-    find_and_click_image("windowsTarget/actual_date.png",150)
-    time.sleep(.1)
+    find_and_click_image("windowsTarget/actual_date.png",150,1)
+    time.sleep(.2)
     keyboard.press_and_release("ctrl+a")
     keyboard.write(FULL_DATE)
     pyautogui.press("tab", presses=5)
@@ -331,7 +328,7 @@ def move_to_communications():
 
 def opt_out_form():
     global FULL_DATE
-    # time.sleep(0.1)
+    time.sleep(0.1)
     find_and_click_image("windowsTarget/solicit_code.png",100)
     time.sleep(0.25)
     keyboard.write("Imprimis")

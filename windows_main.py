@@ -25,7 +25,7 @@ from main_shared_functions import (
 x_scale = 1
 y_scale = 1
 COM_NUM = 1
-delay = 0.04
+delay = 0.02
 confidence = 0.7
 CRM_cords = (0, 0)
 cutOffTopY = 0
@@ -42,12 +42,14 @@ formatted_year = str(CURRENT_DATE.year)
 formatted_day = str(CURRENT_DATE.day)
 FORMATTED_DATE = f"{formatted_month}/{formatted_year}"
 FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
-
-
-def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
-    global cutOffTopY, delay, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, LOAD_OWNER_WAIT
+PREVIOUS_ClICK = ""
+PRECIOUS_BIASX = 0
+PRECIOUS_BIASY = 0
+def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None, max_attempts=15):
+    global cutOffTopY, delay, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, LOAD_OWNER_WAIT, PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY
     box = None
     attempts = 0
+    print(image_filename)
     if (
         image_filename == "windowsTarget/source_file_tab_down.png"
         or image_filename == "windowsTarget/status_alone.png"
@@ -67,9 +69,26 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
             )
         except ImageNotFoundException:
             attempts += 1
-            if attempts > 15:
+            print(attempts)
+            if attempts >= max_attempts:
                 play_sound("audio/alert_notification.mp3")
-                time.sleep(2)
+                # time.sleep(2)
+                attempts = 0
+                if PREVIOUS_ClICK in ["windowsTarget/solicit_code.png", "windowsTarget/actual_date.png"]:
+                    find_and_click_image(PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY, up_or_down) #no global var for up_or_down b/c lazy
+                    if PREVIOUS_ClICK == "windowsTarget/solicit_code.png":
+                        time.sleep(0.25)
+                        keyboard.write("Imprimis")
+                    elif PREVIOUS_ClICK == "windowsTarget/actual_date.png": #untested
+                        pyautogui.alert("UNTESTED delete this alert when done testing")
+                        time.sleep(0.2)
+                        keyboard.press_and_release("ctrl+a")
+                        keyboard.write(FULL_DATE)
+                        pyautogui.press("tab", presses=5)
+                        pyautogui.press("enter")
+                else:
+                    find_and_click_image(PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY, up_or_down)
+
             if box is None and up_or_down:
                 factor = 14 if up_or_down == "up" else -14
                 pyautogui.scroll(factor)
@@ -81,6 +100,9 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
     x, y, width, height = box
     x = box.left + width / 2 + biasx
     y = box.top + height / 2 + biasy
+    PREVIOUS_ClICK = image_filename
+    PRECIOUS_BIASX = biasx
+    PRECIOUS_BIASY = biasy
     if image_filename not in [
         IMPRIMIS,
         PRIMARY_EMAIL,
@@ -89,6 +111,7 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None):
         "windowsTarget/source_wait.png",
         "windowsTarget/preference.png",
         "windowsTarget/interactionsExtract.png",
+        "windowsTarget/interactionsBASED.png",
     ]:
         # pyautogui.moveTo(x, y)
         pyautogui.click(x, y)
@@ -207,12 +230,11 @@ def interactions_section(initials):
 
 def process_application(is_confirmed=True, initials="DE"):
     global noted_date, FULL_DATE
+    find_and_click_image("windowsTarget/tab_down_complete.png")
     if is_confirmed:
-        find_and_click_image("windowsTarget/tab_down_complete.png")
-        find_and_click_image("windowsTarget/completed_form.png")
+        find_and_click_image("windowsTarget/completed_form.png",0,0,None,3)
         find_and_click_image("windowsTarget/wait_for_complete.png")
     else:
-        find_and_click_image("windowsTarget/tab_down_complete.png")
         find_and_click_image("windowsTarget/declined.png")
         find_and_click_image("windowsTarget/wait_for_declined.png")
     # time.sleep(0.09)
@@ -285,13 +307,13 @@ def play_sound(music_file):
 
 def deceased_form():
     global noted_date, FORMATTED_DATE
-    time.sleep(0.04)
+    # time.sleep(0.04)
     find_and_click_image("windowsTarget/source_tab_down.png")
-    time.sleep(0.01)
-    find_and_click_image("windowsTarget/communication_from.png")
-    time.sleep(0.01)
+    # time.sleep(0.01)
+    find_and_click_image("windowsTarget/communication_from.png",0,0,None,3)
+    # time.sleep(0.01)
     find_and_click_image("windowsTarget/deceased_date.png")
-    time.sleep(0.02)
+    # time.sleep(0.02)
     if noted_date == "1/":
         keyboard.write(FORMATTED_DATE)
     elif noted_date != "1/":
@@ -322,17 +344,17 @@ def move_to_communications():
     find_and_click_image(IMPRIMIS)
     # find_and_click_image("windowsTarget/communications.png")
     find_and_click_image("windowsTarget/preference.png")
-    time.sleep(0.01)
+    # time.sleep(0.01)
     find_and_click_image("windowsTarget/add.png")
 
 
 def opt_out_form():
     global FULL_DATE
-    time.sleep(0.1)
+    # time.sleep(0.1)
     find_and_click_image("windowsTarget/solicit_code.png",100)
-    time.sleep(0.25)
+    # time.sleep(0.25)
     keyboard.write("Imprimis")
-    find_and_click_image("windowsTarget/imprimis_three.png")
+    find_and_click_image("windowsTarget/imprimis_three.png",0,0,None, 3)
     find_and_click_image("windowsTarget/source_wait.png")
     find_and_click_image("windowsTarget/opt_out_tab_down.png")
     find_and_click_image("windowsTarget/opt_out.png")
@@ -374,7 +396,7 @@ def main():
     input_str = pyautogui.prompt(
         text="Enter Initials, which computer number this is, and delay time; -1 to quit",
         title="Enter Initials, which computer number this is, and delay time; -1 to quit",
-        default="DE, 1, 0.04",
+        default=f"DE, 1, {delay}",
     )
     initials, computer_number, delay = input_str.strip().split(",")
     COM_NUM = int(computer_number)

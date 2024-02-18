@@ -45,7 +45,11 @@ FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 PREVIOUS_ClICK = ""
 PRECIOUS_BIASX = 0
 PRECIOUS_BIASY = 0
-def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None, max_attempts=15):
+
+
+def find_and_click_image(
+    image_filename, biasx=0, biasy=0, up_or_down=None, max_attempts=15
+):
     global cutOffTopY, delay, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, LOAD_OWNER_WAIT, PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY
     box = None
     attempts = 0
@@ -69,25 +73,36 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None, max_
             )
         except ImageNotFoundException:
             attempts += 1
-            print(attempts)
+            print(f"Current attempts: {attempts}")
             if attempts >= max_attempts:
                 play_sound("audio/alert_notification.mp3")
                 # time.sleep(2)
                 attempts = 0
-                if PREVIOUS_ClICK in ["windowsTarget/solicit_code.png", "windowsTarget/actual_date.png"]:
-                    find_and_click_image(PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY, up_or_down) #no global var for up_or_down b/c lazy
+                if PREVIOUS_ClICK in [
+                    "windowsTarget/solicit_code.png",
+                    "windowsTarget/actual_date.png",
+                ]:
                     if PREVIOUS_ClICK == "windowsTarget/solicit_code.png":
+                        find_and_click_image(
+                            PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY, up_or_down
+                        )  # no global var for up_or_down b/c lazy
                         time.sleep(0.25)
                         keyboard.write("Imprimis")
-                    elif PREVIOUS_ClICK == "windowsTarget/actual_date.png": #untested
+                    elif PREVIOUS_ClICK == "windowsTarget/actual_date.png":  # untested
                         pyautogui.alert("UNTESTED delete this alert when done testing")
+                        time.sleep(2)
+                        find_and_click_image(
+                            PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY, up_or_down
+                        )  # no global var for up_or_down b/c lazy
                         time.sleep(0.2)
                         keyboard.press_and_release("ctrl+a")
                         keyboard.write(FULL_DATE)
                         pyautogui.press("tab", presses=5)
                         pyautogui.press("enter")
                 else:
-                    find_and_click_image(PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY, up_or_down)
+                    find_and_click_image(
+                        PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY, up_or_down
+                    )
 
             if box is None and up_or_down:
                 factor = 14 if up_or_down == "up" else -14
@@ -95,7 +110,6 @@ def find_and_click_image(image_filename, biasx=0, biasy=0, up_or_down=None, max_
             time.sleep(0.5)
             continue
         time.sleep(delay * 5)
-        # If the image is not found and 'up_or_down' is specified
 
     x, y, width, height = box
     x = box.left + width / 2 + biasx
@@ -189,14 +203,16 @@ def get_to_dead_page():
 def click_on_top_interaction(number_of_interactions):
     find_and_click_image(
         "windowsTarget/pending.png",
-        0,0,
+        0,
+        0,
         "down",
     )
     find_and_click_image("windowsTarget/edit_interaction.png", 0, 0, "down")
 
+
 def codes_num_finder():
     x, y = find_and_click_image("windowsTarget/interactionsBASED.png")
-    print(x, y)
+    # print(x, y)
     x = int(x)
     y = int(y)
     amount = None
@@ -206,6 +222,7 @@ def codes_num_finder():
         )
         print(f"Interactions: {amount}")
     return int(amount)
+
 
 def interactions_section(initials):
     global LOAD_OWNER_WAIT, PRIMARY_EMAIL
@@ -232,7 +249,7 @@ def process_application(is_confirmed=True, initials="DE"):
     global noted_date, FULL_DATE
     find_and_click_image("windowsTarget/tab_down_complete.png")
     if is_confirmed:
-        find_and_click_image("windowsTarget/completed_form.png",0,0,None,3)
+        find_and_click_image("windowsTarget/completed_form.png", 0, 0, None, 3)
         find_and_click_image("windowsTarget/wait_for_complete.png")
     else:
         find_and_click_image("windowsTarget/declined.png")
@@ -277,20 +294,19 @@ def process_application(is_confirmed=True, initials="DE"):
         find_and_click_image("windowsTarget/sites.png")
         pyautogui.press("tab", presses=2)
     if found_text != "":
-        time.sleep(.1)
+        time.sleep(0.1)
         pyautogui.press("down")
-        time.sleep(.1)
-        
-        pyautogui.press("enter")
-        pyautogui.press("enter")
+        time.sleep(0.1)
+
+        pyautogui.press("enter", presses=2)
 
     if is_confirmed:
         keyboard.write("Note: Not Researched - " + initials)
     else:
         keyboard.write("Note: Duplicate - " + initials)
 
-    find_and_click_image("windowsTarget/actual_date.png",150,1)
-    time.sleep(.2)
+    find_and_click_image("windowsTarget/actual_date.png", 150, 1)
+    time.sleep(0.2)
     keyboard.press_and_release("ctrl+a")
     keyboard.write(FULL_DATE)
     pyautogui.press("tab", presses=5)
@@ -307,21 +323,15 @@ def play_sound(music_file):
 
 def deceased_form():
     global noted_date, FORMATTED_DATE
-    # time.sleep(0.04)
     find_and_click_image("windowsTarget/source_tab_down.png")
-    # time.sleep(0.01)
-    find_and_click_image("windowsTarget/communication_from.png",0,0,None,3)
-    # time.sleep(0.01)
+    find_and_click_image("windowsTarget/communication_from.png", 0, 0, None, 3)
     find_and_click_image("windowsTarget/deceased_date.png")
-    # time.sleep(0.02)
     if noted_date == "1/":
         keyboard.write(FORMATTED_DATE)
     elif noted_date != "1/":
         keyboard.write(noted_date)
         noted_date = "1/"
-    pyautogui.press("tab")
-    pyautogui.press("tab")
-    pyautogui.press("tab")
+    pyautogui.press("tab", presses=3)
     pyautogui.press("space")
 
 
@@ -340,7 +350,7 @@ def move_to_communications():
         refresh_counter = 0
     with open("refresh_counter.txt", "w") as f:
         f.write(str(refresh_counter))
-    print(refresh_counter)
+    print(f"refresh_counter: {refresh_counter}")
     find_and_click_image(IMPRIMIS)
     # find_and_click_image("windowsTarget/communications.png")
     find_and_click_image("windowsTarget/preference.png")
@@ -351,10 +361,10 @@ def move_to_communications():
 def opt_out_form():
     global FULL_DATE
     # time.sleep(0.1)
-    find_and_click_image("windowsTarget/solicit_code.png",100)
+    find_and_click_image("windowsTarget/solicit_code.png", 100)
     # time.sleep(0.25)
     keyboard.write("Imprimis")
-    find_and_click_image("windowsTarget/imprimis_three.png",0,0,None, 3)
+    find_and_click_image("windowsTarget/imprimis_three.png", 0, 0, None, 3)
     find_and_click_image("windowsTarget/source_wait.png")
     find_and_click_image("windowsTarget/opt_out_tab_down.png")
     find_and_click_image("windowsTarget/opt_out.png")

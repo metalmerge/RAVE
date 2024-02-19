@@ -9,6 +9,7 @@ import os
 import pyautogui
 from pyautogui import ImageNotFoundException
 import re
+from tqdm import tqdm
 
 from date_extractor import extract_dates
 
@@ -25,7 +26,7 @@ from main_shared_functions import (
 x_scale = 1
 y_scale = 1
 COM_NUM = 1
-delay = 0.02
+delay = 0.04
 confidence = 0.7
 CRM_cords = (0, 0)
 cutOffTopY = 0
@@ -59,6 +60,10 @@ def find_and_click_image(
         or image_filename == "windowsTarget/status_alone.png"
     ):
         confidence = 0.8
+    
+    # Initialize tqdm progress bar
+    progress_bar = tqdm(total=max_attempts, desc="Attempts", position=0)
+    
     while box is None:
         try:
             box = pyautogui.locateOnScreen(
@@ -73,10 +78,9 @@ def find_and_click_image(
             )
         except ImageNotFoundException:
             attempts += 1
-            print(f"Current attempts: {attempts}")
+            progress_bar.update(1)  # Update progress bar
             if attempts >= max_attempts:
                 play_sound("audio/alert_notification.mp3")
-                # time.sleep(2)
                 attempts = 0
                 if PREVIOUS_ClICK in [
                     "windowsTarget/solicit_code.png",
@@ -85,15 +89,14 @@ def find_and_click_image(
                     if PREVIOUS_ClICK == "windowsTarget/solicit_code.png":
                         find_and_click_image(
                             PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY, up_or_down
-                        )  # no global var for up_or_down b/c lazy
+                        )
                         time.sleep(0.25)
                         keyboard.write("Imprimis")
-                    elif PREVIOUS_ClICK == "windowsTarget/actual_date.png":  # untested
-                        pyautogui.alert("UNTESTED delete this alert when done testing")
+                    elif PREVIOUS_ClICK == "windowsTarget/actual_date.png":
                         time.sleep(2)
                         find_and_click_image(
                             PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY, up_or_down
-                        )  # no global var for up_or_down b/c lazy
+                        )
                         time.sleep(0.2)
                         keyboard.press_and_release("ctrl+a")
                         keyboard.write(FULL_DATE)
@@ -127,8 +130,8 @@ def find_and_click_image(
         "windowsTarget/interactionsExtract.png",
         "windowsTarget/interactionsBASED.png",
     ]:
-        # pyautogui.moveTo(x, y)
         pyautogui.click(x, y)
+    progress_bar.close()  # Close progress bar after completion
     return x, y
 
 
@@ -239,7 +242,7 @@ def interactions_section(initials):
             find_and_click_image(IMPRIMIS)
             click_on_top_interaction(i)
             process_application(False, initials)
-    find_and_click_image(PRIMARY_EMAIL, 0, 0, "up")
+    find_and_click_image(PRIMARY_EMAIL, 0, 0, "up",8)
     find_and_click_image("windowsTarget/personal_info.png")
     find_and_click_image("windowsTarget/personal_info_wait.png", 0, 0, "down")
     find_and_click_image("windowsTarget/marked_deceased.png")
@@ -289,7 +292,7 @@ def process_application(is_confirmed=True, initials="DE"):
         date_guess = extract_dates_custom(found_text)
         if date_guess == "1/":
             date_guess = formatted_extract_date(found_text)
-        play_sound("audio/alert_notification.mp3")
+        play_sound("audio/retro.mp3")
         noted_date = pyautogui.prompt(text="", title="Noted Date?", default=date_guess)
         find_and_click_image("windowsTarget/sites.png")
         pyautogui.press("tab", presses=2)
@@ -364,7 +367,7 @@ def opt_out_form():
     find_and_click_image("windowsTarget/solicit_code.png", 100)
     # time.sleep(0.25)
     keyboard.write("Imprimis")
-    find_and_click_image("windowsTarget/imprimis_three.png", 0, 0, None, 3)
+    find_and_click_image("windowsTarget/imprimis_three.png", 0, 0, None, 8)
     find_and_click_image("windowsTarget/source_wait.png")
     find_and_click_image("windowsTarget/opt_out_tab_down.png")
     find_and_click_image("windowsTarget/opt_out.png")

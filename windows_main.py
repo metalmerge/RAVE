@@ -49,7 +49,7 @@ PRECIOUS_BIASY = 0
 
 
 def find_and_click_image(
-    image_filename, biasx=0, biasy=0, up_or_down=None, max_attempts=15
+    image_filename, biasx=0, biasy=0, up_or_down=None, max_attempts=20
 ):
     global cutOffTopY, delay, x_scale, y_scale, cutOffBottomY, confidence, PRIMARY_EMAIL, IMPRIMIS, LOAD_OWNER_WAIT, PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY
     box = None
@@ -93,7 +93,7 @@ def find_and_click_image(
                         time.sleep(0.25)
                         keyboard.write("Imprimis")
                     elif PREVIOUS_ClICK == "windowsTarget/actual_date.png":
-                        time.sleep(2)
+                        # time.sleep(2)
                         find_and_click_image(
                             PREVIOUS_ClICK, PRECIOUS_BIASX, PRECIOUS_BIASY, up_or_down
                         )
@@ -316,12 +316,15 @@ def process_application(is_confirmed=True, initials="DE"):
     pyautogui.press("enter")
 
 
+
 def play_sound(music_file):
     pygame.init()
     sound = pygame.mixer.Sound(music_file)
     sound.play()
     sound.set_volume(1)
-    pygame.mixer.music.stop()
+    pygame.time.wait(2000)  # Wait for 2000 milliseconds (2 seconds)
+    sound.stop()
+    pygame.quit()
 
 
 def deceased_form():

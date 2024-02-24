@@ -1,5 +1,6 @@
 # @Dimitry Ermakov
-# @12/06/2023
+# @2/24/2024
+# CRUD = Create, Read, Update, and Delete
 import time
 import keyboard
 import pyautogui
@@ -31,8 +32,6 @@ formatted_year = str(CURRENT_DATE.year)
 formatted_day = str(CURRENT_DATE.day)
 FORMATTED_DATE = f"{formatted_month}/{formatted_year}"
 FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
-namesOne = None
-namesTwo = None
 
 
 def find_and_click_image(
@@ -207,17 +206,17 @@ def allowed_constituencies():
         print(f"Text: {amount}")
 
     text = [
-        # "Trustee",
+        "Trustee",
         "Prospect",
         "prospect",
-        # "Student",
-        # "Staff",
+        "Student",
+        "Staff",
         # "Planned Giver",
         # "Parent",
         # "Major Donor",
         # "Grandparent",
-        # "Faculty",
-        # "Academy Student",
+        "Faculty",
+        "Academy Student",
         # "Alumnus - Graduated",
         # "Alumnus - Not Graduated",
         # "Donor",
@@ -234,7 +233,7 @@ def merge_request():
 
 
 def main():
-    global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords, namesOne, namesTwo
+    global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
@@ -243,16 +242,14 @@ def main():
         if allowed_constituencies() != -1:
             answer = None
             x1, y1 = find_and_click_image(
-                "mergeConflictImages/start_date.png", 0, 0, "NULL"
+                "images_duplicate/start_date.png", 0, 0, "NULL"
             )
             guess = extract_text_from_coordinates(
-                x1 - 40, y1 + 11, x1 + 40, y1 + 40
+                x1 - 40, y1 + 45, x1 + 40, y1 + 68
             )  # TODO
-            x2, y2 = find_and_click_image(
-                "mergeConflictImages/end_date.png", 0, 0, "NULL"
-            )
+            x2, y2 = find_and_click_image("images_duplicate/end_date.png", 0, 0, "NULL")
             guessTwo = extract_text_from_coordinates(
-                x2 - 40, y2 + 11, x2 + 40, y2 + 40
+                x2 - 40, y2 + 45, x2 + 40, y2 + 68
             )  # TODO
             defaultGuess = f"i {guess}"
             if guessTwo != "":
@@ -282,6 +279,7 @@ def main():
                 title="Error",
                 button="OK",
             )
+            merge_request()
 
 
 if __name__ == "__main__":

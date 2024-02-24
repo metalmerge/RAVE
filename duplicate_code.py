@@ -25,13 +25,6 @@ cutOffBottomY = 900
 pyautogui.FAILSAFE = True
 pyautogui.PAUSE = delay
 PRIMARY_EMAIL = "windowsTarget/primary_email.png"
-MAX_ATTEMPTS = round(1.25 / (delay * 5))
-CURRENT_DATE = datetime.now()
-formatted_month = str(CURRENT_DATE.month)
-formatted_year = str(CURRENT_DATE.year)
-formatted_day = str(CURRENT_DATE.day)
-FORMATTED_DATE = f"{formatted_month}/{formatted_year}"
-FULL_DATE = f"{formatted_month}/{formatted_day}/{formatted_year}"
 
 
 def find_and_click_image(

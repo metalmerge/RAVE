@@ -60,10 +60,10 @@ def find_and_click_image(
         or image_filename == "windowsTarget/status_alone.png"
     ):
         confidence = 0.8
-    
+
     # Initialize tqdm progress bar
     progress_bar = tqdm(total=max_attempts, desc="Attempts", position=0)
-    
+
     while box is None:
         try:
             box = pyautogui.locateOnScreen(
@@ -242,7 +242,7 @@ def interactions_section(initials):
             find_and_click_image(IMPRIMIS)
             click_on_top_interaction(i)
             process_application(False, initials)
-    find_and_click_image(PRIMARY_EMAIL, 0, 0, "up",8)
+    find_and_click_image(PRIMARY_EMAIL, 0, 0, "up", 8)
     find_and_click_image("windowsTarget/personal_info.png")
     find_and_click_image("windowsTarget/personal_info_wait.png", 0, 0, "down")
     find_and_click_image("windowsTarget/marked_deceased.png")
@@ -314,7 +314,6 @@ def process_application(is_confirmed=True, initials="DE"):
     keyboard.write(FULL_DATE)
     pyautogui.press("tab", presses=5)
     pyautogui.press("enter")
-
 
 
 def play_sound(music_file):

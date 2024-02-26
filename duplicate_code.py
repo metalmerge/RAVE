@@ -33,7 +33,8 @@ def find_and_click_image(
     global cutOffTopY, delay, MAX_ATTEMPTS, x_scale, y_scale, cutOffBottomY, confidence
     box = None
     attempts = 0
-
+    if image_filename == "images_duplicate/comment.png":
+        confidence=.9
     while box is None and attempts < max_attempts:
         try:
             box = pyautogui.locateOnScreen(
@@ -57,7 +58,7 @@ def find_and_click_image(
                 time.sleep(delay * 2)
             continue
         time.sleep(delay * 5)
-        # print(image_filename)
+        print(image_filename)
 
     if box is not None:
         x, y, width, height = box
@@ -92,8 +93,10 @@ def get_screen_dimensions():
 
 
 def process_answer(answer, start_date, end_date):
+    print(answer)
     if answer == "q":
-        merge_request()
+        find_and_click_image("images_duplicate/comment.png", 0, 25)
+        find_and_click_image("images_duplicate/save.png")
         sys.exit()
     elif answer == "i":
         opt_form(start_date, end_date, True)
@@ -109,14 +112,23 @@ def process_answer(answer, start_date, end_date):
         delete_specifc_form("mergeConflictImages/noNDO.png")
     elif answer == "dva":
         delete_specifc_form("images_duplicate/noValidAddress.png")
+    elif answer == "dni":
+        delete_specifc_form("images_duplicate/no_imprintis.png")
+    elif answer.isdigit():
+        if int(answer) > 3:
+            pyautogui.press("down",presses=2)
+            time.sleep(1)
+        delete_specifc_form("images_duplicate/review_down.png",0,(80+((int(answer)-1)*25)))
+
+
 
 
 def opt_form(start_date, end_date, opt_in):
-    find_and_click_image("mergeConflictImages/target_select.png", 0, 40)
+    find_and_click_image("images_duplicate/target_select.png", 0, 40)
     if opt_in:
-        find_and_click_image("mergeConflictImages/opt_in_button.png")
+        find_and_click_image("images_duplicate/opt_in_button.png")
     else:
-        find_and_click_image("mergeConflictImages/opt_out_button.png")
+        find_and_click_image("images_duplicate/opt_in_button.png",100)
 
     time.sleep(3)
     pyautogui.press("tab", presses=2)
@@ -126,10 +138,10 @@ def opt_form(start_date, end_date, opt_in):
     pyautogui.press("tab")
     if end_date is not None:
         keyboard.write(end_date)
-    pyautogui.press("tab", presses=5)  # TODO test
+    pyautogui.press("tab", presses=7)  # TODO test
     pyautogui.press("enter")
-    time.sleep(1)
-    find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL")
+    # time.sleep(3)
+    # find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL")
     # pyautogui.press("down", presses=12)
     # time.sleep(1)
 
@@ -148,8 +160,8 @@ def no_contact_form(start_date, end_date):
         keyboard.write(end_date)
     tab_command(2)
     pyautogui.press("enter")
-    time.sleep(1)
-    find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL")
+    time.sleep(3)
+    # find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL")
     # pyautogui.press("down", presses=12)
 
 
@@ -167,25 +179,27 @@ def ndo_form(start_date, end_date):
         keyboard.write(end_date)
     tab_command(2)
     pyautogui.press("enter")
-    time.sleep(1)
-    find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL")
+    time.sleep(3)
+    # find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL")
     # pyautogui.press("down", presses=12)
 
 
-def delete_specifc_form(image):
+def delete_specifc_form(image,biasx=30,biasy=0):
     while True:
-        x, y = find_and_click_image(f"mergeConflictImages/{image}.png", 0, 25, 10)
+        x, y = find_and_click_image(image,biasx,biasy)
         if x == None and y == None:
             break
         find_and_click_image("mergeConflictImages/delete.png")
-        find_and_click_image("mergeConflictImages/yes.png")
-        time.sleep(1)
-        find_and_click_image(
-            PRIMARY_EMAIL,
-            0,
-            0,
-            "NULL",
-        )
+        find_and_click_image("images_duplicate/yes.png")
+        if image == "images_duplicate/review_down.png":
+            break
+        time.sleep(3)
+        # find_and_click_image(
+        #     PRIMARY_EMAIL,
+        #     0,
+        #     0,
+        #     "NULL",
+        # )
         # pyautogui.press("down", presses=12)
         # time.sleep(1)
 
@@ -193,10 +207,12 @@ def delete_specifc_form(image):
 def allowed_constituencies():
     x, y = find_and_click_image("mergeConflictImages/constitencies.png", 0, 0, "NULL")
     print(x, y)
-    amount = None
-    while not amount:
+    amount = ""
+    attempts = 0
+    while amount == "" and attempts < 30:
         amount = extract_text_from_coordinates(x + 45, y - 10, x + 450, y + 10)  # TODO
         print(f"Text: {amount}")
+        attempts += 1
 
     text = [
         "Trustee",
@@ -222,6 +238,7 @@ def allowed_constituencies():
 def merge_request():
     find_and_click_image("images_duplicate/comment.png", 0, 25)
     find_and_click_image("images_duplicate/save.png")
+    time.sleep(1)
     find_and_click_image("images_duplicate/return.png")
 
 
@@ -230,36 +247,46 @@ def main():
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
-        find_and_click_image("images_duplicate/target_lookup_id.png", 0, 25)
+        find_and_click_image("windowsTarget/updates.png")
+        find_and_click_image("images_duplicate/target_lookup_id.png", -30, 25)
 
         if allowed_constituencies() != -1:
             answer = None
-            x1, y1 = find_and_click_image(
-                "images_duplicate/start_date.png", 0, 0, "NULL"
-            )
-            guess = extract_text_from_coordinates(
-                x1 - 40, y1 + 45, x1 + 40, y1 + 68
-            )  # TODO
-            x2, y2 = find_and_click_image("images_duplicate/end_date.png", 0, 0, "NULL")
-            guessTwo = extract_text_from_coordinates(
-                x2 - 40, y2 + 45, x2 + 40, y2 + 68
-            )  # TODO
-            defaultGuess = f"i {guess}"
-            if guessTwo != "":
-                defaultGuess = f"i {guess} {guessTwo}"
+            # x1, y1 = find_and_click_image(
+            #     "images_duplicate/start_date.png", 0, 0, "NULL"
+            # )
+            # guess = extract_text_from_coordinates(
+            #     x1 - 40, y1 + 45, x1 + 40, y1 + 68
+            # )  # TODO
+            # x2, y2 = find_and_click_image("images_duplicate/end_date.png", 0, 0, "NULL")
+            # guessTwo = extract_text_from_coordinates(
+            #     x2 - 40, y2 + 45, x2 + 40, y2 + 68
+            # )  # TODO
+            # defaultGuess = f"i {guess}"
+            defaultGuess = f"i 10/16/2023"
+            # if guessTwo != "":
+            #     defaultGuess = f"i {guess} {guessTwo}"
+
+            # delete_specifc_form("images_duplicate/noValidAddress.png")
+            # delete_specifc_form("images_duplicate/no_current.png")
+            
             while True:
                 response = pyautogui.prompt(
-                    text="i = opt in; o = opt out; dnc = delete no contact; dnn = delete NDO; dva = delete no valid address; q = stop; e",
+                    text="i = opt in; o = opt out; dnc = delete no contact; dnn = delete NDO; dva = delete no valid address; dni = delete no imprintis; q = stop; e",
                     title="Command",
                     default=defaultGuess,
                 )
                 commands = response.split(",")
-                for command in commands:
+                for index, command in enumerate(commands):
                     parts = command.strip().split(" ")
                     answer = parts[0] if len(parts) > 0 else None
                     start_date = parts[1] if len(parts) > 1 else None
                     end_date = parts[2] if len(parts) > 2 else None
                     process_answer(answer, start_date, end_date)
+                    
+                    if index != len(commands) - 1:
+                        
+                        time.sleep(3)
                 if commands[-1].strip().split(" ")[0] != "e":
                     defaultGuess = "e"
                     continue

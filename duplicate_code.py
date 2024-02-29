@@ -34,7 +34,7 @@ def find_and_click_image(
     box = None
     attempts = 0
     if image_filename == "images_duplicate/comment.png":
-        confidence = 0.9
+        confidence=.9
     while box is None and attempts < max_attempts:
         try:
             box = pyautogui.locateOnScreen(
@@ -111,18 +111,18 @@ def process_answer(answer, start_date, end_date):
     elif answer == "dnn":
         delete_specifc_form("mergeConflictImages/noNDO.png")
     elif answer == "dva":
-        pyautogui.press("down", presses=2)
+        pyautogui.press("down",presses=2)
         time.sleep(1)
         delete_specifc_form("images_duplicate/noValidAddress.png")
     elif answer == "dni":
         delete_specifc_form("images_duplicate/no_imprintis.png")
     elif answer.isdigit():
         if int(answer) >= 3:
-            pyautogui.press("down", presses=2)
+            pyautogui.press("down",presses=2)
             time.sleep(1)
-        delete_specifc_form(
-            "images_duplicate/review_down.png", 0, (80 + ((int(answer) - 1) * 25))
-        )
+        delete_specifc_form("images_duplicate/review_down.png",0,(80+((int(answer)-1)*25)))
+
+
 
 
 def opt_form(start_date, end_date, opt_in):
@@ -130,7 +130,7 @@ def opt_form(start_date, end_date, opt_in):
     if opt_in:
         find_and_click_image("images_duplicate/opt_in_button.png")
     else:
-        find_and_click_image("images_duplicate/opt_in_button.png", 100)
+        find_and_click_image("images_duplicate/opt_in_button.png",100)
 
     time.sleep(3)
     pyautogui.press("tab", presses=2)
@@ -186,9 +186,9 @@ def ndo_form(start_date, end_date):
     # pyautogui.press("down", presses=12)
 
 
-def delete_specifc_form(image, biasx=30, biasy=0):
+def delete_specifc_form(image,biasx=30,biasy=0):
     while True:
-        x, y = find_and_click_image(image, biasx, biasy)
+        x, y = find_and_click_image(image,biasx,biasy)
         if x == None and y == None:
             break
         find_and_click_image("mergeConflictImages/delete.png")
@@ -245,6 +245,21 @@ def merge_request():
     time.sleep(1)
     find_and_click_image("images_duplicate/return.png")
 
+def print_string_difference_and_similarity(string1, string2):
+    diff_count = 0
+    total_chars = min(len(string1), len(string2))
+    match_count = 0
+    
+    for i, (char1, char2) in enumerate(zip(string1, string2)):
+        if char1 != char2 and (i == 0 or char1 != string1[i - 1]) and (i == len(string1) - 1 or char1 != string1[i + 1]):
+            print(f"Difference found at index {i}: '{char1}' != '{char2}'")
+            diff_count += 1
+        else:
+            match_count += 1
+    
+    similarity_percent = (match_count / total_chars) * 100
+    print(f"Percentage of similarity between the strings: {similarity_percent:.2f}%")
+    print(f"Total differences found: {diff_count}")
 
 def main():
     global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
@@ -254,16 +269,34 @@ def main():
         find_and_click_image("windowsTarget/updates.png")
         find_and_click_image("images_duplicate/target_lookup_id.png", -30, 25)
         if allowed_constituencies() != -1:
-            pyautogui.press("down", presses=5)
+            pyautogui.press("down",presses=5)
             time.sleep(1)
-            find_and_click_image("images_duplicate/target_select.png", 0, 50)
+            x1, y1 = find_and_click_image("images_duplicate/target_select.png", 0, 50)
+            y1 -= 50
             time.sleep(1)
-            find_and_click_image("images_duplicate/source_target.png", 0, 50)
-            add = pyautogui.prompt(
-                text="Addresses Correct?",
-                title="Addresses",
-                default="y",
-            )
+            x2, y2 = find_and_click_image("images_duplicate/source_target.png", 0, 50)
+            y2-=50
+            add1 = "-1"
+            add2 = ""
+            attempts = 0
+            # while add1 == "" and attempts < 30:
+            #     add1 = extract_text_from_coordinates(x1 + (305-259), y1 + (105), x1 + (486-259), y1 + (153))
+            #     print(f"Text: {add1}")
+            #     attempts += 1
+            # attempts = 0
+            # while add2 == "" and attempts < 30:
+            #     add2 = extract_text_from_coordinates(x2 + (35), y2 + (80), x2 + (225), y2 + (130))
+            #     print(f"Text: {add2}")
+            #     attempts += 1
+            if add1 != add2:
+                # print_string_difference_and_similarity(add1,add2)
+                add = pyautogui.prompt(
+                    text="Addresses Correct?",
+                    title="Addresses",
+                    default="y",
+                )
+            else:
+                add = "y"
             if add != "y":
                 continue
             find_and_click_image("images_duplicate/target_select.png", 0, 50)
@@ -287,7 +320,7 @@ def main():
 
             # delete_specifc_form("images_duplicate/noValidAddress.png")
             # delete_specifc_form("images_duplicate/no_current.png")
-
+            
             while True:
                 response = pyautogui.prompt(
                     text="i = opt in; o = opt out; dnc = delete no contact; dnn = delete NDO; dva = delete no valid address; dni = delete no imprintis; q = stop; e",
@@ -295,15 +328,16 @@ def main():
                     default=defaultGuess,
                 )
                 commands = response.split(",")
-
+                
                 for index, command in enumerate(commands):
                     parts = command.strip().split(" ")
                     answer = parts[0] if len(parts) > 0 else None
                     start_date = parts[1] if len(parts) > 1 else None
                     end_date = parts[2] if len(parts) > 2 else None
                     process_answer(answer, start_date, end_date)
-
+                    
                     if index != len(commands) - 1:
+                        
                         time.sleep(3)
                 if commands[-1].strip().split(" ")[0] != "e":
                     defaultGuess = "e"

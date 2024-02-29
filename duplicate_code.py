@@ -34,7 +34,7 @@ def find_and_click_image(
     box = None
     attempts = 0
     if image_filename == "images_duplicate/comment.png":
-        confidence=.9
+        confidence = 0.9
     while box is None and attempts < max_attempts:
         try:
             box = pyautogui.locateOnScreen(
@@ -111,16 +111,18 @@ def process_answer(answer, start_date, end_date):
     elif answer == "dnn":
         delete_specifc_form("mergeConflictImages/noNDO.png")
     elif answer == "dva":
+        pyautogui.press("down", presses=2)
+        time.sleep(1)
         delete_specifc_form("images_duplicate/noValidAddress.png")
     elif answer == "dni":
         delete_specifc_form("images_duplicate/no_imprintis.png")
     elif answer.isdigit():
-        if int(answer) > 3:
-            pyautogui.press("down",presses=2)
+        if int(answer) >= 3:
+            pyautogui.press("down", presses=2)
             time.sleep(1)
-        delete_specifc_form("images_duplicate/review_down.png",0,(80+((int(answer)-1)*25)))
-
-
+        delete_specifc_form(
+            "images_duplicate/review_down.png", 0, (80 + ((int(answer) - 1) * 25))
+        )
 
 
 def opt_form(start_date, end_date, opt_in):
@@ -128,7 +130,7 @@ def opt_form(start_date, end_date, opt_in):
     if opt_in:
         find_and_click_image("images_duplicate/opt_in_button.png")
     else:
-        find_and_click_image("images_duplicate/opt_in_button.png",100)
+        find_and_click_image("images_duplicate/opt_in_button.png", 100)
 
     time.sleep(3)
     pyautogui.press("tab", presses=2)
@@ -184,9 +186,9 @@ def ndo_form(start_date, end_date):
     # pyautogui.press("down", presses=12)
 
 
-def delete_specifc_form(image,biasx=30,biasy=0):
+def delete_specifc_form(image, biasx=30, biasy=0):
     while True:
-        x, y = find_and_click_image(image,biasx,biasy)
+        x, y = find_and_click_image(image, biasx, biasy)
         if x == None and y == None:
             break
         find_and_click_image("mergeConflictImages/delete.png")
@@ -213,10 +215,11 @@ def allowed_constituencies():
         amount = extract_text_from_coordinates(x + 45, y - 10, x + 450, y + 10)  # TODO
         print(f"Text: {amount}")
         attempts += 1
-
+    listAmount = amount.split(" ")
     text = [
         "Trustee",
         "Prospect",
+        " Prospect",
         "prospect",
         "Student",
         "Staff",
@@ -230,8 +233,9 @@ def allowed_constituencies():
         # "Alumnus - Not Graduated",
         # "Donor",
     ]
-    if amount in text:
-        return -1
+    for x in listAmount:
+        if x in text:
+            return -1
     return 0
 
 
@@ -249,8 +253,22 @@ def main():
     while True:
         find_and_click_image("windowsTarget/updates.png")
         find_and_click_image("images_duplicate/target_lookup_id.png", -30, 25)
-
         if allowed_constituencies() != -1:
+            pyautogui.press("down", presses=5)
+            time.sleep(1)
+            find_and_click_image("images_duplicate/target_select.png", 0, 50)
+            time.sleep(1)
+            find_and_click_image("images_duplicate/source_target.png", 0, 50)
+            add = pyautogui.prompt(
+                text="Addresses Correct?",
+                title="Addresses",
+                default="y",
+            )
+            if add != "y":
+                continue
+            find_and_click_image("images_duplicate/target_select.png", 0, 50)
+            time.sleep(1)
+            find_and_click_image("images_duplicate/source_target.png", 0, 50)
             answer = None
             # x1, y1 = find_and_click_image(
             #     "images_duplicate/start_date.png", 0, 0, "NULL"
@@ -263,13 +281,13 @@ def main():
             #     x2 - 40, y2 + 45, x2 + 40, y2 + 68
             # )  # TODO
             # defaultGuess = f"i {guess}"
-            defaultGuess = f"i 10/16/2023"
+            defaultGuess = f"3"
             # if guessTwo != "":
             #     defaultGuess = f"i {guess} {guessTwo}"
 
             # delete_specifc_form("images_duplicate/noValidAddress.png")
             # delete_specifc_form("images_duplicate/no_current.png")
-            
+
             while True:
                 response = pyautogui.prompt(
                     text="i = opt in; o = opt out; dnc = delete no contact; dnn = delete NDO; dva = delete no valid address; dni = delete no imprintis; q = stop; e",
@@ -277,15 +295,15 @@ def main():
                     default=defaultGuess,
                 )
                 commands = response.split(",")
+
                 for index, command in enumerate(commands):
                     parts = command.strip().split(" ")
                     answer = parts[0] if len(parts) > 0 else None
                     start_date = parts[1] if len(parts) > 1 else None
                     end_date = parts[2] if len(parts) > 2 else None
                     process_answer(answer, start_date, end_date)
-                    
+
                     if index != len(commands) - 1:
-                        
                         time.sleep(3)
                 if commands[-1].strip().split(" ")[0] != "e":
                     defaultGuess = "e"

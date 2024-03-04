@@ -117,9 +117,9 @@ def process_answer(answer, start_date, end_date):
     elif answer == "dni":
         delete_specifc_form("images_duplicate/no_imprintis.png")
     elif answer.isdigit():
-        if int(answer) >= 3:
-            pyautogui.press("down",presses=2)
-            time.sleep(1)
+        # if int(answer) >= 3:
+        #     pyautogui.press("down",presses=2)
+        #     time.sleep(1)
         delete_specifc_form("images_duplicate/review_down.png",0,(80+((int(answer)-1)*25)))
 
 
@@ -218,9 +218,9 @@ def allowed_constituencies():
     listAmount = amount.split(" ")
     text = [
         "Trustee",
-        "Prospect",
-        " Prospect",
-        "prospect",
+        # "Prospect",
+        # " Prospect",
+        # "prospect",
         "Student",
         "Staff",
         # "Planned Giver",
@@ -265,93 +265,93 @@ def main():
     global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
+    find_and_click_image("windowsTarget/updates.png")
     while True:
-        find_and_click_image("windowsTarget/updates.png")
         find_and_click_image("images_duplicate/target_lookup_id.png", -30, 25)
-        if allowed_constituencies() != -1:
-            pyautogui.press("down",presses=5)
-            time.sleep(1)
-            x1, y1 = find_and_click_image("images_duplicate/target_select.png", 0, 50)
-            y1 -= 50
-            time.sleep(1)
-            x2, y2 = find_and_click_image("images_duplicate/source_target.png", 0, 50)
-            y2-=50
-            add1 = "-1"
-            add2 = ""
-            attempts = 0
-            # while add1 == "" and attempts < 30:
-            #     add1 = extract_text_from_coordinates(x1 + (305-259), y1 + (105), x1 + (486-259), y1 + (153))
-            #     print(f"Text: {add1}")
-            #     attempts += 1
-            # attempts = 0
-            # while add2 == "" and attempts < 30:
-            #     add2 = extract_text_from_coordinates(x2 + (35), y2 + (80), x2 + (225), y2 + (130))
-            #     print(f"Text: {add2}")
-            #     attempts += 1
-            if add1 != add2:
-                # print_string_difference_and_similarity(add1,add2)
-                add = pyautogui.prompt(
-                    text="Addresses Correct?",
-                    title="Addresses",
-                    default="y",
-                )
-            else:
-                add = "y"
-            if add != "y":
-                continue
-            find_and_click_image("images_duplicate/target_select.png", 0, 50)
-            time.sleep(1)
-            find_and_click_image("images_duplicate/source_target.png", 0, 50)
-            answer = None
-            # x1, y1 = find_and_click_image(
-            #     "images_duplicate/start_date.png", 0, 0, "NULL"
-            # )
-            # guess = extract_text_from_coordinates(
-            #     x1 - 40, y1 + 45, x1 + 40, y1 + 68
-            # )  # TODO
-            # x2, y2 = find_and_click_image("images_duplicate/end_date.png", 0, 0, "NULL")
-            # guessTwo = extract_text_from_coordinates(
-            #     x2 - 40, y2 + 45, x2 + 40, y2 + 68
-            # )  # TODO
-            # defaultGuess = f"i {guess}"
-            defaultGuess = f"3"
-            # if guessTwo != "":
-            #     defaultGuess = f"i {guess} {guessTwo}"
-
-            # delete_specifc_form("images_duplicate/noValidAddress.png")
-            # delete_specifc_form("images_duplicate/no_current.png")
-            
-            while True:
-                response = pyautogui.prompt(
-                    text="i = opt in; o = opt out; dnc = delete no contact; dnn = delete NDO; dva = delete no valid address; dni = delete no imprintis; q = stop; e",
-                    title="Command",
-                    default=defaultGuess,
-                )
-                commands = response.split(",")
-                
-                for index, command in enumerate(commands):
-                    parts = command.strip().split(" ")
-                    answer = parts[0] if len(parts) > 0 else None
-                    start_date = parts[1] if len(parts) > 1 else None
-                    end_date = parts[2] if len(parts) > 2 else None
-                    process_answer(answer, start_date, end_date)
-                    
-                    if index != len(commands) - 1:
-                        
-                        time.sleep(3)
-                if commands[-1].strip().split(" ")[0] != "e":
-                    defaultGuess = "e"
-                    continue
-                if commands[-1].strip().split(" ")[0] == "e":
-                    merge_request()
-                break
-        else:
+        if allowed_constituencies() == -1:
             pyautogui.alert(
                 text="This constituent is not allowed to be solicited",
                 title="Error",
                 button="OK",
             )
-            merge_request()
+        pyautogui.press("down",presses=5)
+        time.sleep(1)
+        x1, y1 = find_and_click_image("images_duplicate/target_select.png", 0, 50)
+        y1 -= 50
+        time.sleep(1)
+        x2, y2 = find_and_click_image("images_duplicate/source_target.png", 0, 50)
+        y2-=50
+        add1 = "-1"
+        add2 = ""
+        attempts = 0
+        # while add1 == "" and attempts < 30:
+        #     add1 = extract_text_from_coordinates(x1 + (305-259), y1 + (105), x1 + (486-259), y1 + (153))
+        #     print(f"Text: {add1}")
+        #     attempts += 1
+        # attempts = 0
+        # while add2 == "" and attempts < 30:
+        #     add2 = extract_text_from_coordinates(x2 + (35), y2 + (80), x2 + (225), y2 + (130))
+        #     print(f"Text: {add2}")
+        #     attempts += 1
+        if add1 != add2:
+            # print_string_difference_and_similarity(add1,add2)
+            add = pyautogui.prompt(
+                text="Addresses Correct?",
+                title="Addresses",
+                default="y",
+            )
+        else:
+            add = "y"
+        if add != "y":
+            continue
+        find_and_click_image("images_duplicate/target_select.png", 0, 50)
+        time.sleep(1)
+        find_and_click_image("images_duplicate/source_target.png", 0, 50)
+        answer = None
+        # x1, y1 = find_and_click_image(
+        #     "images_duplicate/start_date.png", 0, 0, "NULL"
+        # )
+        # guess = extract_text_from_coordinates(
+        #     x1 - 40, y1 + 45, x1 + 40, y1 + 68
+        # )  # TODO
+        # x2, y2 = find_and_click_image("images_duplicate/end_date.png", 0, 0, "NULL")
+        # guessTwo = extract_text_from_coordinates(
+        #     x2 - 40, y2 + 45, x2 + 40, y2 + 68
+        # )  # TODO
+        # defaultGuess = f"i {guess}"
+        defaultGuess = f"3"
+        # if guessTwo != "":
+        #     defaultGuess = f"i {guess} {guessTwo}"
+
+        # delete_specifc_form("images_duplicate/noValidAddress.png")
+        # delete_specifc_form("images_duplicate/no_current.png")
+        
+        while True:
+            response = pyautogui.prompt(
+                text="i = opt in; o = opt out; dnc = delete no contact; dnn = delete NDO; dva = delete no valid address; dni = delete no imprintis; q = stop; e",
+                title="Command",
+                default=defaultGuess,
+            )
+            commands = response.split(",")
+            
+            for index, command in enumerate(commands):
+                parts = command.strip().split(" ")
+                answer = parts[0] if len(parts) > 0 else None
+                start_date = parts[1] if len(parts) > 1 else None
+                end_date = parts[2] if len(parts) > 2 else None
+                process_answer(answer, start_date, end_date)
+                
+                if index != len(commands) - 1:
+                    
+                    time.sleep(3)
+            if commands[-1].strip().split(" ")[0] != "":
+                defaultGuess = ""
+                continue
+            if commands[-1].strip().split(" ")[0] == "":
+                merge_request()
+            break
+            
+            
 
 
 if __name__ == "__main__":

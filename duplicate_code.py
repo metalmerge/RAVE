@@ -91,10 +91,62 @@ def get_screen_dimensions():
     screen_width, screen_height = pyautogui.size()
     return screen_width / 1440, screen_height / 900, screen_height
 
-
+def contains_non_digits_or_slash(input_string):
+    for char in input_string:
+        if not (char.isdigit() or char == "/"):
+            return True
+    return False
 def process_answer(answer, start_date, end_date):
     print(answer)
-    if answer == "q":
+    attempts = 0
+    add1=""
+    if start_date:
+        if "c" in start_date:
+            bias = (int(start_date[1])-1)*25
+            x1, y1 = find_and_click_image("images_duplicate/start_date.png",0,0,"NULL")
+            print(x1,y1)
+            while add1 == "" and attempts < 30:
+                add1 = extract_text_from_coordinates(x1 + (-45), y1 + (45+(bias)), x1 + (47), y1 + (68+bias)).replace('‘','').replace('(','')
+                print(f"Text: {add1}")
+                attempts += 1
+            start_date = add1
+        attempts = 0
+        add2=""
+    if end_date:
+        if "c" in end_date:
+            bias = (int(end_date[1])-1)*25
+            x2, y2 = find_and_click_image("images_duplicate/end_date.png",0,0,"NULL")
+            print(x2,y2)
+            while add2 == "" and attempts < 30:
+                add2 = extract_text_from_coordinates(x2 + (-45), y2 + (45+(bias)), x2 + (47), y2 + (68+bias))
+                print(f"Text: {add2}")
+                attempts += 1
+            end_date = add2
+    if answer == "add":
+        attempts = 0
+        add3=""
+        x3, y3 = find_and_click_image("images_duplicate/add_start.png",0,0,"NULL")
+        print(x3,y3)
+        while add3 == "" and attempts < 30 and contains_non_digits_or_slash(add3) == False:
+            add3 = extract_text_from_coordinates(x3 + (-58), y3 + (13), x3 + (22), y3 + (38))
+            print(f"Text: {add3}")
+            attempts += 1
+        if attempts > 30:
+            add3 = pyautogui.prompt(title="fix", default=f"{add3}")
+        opt_form(add3, end_date, True)
+    elif answer == "add2":
+        attempts = 0
+        add4=""
+        x4, y4 = find_and_click_image("images_duplicate/source_target.png",0,0,"NULL")
+        print(x4,y4)
+        while add4 == "" and attempts < 30 and contains_non_digits_or_slash(add4) == False:
+            add4 = extract_text_from_coordinates(x4 + (755), y4 + (36), x4 + (844), y4 + (60))
+            print(f"Text: {add4}")
+            attempts += 1
+        if  attempts > 30:
+            add4 = pyautogui.prompt(title="fix", default=f"{add3}")
+        opt_form(add4, end_date, True)
+    elif answer == "q":
         find_and_click_image("images_duplicate/comment.png", 0, 25)
         find_and_click_image("images_duplicate/save.png")
         sys.exit()
@@ -136,9 +188,11 @@ def opt_form(start_date, end_date, opt_in):
     pyautogui.press("tab", presses=2)
 
     if start_date is not None:
+        print(start_date)
         keyboard.write(start_date)
     pyautogui.press("tab")
     if end_date is not None:
+        print(end_date)
         keyboard.write(end_date)
     pyautogui.press("tab", presses=7)  # TODO test
     pyautogui.press("enter")
@@ -146,44 +200,6 @@ def opt_form(start_date, end_date, opt_in):
     # find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL")
     # pyautogui.press("down", presses=12)
     # time.sleep(1)
-
-
-def no_contact_form(start_date, end_date):
-    find_and_click_image("windowsTarget/add.png", 0, 0, "down")
-    time.sleep(0.02)
-    find_and_click_image("windowsTarget/solicit_code.png", 0, 0, None)
-    keyboard.write("No Contact")
-    find_and_click_image("mergeConflictImages/no_contact_menu.png", 0, 0, None)
-    pyautogui.press("tab")
-    if start_date is not None:
-        keyboard.write(start_date)
-    tab_command(1)
-    if end_date is not None:
-        keyboard.write(end_date)
-    tab_command(2)
-    pyautogui.press("enter")
-    time.sleep(3)
-    # find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL")
-    # pyautogui.press("down", presses=12)
-
-
-def ndo_form(start_date, end_date):
-    find_and_click_image("windowsTarget/add.png", 0, 0, "down")
-    time.sleep(0.02)
-    find_and_click_image("windowsTarget/solicit_code.png", 0, 0, None)
-    keyboard.write("No NDO Direct Mail Fundraising")
-    find_and_click_image("mergeConflictImages/noNDOForm.png", 0, 0, None)
-    pyautogui.press("tab")
-    if start_date is not None:
-        keyboard.write(start_date)
-    tab_command(1)
-    if end_date is not None:
-        keyboard.write(end_date)
-    tab_command(2)
-    pyautogui.press("enter")
-    time.sleep(3)
-    # find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL")
-    # pyautogui.press("down", presses=12)
 
 
 def delete_specifc_form(image,biasx=30,biasy=0):
@@ -241,8 +257,15 @@ def allowed_constituencies():
 
 def merge_request():
     find_and_click_image("images_duplicate/comment.png", 0, 25)
-    find_and_click_image("images_duplicate/save.png")
+    find_and_click_image("windowsTarget/sites.png")
+    pyautogui.press("tab", presses=2)
+    pyautogui.press("enter", presses=2)
+    keyboard.write("DE") #Make dynamic TODO
+    pyautogui.press("tab", presses=2)
+    pyautogui.press("enter")
+    # find_and_click_image("images_duplicate/save.png")
     time.sleep(1)
+    find_and_click_image("images_duplicate/comment.png", 0, 0,"NULL")
     find_and_click_image("images_duplicate/return.png")
 
 def print_string_difference_and_similarity(string1, string2):
@@ -261,97 +284,92 @@ def print_string_difference_and_similarity(string1, string2):
     print(f"Percentage of similarity between the strings: {similarity_percent:.2f}%")
     print(f"Total differences found: {diff_count}")
 
+def end_time_recording(start_time):
+    
+    end_time = time.time()
+    duration = end_time - start_time
+    log_file = "dup_time_logs.txt"
+    print(f"{duration:.2f}")
+    with open(log_file, "a") as f:
+        f.write(f"{duration:.2f}\n")
 def main():
     global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
+    bias = 100
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
-    find_and_click_image("windowsTarget/updates.png")
     while True:
-        find_and_click_image("images_duplicate/target_lookup_id.png", -30, 25)
-        if allowed_constituencies() == -1:
-            pyautogui.alert(
-                text="This constituent is not allowed to be solicited",
-                title="Error",
-                button="OK",
-            )
-        pyautogui.press("down",presses=5)
-        time.sleep(1)
-        x1, y1 = find_and_click_image("images_duplicate/target_select.png", 0, 50)
-        y1 -= 50
-        time.sleep(1)
-        x2, y2 = find_and_click_image("images_duplicate/source_target.png", 0, 50)
-        y2-=50
-        add1 = "-1"
-        add2 = ""
-        attempts = 0
-        # while add1 == "" and attempts < 30:
-        #     add1 = extract_text_from_coordinates(x1 + (305-259), y1 + (105), x1 + (486-259), y1 + (153))
-        #     print(f"Text: {add1}")
-        #     attempts += 1
-        # attempts = 0
-        # while add2 == "" and attempts < 30:
-        #     add2 = extract_text_from_coordinates(x2 + (35), y2 + (80), x2 + (225), y2 + (130))
-        #     print(f"Text: {add2}")
-        #     attempts += 1
-        if add1 != add2:
-            # print_string_difference_and_similarity(add1,add2)
-            add = pyautogui.prompt(
-                text="Addresses Correct?",
-                title="Addresses",
-                default="y",
-            )
-        else:
-            add = "y"
-        if add != "y":
-            continue
-        find_and_click_image("images_duplicate/target_select.png", 0, 50)
-        time.sleep(1)
-        find_and_click_image("images_duplicate/source_target.png", 0, 50)
-        answer = None
-        # x1, y1 = find_and_click_image(
-        #     "images_duplicate/start_date.png", 0, 0, "NULL"
-        # )
-        # guess = extract_text_from_coordinates(
-        #     x1 - 40, y1 + 45, x1 + 40, y1 + 68
-        # )  # TODO
-        # x2, y2 = find_and_click_image("images_duplicate/end_date.png", 0, 0, "NULL")
-        # guessTwo = extract_text_from_coordinates(
-        #     x2 - 40, y2 + 45, x2 + 40, y2 + 68
-        # )  # TODO
-        # defaultGuess = f"i {guess}"
-        defaultGuess = f"3"
-        # if guessTwo != "":
-        #     defaultGuess = f"i {guess} {guessTwo}"
-
-        # delete_specifc_form("images_duplicate/noValidAddress.png")
-        # delete_specifc_form("images_duplicate/no_current.png")
-        
+        find_and_click_image("windowsTarget/updates.png")
         while True:
-            response = pyautogui.prompt(
-                text="i = opt in; o = opt out; dnc = delete no contact; dnn = delete NDO; dva = delete no valid address; dni = delete no imprintis; q = stop; e",
-                title="Command",
-                default=defaultGuess,
-            )
-            commands = response.split(",")
-            
-            for index, command in enumerate(commands):
-                parts = command.strip().split(" ")
-                answer = parts[0] if len(parts) > 0 else None
-                start_date = parts[1] if len(parts) > 1 else None
-                end_date = parts[2] if len(parts) > 2 else None
-                process_answer(answer, start_date, end_date)
+            find_and_click_image("images_duplicate/target_lookup_id.png", -30, (25+bias)) # +25 for bias
+            if allowed_constituencies() == -1:
+                pyautogui.alert(
+                    text="This constituent is not allowed to be solicited",
+                    title="Error",
+                    button="OK",
+                )
+            pyautogui.press("down",presses=5)
+            time.sleep(1)
+            x1, y1 = find_and_click_image("images_duplicate/target_select.png", 0, 50)
+            y1 -= 50
+            time.sleep(1.5)
+            x2, y2 = find_and_click_image("images_duplicate/source_target.png", 0, 51)
+            y2 -= 50
+            add1 = "-1"
+            add2 = ""
+            attempts = 0
+            if add1 != add2:
+                play_sound("audio/alert_notification.mp3")
+                add = pyautogui.prompt(
+                    text="Addresses Correct?",
+                    title="Addresses",
+                    default="y",
+                )
+                if add == "add":
+                    bias += 25
+                    break  # Exit the inner loop to click updates again
+            else:
+                add = "y"
                 
-                if index != len(commands) - 1:
+            find_and_click_image("images_duplicate/target_select.png", 0, 50)
+            time.sleep(1)
+            find_and_click_image("images_duplicate/source_target.png", 0, 51)
+            if add == "z":
+                additional = pyautogui.prompt(
+                    text="Addresses Correct?",
+                    title="Addresses",
+                    default="y",
+                )
+                if additional == "y":
+                    find_and_click_image("images_duplicate/target_select.png", 0, 50)
+                    time.sleep(1)
+                    find_and_click_image("images_duplicate/source_target.png", 0, 51)
+            answer = None
+            defaultGuess = f"o c2,3,3,add2,"
+
+            while True:
+                response = pyautogui.prompt(
+                    text="i = opt in; o = opt out; dnc = delete no contact; dnn = delete NDO; dva = delete no valid address; dni = delete no imprintis; q = stop; e",
+                    title="Command",
+                    default=defaultGuess,
+                )
+                start_time = time.time()
+                commands = response.split(",")
+                for index, command in enumerate(commands):
+                    parts = command.strip().split(" ")
+                    answer = parts[0] if len(parts) > 0 else None
+                    start_date = parts[1] if len(parts) > 1 else None
+                    end_date = parts[2] if len(parts) > 2 else None
+                    process_answer(answer, start_date, end_date)
                     
-                    time.sleep(3)
-            if commands[-1].strip().split(" ")[0] != "":
-                defaultGuess = ""
-                continue
-            if commands[-1].strip().split(" ")[0] == "":
-                merge_request()
-            break
-            
-            
+                    if index != len(commands) - 1:
+                        time.sleep(3)
+                if commands[-1].strip().split(" ")[0] != "":
+                    defaultGuess = ""
+                    continue
+                if commands[-1].strip().split(" ")[0] == "":
+                    merge_request()
+                end_time_recording(start_time)
+                break
 
 
 if __name__ == "__main__":

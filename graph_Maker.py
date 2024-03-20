@@ -15,7 +15,7 @@ std_dev = np.std(data_array)
 mean = np.mean(data_array)
 
 two_std = std_dev * 1
-filtered_data = data_array[data_array - mean < two_std]
+filtered_data = data_array[abs(data_array - mean) < two_std]
 median = np.median(filtered_data)
 
 window = 86

@@ -37,7 +37,6 @@ def find_and_click_image(
         confidence = 0.9
     while box is None and attempts < max_attempts:
         try:
-            print(image_filename)
             box = pyautogui.locateOnScreen(
                 image_filename,
                 confidence=confidence,
@@ -60,6 +59,7 @@ def find_and_click_image(
             continue
         time.sleep(delay * 5)
 
+    print(image_filename)
     if box is not None:
         x, y, width, height = box
         x = box.left + width / 2 + biasx
@@ -364,8 +364,6 @@ def main():
                 )
                 if add == "z":
                     bias += 25
-                    time.sleep(0.1)
-                    pyautogui.press("up", presses=10)
                     break  # Exit the inner loop to click updates again
             else:
                 add = "y"
@@ -387,20 +385,36 @@ def main():
             defaultGuess = f"o c2,3,3,add2,"
 
             while True:
-                response = pyautogui.prompt(
-                    text="i = opt in; o = opt out; dnc = delete no contact; dnn = delete NDO; dva = delete no valid address; dni = delete no imprintis; q = stop; e",
+                option_mapping = {
+                    "1": "2,2,",
+                    "2": "i c3 x,3,3,add,",
+                    "3": "i c3,3,3,",
+                    "4": "i c2,2,2,",
+                    "5": "2,2,add,",
+                    "6": "2,2,2,add,",
+                }
+
+                option = pyautogui.prompt(
+                    text="1: 2,2,\n2:i c3 x,3,3,add,\n3:i c3,3,3,\n4:i c2,2,2,\n5:2,2,add,\n6:2,2,2,add,",
                     title="Command",
                     default=defaultGuess,
                 )
+
+                option = option_mapping.get(option, option)
+
+                if option.find("x") != -1:
+                    retro_date = pyautogui.prompt(text="Replace x:")
+                    option = option.replace("x", retro_date)
                 start_time = time.time()
-                commands = response.split(",")
+
+                commands = option.split(",")
                 for index, command in enumerate(commands):
                     parts = command.strip().split(" ")
                     answer = parts[0] if len(parts) > 0 else None
                     start_date = parts[1] if len(parts) > 1 else None
                     end_date = parts[2] if len(parts) > 2 else None
                     process_answer(answer, start_date, end_date)
-                    
+
                     if index != len(commands) - 1:
                         time.sleep(3)
                 if commands[-1].strip().split(" ")[0] != "":

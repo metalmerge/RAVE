@@ -301,6 +301,7 @@ def end_time_recording(start_time):
 
 
 def codes_num_finder():
+    time.sleep(1)
     x, y = find_and_click_image("images_duplicate/review_sol.png", 0, 0, "NULL")
     print(x, y)
     x = int(x)
@@ -317,7 +318,8 @@ def codes_num_finder():
 def main():
     global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
-    bias = 25
+    with open("bias.txt", "r") as file:
+        bias = int(file.read().strip())
     add1 = "-1"
     add2 = ""
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
@@ -326,7 +328,7 @@ def main():
         find_and_click_image("windowsTarget/updates.png", 0, 25)
         while True:
             find_and_click_image(
-                "images_duplicate/target_lookup_id.png", -30, (2 + bias)
+                "images_duplicate/target_lookup_id.png", -30, (27 + bias)
             )  # +25 for bias
             if allowed_constituencies() == -1:
                 pyautogui.alert(
@@ -369,7 +371,12 @@ def main():
                         default="y",
                     )
                     if add == "z":
-                        bias += 25
+                        with open("bias.txt", "r+") as file:
+                            bias_value = int(file.read().strip()) + 25
+                            file.seek(0)
+                            file.write(str(bias_value))
+
+                        bias = bias_value
                         break  # Exit the inner loop to click updates again
                 else:
                     add = "y"
@@ -393,31 +400,49 @@ def main():
                             "images_duplicate/source_target.png", 0, 51
                         )
             answer = None
-            defaultGuess = f"o c2,3,3,add2,"
 
             while True:
-                code_num = codes_num_finder()
-                print(code_num)
                 option_mapping = {
-                    "1": "2,2,",
-                    "2": "i c3 x,3,3,add,",
-                    "3": "i c3,3,3,",
-                    "4": "i c2,2,2,",
-                    "5": "2,2,add,",
-                    "6": "2,2,2,add,",
-                    "7": "2,",
-                    "8": "",
+                    "1": ("2,2,", 2),
+                    "2": ("i c3 x,3,3,add,", 0),
+                    "3": ("i c3,3,3,", 3),
+                    "4": ("i c2,2,2,", 0),
+                    "5": ("2,2,add,", 0),
+                    "6": ("2,2,2,add,", 4),
+                    "7": ("2,", 2),
+                    "8": ("", 1),
+                    "9": ("o c2,3,3,add2,", 3),
+                    "10": ("2,add,", 2),
                 }
+                code_num = codes_num_finder()
+                if code_num == 1:
+                    defaultGuess = option_mapping["8"][0]
+                elif code_num == 2:
+                    defaultGuess = option_mapping["1"][0]
+                elif code_num == 3:
+                    defaultGuess = option_mapping["9"][0]
+                elif code_num == 4:
+                    defaultGuess = option_mapping["6"][0]
+                else:
+                    defaultGuess = ""
+                text = "\n".join(
+                    [
+                        f"{key}| {value[0]}| Commas: {value[1]}"
+                        for key, value in option_mapping.items()
+                    ]
+                )
+
                 if add1 != "0":
                     play_sound("audio/alert_notification.mp3")
                 option = pyautogui.prompt(
-                    text="1: 2,2,\n2:i c3 x,3,3,add,\n3:i c3,3,3,\n4:i c2,2,2,\n5:2,2,add,\n6:2,2,2,add,\n7:2,\n8:",
-                    title="Command",
+                    text=text,
                     default=defaultGuess,
                 )
 
-                option = option_mapping.get(option, option)
-
+                if option in option_mapping:
+                    option = option_mapping[option][0]
+                if option == "q":
+                    sys.exit()
                 if option.find("x") != -1:
                     retro_date = pyautogui.prompt(text="Replace x:")
                     option = option.replace("x", retro_date)

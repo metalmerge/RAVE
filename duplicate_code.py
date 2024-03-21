@@ -109,75 +109,47 @@ def is_date(date_str):
         return False
 
 
-def process_answer(answer, start_date, end_date):
-    print(answer)
+def extract_text_with_conditions(image_path, x_offset, y_offset, start_text, bias=0):
     attempts = 0
-    add1 = ""
-    if start_date:
-        if "c" in start_date:
-            bias = (int(start_date[1]) - 1) * 25
-            x1, y1 = find_and_click_image(
-                "images_duplicate/start_date.png", 0, 0, "NULL"
-            )
-            print(x1, y1)
-            while (add1 == "" or is_date(add1) == False) and attempts < 30:
-                add1 = (
-                    extract_text_from_coordinates(
-                        x1 + (-45), y1 + (45 + (bias)), x1 + (55), y1 + (70 + bias)
-                    )
-                    .replace("‘", "")
-                    .replace("(", "")
-                )
-                print(f"Text: {add1}")
-                attempts += 1
-            if attempts >= 30:
-                add1 = pyautogui.prompt(title="fix", default=f"{add1}")
-            start_date = add1
-        attempts = 0
-        add2 = ""
-    if end_date:
-        if "c" in end_date:
-            bias = (int(end_date[1]) - 1) * 25
-            x2, y2 = find_and_click_image("images_duplicate/end_date.png", 0, 0, "NULL")
-            print(x2, y2)
-            while (add2 == "" or is_date(add2) == False) and attempts < 30:
-                add2 = extract_text_from_coordinates(
-                    x2 + (-45), y2 + (45 + (bias)), x2 + (47), y2 + (68 + bias)
-                )
-                print(f"Text: {add2}")
-                attempts += 1
-            if attempts >= 30:
-                add2 = pyautogui.prompt(title="fix", default=f"{add2}")
-            end_date = add2
+    extracted_text = ""
+    x, y = find_and_click_image(image_path, 0, 0, "NULL")
+    print(x, y)
+    while (extracted_text == "" or not is_date(extracted_text)) and attempts < 30:
+        extracted_text = extract_text_from_coordinates(
+            x + x_offset,
+            y + y_offset + bias,
+            x + x_offset + 100,
+            y + y_offset + bias + 25,
+        )
+        print(f"Text: {extracted_text}")
+        attempts += 1
+    if attempts >= 30:
+        extracted_text = pyautogui.prompt(title="fix", default=f"{extracted_text}")
+    return extracted_text
+
+
+def process_answer(answer, start_date, end_date):
+    if start_date and "c" in start_date:
+        bias = (int(start_date[1]) - 1) * 25
+        start_date = extract_text_with_conditions(
+            "images_duplicate/start_date.png", -45, 45, start_date, bias
+        )
+
+    if end_date and "c" in end_date:
+        bias = (int(end_date[1]) - 1) * 25
+        end_date = extract_text_with_conditions(
+            "images_duplicate/end_date.png", -45, 45, end_date, bias
+        )
+
     if answer == "add":
-        attempts = 0
-        add3 = ""
-        x3, y3 = find_and_click_image("images_duplicate/add_start.png", 0, 0, "NULL")
-        print(x3, y3)
-        while (add3 == "" or is_date(add3) == False) and attempts < 30:
-            add3 = extract_text_from_coordinates(
-                x3 + (-58), y3 + (13), x3 + (22), y3 + (38)
-            )
-            print(f"Text: {add3}")
-            attempts += 1
-        if attempts >= 30:
-            add3 = pyautogui.prompt(title="fix", default=f"{add3}")
+        add3 = extract_text_with_conditions(
+            "images_duplicate/add_start.png", -58, 13, ""
+        )
         opt_form(add3, end_date, True)
     elif answer == "add2":
-        attempts = 0
-        add4 = ""
-        x4, y4 = find_and_click_image(
-            "images_duplicate/source_target.png", 0, 0, "NULL"
+        add4 = extract_text_with_conditions(
+            "images_duplicate/source_target.png", 755, 36, ""
         )
-        print(x4, y4)
-        while (add4 == "" or is_date(add4) == False) and attempts < 30:
-            add4 = extract_text_from_coordinates(
-                x4 + (755), y4 + (36), x4 + (844), y4 + (60)
-            )
-            print(f"Text: {add4}")
-            attempts += 1
-        if attempts >= 30:
-            add4 = pyautogui.prompt(title="fix", default=f"{add3}")
         opt_form(add4, end_date, True)
     elif answer == "q":
         find_and_click_image("images_duplicate/comment.png", 0, 25)
@@ -328,10 +300,26 @@ def end_time_recording(start_time):
         f.write(f"{duration:.2f}\n")
 
 
+def codes_num_finder():
+    x, y = find_and_click_image("images_duplicate/review_sol.png", 0, 0, "NULL")
+    print(x, y)
+    x = int(x)
+    y = int(y)
+    amount = None
+    while not amount:
+        amount = extract_digits_from_text(
+            extract_text_from_coordinates(x + 80, y - 20, x + 120, y + 20)
+        )
+        print(f"Solicit Codes: {amount}")
+    return int(amount)
+
+
 def main():
     global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
-    bias = 100
+    bias = 25
+    add1 = "-1"
+    add2 = ""
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
         print(bias)
@@ -346,45 +334,70 @@ def main():
                     title="Error",
                     button="OK",
                 )
-            pyautogui.press("down", presses=5)
-            time.sleep(1)
-            x2, y2 = find_and_click_image("images_duplicate/source_target.png", 0, 51)
-            x1, y1 = find_and_click_image("images_duplicate/target_select.png", 0, 50)
-            y1 -= 50
-            y2 -= 50
-            add1 = "-1"
-            add2 = ""
+            x5, y5 = find_and_click_image("images_duplicate/return.png", 0, 0, "NULL")
+            add5 = ""
             attempts = 0
-            if add1 != add2:
-                play_sound("audio/alert_notification.mp3")
-                add = pyautogui.prompt(
-                    text="Addresses Correct?",
-                    title="Addresses",
-                    default="y",
+            print(x5, y5)
+            while (add5 == "" or add5.index("%") == -1) and attempts < 30:
+                add5 = extract_text_from_coordinates(
+                    x5 + (-50), y5 + (35), x5 + (30), y5 + (65)
                 )
-                if add == "z":
-                    bias += 25
-                    break  # Exit the inner loop to click updates again
-            else:
-                add = "y"
+                print(f"Text: {add5}")
+                attempts += 1
+            if attempts >= 30:
+                add5 = pyautogui.prompt(title="fix percent", default=f"-1")
+                if add5 == "0":
+                    add5 == "100.00%"
+            pyautogui.press("down", presses=5)
+            if add5 != "100.00%" and add5 != "10.00%":
+                time.sleep(1)
+                x2, y2 = find_and_click_image(
+                    "images_duplicate/source_target.png", 0, 51
+                )
+                x1, y1 = find_and_click_image(
+                    "images_duplicate/target_select.png", 0, 50
+                )
+                y1 -= 50
+                y2 -= 50
+                attempts = 0
+                if add1 != add2:
+                    add1 = "0"
+                    play_sound("audio/alert_notification.mp3")
+                    add = pyautogui.prompt(
+                        text="Addresses Correct?",
+                        title="Addresses",
+                        default="y",
+                    )
+                    if add == "z":
+                        bias += 25
+                        break  # Exit the inner loop to click updates again
+                else:
+                    add = "y"
 
-            find_and_click_image("images_duplicate/target_select.png", 0, 50)
-            time.sleep(1)
-            find_and_click_image("images_duplicate/source_target.png", 0, 51)
-            if add == "z":
-                additional = pyautogui.prompt(
-                    text="Addresses Correct?",
-                    title="Addresses",
-                    default="y",
-                )
-                if additional == "y":
-                    find_and_click_image("images_duplicate/target_select.png", 0, 50)
-                    time.sleep(1)
-                    find_and_click_image("images_duplicate/source_target.png", 0, 51)
+                find_and_click_image("images_duplicate/target_select.png", 0, 50)
+                time.sleep(1)
+                find_and_click_image("images_duplicate/source_target.png", 0, 51)
+                if add == "z":
+                    play_sound("audio/alert_notification.mp3")
+                    additional = pyautogui.prompt(
+                        text="Addresses Correct?",
+                        title="Addresses",
+                        default="y",
+                    )
+                    if additional == "y":
+                        find_and_click_image(
+                            "images_duplicate/target_select.png", 0, 50
+                        )
+                        time.sleep(1)
+                        find_and_click_image(
+                            "images_duplicate/source_target.png", 0, 51
+                        )
             answer = None
             defaultGuess = f"o c2,3,3,add2,"
 
             while True:
+                code_num = codes_num_finder()
+                print(code_num)
                 option_mapping = {
                     "1": "2,2,",
                     "2": "i c3 x,3,3,add,",
@@ -392,10 +405,13 @@ def main():
                     "4": "i c2,2,2,",
                     "5": "2,2,add,",
                     "6": "2,2,2,add,",
+                    "7": "2,",
+                    "8": "",
                 }
-
+                if add1 != "0":
+                    play_sound("audio/alert_notification.mp3")
                 option = pyautogui.prompt(
-                    text="1: 2,2,\n2:i c3 x,3,3,add,\n3:i c3,3,3,\n4:i c2,2,2,\n5:2,2,add,\n6:2,2,2,add,",
+                    text="1: 2,2,\n2:i c3 x,3,3,add,\n3:i c3,3,3,\n4:i c2,2,2,\n5:2,2,add,\n6:2,2,2,add,\n7:2,\n8:",
                     title="Command",
                     default=defaultGuess,
                 )

@@ -121,9 +121,11 @@ def extract_text_with_conditions(image_path, x_offset, y_offset, start_text, bia
             x + x_offset + 100,
             y + y_offset + bias + 25,
         )
+        extracted_text.replace("(", "")
         print(f"Text: {extracted_text}")
         attempts += 1
     if attempts >= 30:
+        play_sound("audio/alert_notification.mp3")
         extracted_text = pyautogui.prompt(title="fix", default=f"{extracted_text}")
     return extracted_text
 
@@ -304,9 +306,9 @@ def codes_num_finder():
     time.sleep(1)
     x, y = find_and_click_image("images_duplicate/review_sol.png", 0, 0, "NULL")
     print(x, y)
+    amount = None
     x = int(x)
     y = int(y)
-    amount = None
     while not amount:
         amount = extract_digits_from_text(
             extract_text_from_coordinates(x + 80, y - 20, x + 120, y + 20)
@@ -315,17 +317,33 @@ def codes_num_finder():
     return int(amount)
 
 
+def opt_one_finder():
+    time.sleep(1)
+    x, y = find_and_click_image("images_duplicate/pref.png", 0, 0, "NULL")
+    print(x, y)
+    x = int(x)
+    y = int(y)
+    amount = None
+    attempts = 0
+    while not amount and attempts < 30:
+        amount = extract_text_from_coordinates(x - 45, y + 45, x + 30, y + 70)
+        if amount:
+            print(f"opt one: {amount}")
+        attempts += 1
+    return amount
+
+
 def main():
     global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
     with open("bias.txt", "r") as file:
         bias = int(file.read().strip())
-    add1 = "-1"
-    add2 = ""
+    add1 = -1
+    add2 = 25
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
         print(bias)
-        find_and_click_image("windowsTarget/updates.png", 0, 25)
+        find_and_click_image("windowsTarget/updates.png", 0, add2)
         while True:
             find_and_click_image(
                 "images_duplicate/target_lookup_id.png", -30, (27 + bias)
@@ -364,6 +382,7 @@ def main():
                 attempts = 0
                 if add1 != add2:
                     add1 = "0"
+                    add2 = 0
                     play_sound("audio/alert_notification.mp3")
                     add = pyautogui.prompt(
                         text="Addresses Correct?",
@@ -402,32 +421,55 @@ def main():
             answer = None
 
             while True:
+
                 option_mapping = {
-                    "1": ("2,2,", 2),
-                    "2": ("i c3 x,3,3,add,", 0),
-                    "3": ("i c3,3,3,", 3),
-                    "4": ("i c2,2,2,", 0),
-                    "5": ("2,2,add,", 0),
-                    "6": ("2,2,2,add,", 4),
-                    "7": ("2,", 2),
-                    "8": ("", 1),
-                    "9": ("o c2,3,3,add2,", 3),
-                    "10": ("2,add,", 2),
+                    "1": ("2,2,", 3, "0", True),
+                    "2": ("i c3 x,3,3,add,", 0, "0", False),
+                    "3": ("i c3,3,3,", 3, "22", False),  #
+                    "4": ("i c2,2,2,", 0, "0", False),
+                    "5": ("2,2,add,", 0, "0", True),  #
+                    "6": ("2,2,2,add,", 4, "30", False),  #
+                    "7": ("2,", 2, "0", True),
+                    "8": ("", 1, "0", False),
+                    "9": ("o c2,3,3,add2,", 3, "31", True),  #
+                    "10": ("2,add,", 2, "0", False),
+                    "11": ("3,3,add,", 4, "0", False),
+                    "12": ("3,add2,", 3, "0", None),
+                    "13": ("2,2,2,2,add,", 5, "0", False),
+                    "14": ("3,3,3,add2,", 5, "0", True),
+                    "15": ("o c3,4,4,add,", 4, "0", True),
                 }
+
                 code_num = codes_num_finder()
+                opt_one = opt_one_finder()
+                if opt_one == "Opt-out" or opt_one == "opt-out":
+                    opt_one = False
+                elif opt_one == "":
+                    opt_one = None
+                else:
+                    opt_one = True
+
                 if code_num == 1:
                     defaultGuess = option_mapping["8"][0]
                 elif code_num == 2:
-                    defaultGuess = option_mapping["1"][0]
-                elif code_num == 3:
+                    defaultGuess = option_mapping["7"][0]
+                elif code_num == 3 and opt_one == False:
+                    defaultGuess = option_mapping["3"][0]
+                elif code_num == 3 and opt_one == True:
                     defaultGuess = option_mapping["9"][0]
+                elif code_num == 3 and opt_one == None:
+                    defaultGuess = option_mapping["12"][0]
                 elif code_num == 4:
                     defaultGuess = option_mapping["6"][0]
+                elif code_num == 5 and opt_one == False:
+                    defaultGuess = option_mapping["13"][0]
+                elif code_num == 5 and opt_one == True:
+                    defaultGuess = option_mapping["13"][0]
                 else:
                     defaultGuess = ""
                 text = "\n".join(
                     [
-                        f"{key}| {value[0]}| Commas: {value[1]}"
+                        f"{key}| {value[0]}| Commas: {value[1]}| Time: {value[2]}| Opt-in/out: {value[3]}"
                         for key, value in option_mapping.items()
                     ]
                 )

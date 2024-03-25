@@ -317,7 +317,7 @@ def codes_num_finder():
     return int(amount)
 
 
-def opt_one_finder():
+def opt_finder(bias=0):
     time.sleep(1)
     x, y = find_and_click_image("images_duplicate/pref.png", 0, 0, "NULL")
     print(x, y)
@@ -325,11 +325,19 @@ def opt_one_finder():
     y = int(y)
     amount = None
     attempts = 0
-    while not amount and attempts < 30:
-        amount = extract_text_from_coordinates(x - 45, y + 45, x + 30, y + 70)
+    while not amount and attempts < 20:
+        amount = extract_text_from_coordinates(
+            x - 45, y + 45 + bias, x + 30, y + 70 + bias
+        )
         if amount:
             print(f"opt one: {amount}")
         attempts += 1
+    if amount == "Opt-out" or amount == "opt-out":
+        amount = False
+    elif amount == "":
+        amount = None
+    else:
+        amount = True
     return amount
 
 
@@ -396,7 +404,7 @@ def main():
                             file.write(str(bias_value))
 
                         bias = bias_value
-                        break  # Exit the inner loop to click updates again
+                        break
                 else:
                     add = "y"
 
@@ -425,34 +433,42 @@ def main():
                 option_mapping = {
                     "1": ("2,2,", 3, "0", True),
                     "2": ("i c3 x,3,3,add,", 0, "0", False),
-                    "3": ("i c3,3,3,", 3, "22", False),  #
-                    "4": ("i c2,2,2,", 0, "0", False),
-                    "5": ("2,2,add,", 0, "0", True),  #
-                    "6": ("2,2,2,add,", 4, "30", False),  #
+                    "3": ("i c3,3,3,", 3, "22", False),
+                    "4": ("i c2,2,2,", 2, "0", None),
+                    "5": ("2,2,add,", 3, "0", True),
+                    "6": ("2,2,2,add,", 4, "30", False),
                     "7": ("2,", 2, "0", True),
                     "8": ("", 1, "0", False),
-                    "9": ("o c2,3,3,add2,", 3, "31", True),  #
+                    "9": ("o c2,3,3,add2,", 3, "31", True),
                     "10": ("2,add,", 2, "0", False),
                     "11": ("3,3,add,", 4, "0", False),
                     "12": ("3,add2,", 3, "0", None),
                     "13": ("2,2,2,2,add,", 5, "0", False),
                     "14": ("3,3,3,add2,", 5, "0", True),
                     "15": ("o c3,4,4,add,", 4, "0", True),
+                    "16": ("2,2,add2,", 3, "0", True),  # None
+                    "17": ("3,3,3,3,add,", 5, "0", False),
                 }
 
                 code_num = codes_num_finder()
-                opt_one = opt_one_finder()
-                if opt_one == "Opt-out" or opt_one == "opt-out":
-                    opt_one = False
-                elif opt_one == "":
-                    opt_one = None
-                else:
-                    opt_one = True
-
+                opt_one = ""
+                opt_two = ""
                 if code_num == 1:
                     defaultGuess = option_mapping["8"][0]
-                elif code_num == 2:
+                else:
+                    opt_one = opt_finder()
+                    opt_two = opt_finder(25)
+
+                if code_num == 2 and opt_one == True and opt_two == None:
+                    defaultGuess = option_mapping["10"][0]
+                elif code_num == 2 and opt_one == True:
                     defaultGuess = option_mapping["7"][0]
+                elif code_num == 2 and opt_one == None:
+                    defaultGuess = option_mapping["4"][0]
+                elif code_num == 2 and opt_one == False:
+                    defaultGuess = option_mapping["10"][0]
+                elif code_num == 3 and opt_one == True and opt_two == None:
+                    defaultGuess = option_mapping["16"][0]
                 elif code_num == 3 and opt_one == False:
                     defaultGuess = option_mapping["3"][0]
                 elif code_num == 3 and opt_one == True:
@@ -461,6 +477,8 @@ def main():
                     defaultGuess = option_mapping["12"][0]
                 elif code_num == 4:
                     defaultGuess = option_mapping["6"][0]
+                elif code_num == 5 and opt_one == False and opt_two == None:
+                    defaultGuess = option_mapping["17"][0]
                 elif code_num == 5 and opt_one == False:
                     defaultGuess = option_mapping["13"][0]
                 elif code_num == 5 and opt_one == True:
@@ -485,6 +503,15 @@ def main():
                     option = option_mapping[option][0]
                 if option == "q":
                     sys.exit()
+                elif option == "z":
+                    with open("bias.txt", "r+") as file:
+                        bias_value = int(file.read().strip()) + 25
+                        file.seek(0)
+                        file.write(str(bias_value))
+
+                    bias = bias_value
+                    find_and_click_image("windowsTarget/updates.png", 0, bias)
+                    break
                 if option.find("x") != -1:
                     retro_date = pyautogui.prompt(text="Replace x:")
                     option = option.replace("x", retro_date)

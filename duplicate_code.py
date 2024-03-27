@@ -109,10 +109,10 @@ def is_date(date_str):
         return False
 
 
-def extract_text_with_conditions(image_path, x_offset, y_offset, start_text, bias=0):
+def extract_text_with_conditions(image_path, x_offset, y_offset, bias=0):
     attempts = 0
     extracted_text = ""
-    x, y = find_and_click_image(image_path, 0, 0, "NULL")
+    x, y = find_and_click_image(image_path, up_or_down="NULL")
     print(x, y)
     while (extracted_text == "" or not is_date(extracted_text)) and attempts < 30:
         extracted_text = extract_text_from_coordinates(
@@ -120,8 +120,7 @@ def extract_text_with_conditions(image_path, x_offset, y_offset, start_text, bia
             y + y_offset + bias,
             x + x_offset + 100,
             y + y_offset + bias + 25,
-        )
-        extracted_text.replace("(", "")
+        ).replace("(", "")
         print(f"Text: {extracted_text}")
         attempts += 1
     if attempts >= 30:
@@ -134,23 +133,21 @@ def process_answer(answer, start_date, end_date):
     if start_date and "c" in start_date:
         bias = (int(start_date[1]) - 1) * 25
         start_date = extract_text_with_conditions(
-            "images_duplicate/start_date.png", -45, 45, start_date, bias
+            "images_duplicate/start_date.png", -45, 45, bias
         )
 
     if end_date and "c" in end_date:
         bias = (int(end_date[1]) - 1) * 25
         end_date = extract_text_with_conditions(
-            "images_duplicate/end_date.png", -45, 45, end_date, bias
+            "images_duplicate/end_date.png", -45, 45, bias
         )
 
     if answer == "add":
-        add3 = extract_text_with_conditions(
-            "images_duplicate/add_start.png", -58, 13, ""
-        )
+        add3 = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
         opt_form(add3, end_date, True)
     elif answer == "add2":
         add4 = extract_text_with_conditions(
-            "images_duplicate/source_target.png", 755, 36, ""
+            "images_duplicate/source_target.png", 755, 36
         )
         opt_form(add4, end_date, True)
     elif answer == "q":
@@ -200,7 +197,7 @@ def opt_form(start_date, end_date, opt_in):
     pyautogui.press("tab", presses=7)  # TODO test
     pyautogui.press("enter")
     # time.sleep(3)
-    # find_and_click_image(PRIMARY_EMAIL, 0, 0, "NULL")
+    # find_and_click_image(PRIMARY_EMAIL, up_or_down="NULL")
     # pyautogui.press("down", presses=12)
     # time.sleep(1)
 
@@ -226,7 +223,9 @@ def delete_specifc_form(image, biasx=30, biasy=0):
 
 
 def allowed_constituencies():
-    x, y = find_and_click_image("mergeConflictImages/constitencies.png", 0, 0, "NULL")
+    x, y = find_and_click_image(
+        "mergeConflictImages/constitencies.png", up_or_down="NULL"
+    )
     print(x, y)
     amount = ""
     attempts = 0
@@ -304,7 +303,7 @@ def end_time_recording(start_time):
 
 def codes_num_finder():
     time.sleep(1)
-    x, y = find_and_click_image("images_duplicate/review_sol.png", 0, 0, "NULL")
+    x, y = find_and_click_image("images_duplicate/review_sol.png", up_or_down="NULL")
     print(x, y)
     amount = None
     x = int(x)
@@ -319,7 +318,7 @@ def codes_num_finder():
 
 def opt_finder(bias=0):
     time.sleep(1)
-    x, y = find_and_click_image("images_duplicate/pref.png", 0, 0, "NULL")
+    x, y = find_and_click_image("images_duplicate/pref.png", up_or_down="NULL")
     print(x, y)
     x = int(x)
     y = int(y)
@@ -341,6 +340,25 @@ def opt_finder(bias=0):
     return amount
 
 
+from datetime import datetime, timedelta
+
+
+def subtract_one_day(date_string):
+    try:
+        # Convert the input string to a datetime object
+        date_obj = datetime.strptime(date_string, "%Y-%m-%d")
+
+        # Subtract one day from the datetime object
+        previous_day = date_obj - timedelta(days=1)
+
+        # Convert the resulting datetime object back to a string
+        previous_day_string = previous_day.strftime("%Y-%m-%d")
+
+        return previous_day_string
+    except ValueError:
+        return "Invalid date format. Please provide the date in the format YYYY-MM-DD."
+
+
 def main():
     global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
@@ -348,6 +366,7 @@ def main():
         bias = int(file.read().strip())
     add1 = -1
     add2 = 25
+    play = 0
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
         print(bias)
@@ -392,6 +411,7 @@ def main():
                     add1 = "0"
                     add2 = 0
                     play_sound("audio/alert_notification.mp3")
+                    play = -1
                     add = pyautogui.prompt(
                         text="Addresses Correct?",
                         title="Addresses",
@@ -413,6 +433,7 @@ def main():
                 find_and_click_image("images_duplicate/source_target.png", 0, 51)
                 if add == "z":
                     play_sound("audio/alert_notification.mp3")
+                    play = -1
                     additional = pyautogui.prompt(
                         text="Addresses Correct?",
                         title="Addresses",
@@ -432,7 +453,7 @@ def main():
 
                 option_mapping = {
                     "1": ("2,2,", 3, "0", True),
-                    "2": ("i c3 x,3,3,add,", 0, "0", False),
+                    "2": ("i c3 x,3,3,add,", 3, "0", False),
                     "3": ("i c3,3,3,", 3, "22", False),
                     "4": ("i c2,2,2,", 2, "0", None),
                     "5": ("2,2,add,", 3, "0", True),
@@ -448,25 +469,35 @@ def main():
                     "15": ("o c3,4,4,add,", 4, "0", True),
                     "16": ("2,2,add2,", 3, "0", True),  # None
                     "17": ("3,3,3,3,add,", 5, "0", False),
+                    "18": ("o c3,3,3,3,add2,", 4, "0", True),
+                    "19": ("1,", 1, "0", None),
+                    "20": ("1,1,1,1,i x,o x,add2,", 4, "0", True),
+                    "21": ("4,4,4,4,", 6, "0", False),  # None
                 }
 
                 code_num = codes_num_finder()
                 opt_one = ""
                 opt_two = ""
-                if code_num == 1:
-                    defaultGuess = option_mapping["8"][0]
-                else:
-                    opt_one = opt_finder()
-                    opt_two = opt_finder(25)
+                opt_one = opt_finder()
+                opt_two = opt_finder(25)
 
-                if code_num == 2 and opt_one == True and opt_two == None:
+                if code_num == 1 and opt_one == None:
+                    defaultGuess = option_mapping["19"][0]
+                elif code_num == 1:
+                    defaultGuess = option_mapping["8"][0]
+                elif code_num == 2 and opt_one == False and opt_two == None:
                     defaultGuess = option_mapping["10"][0]
-                elif code_num == 2 and opt_one == True:
+                elif code_num == 2 and (
+                    (opt_one == True and opt_two == None)
+                    or (opt_one == True and opt_two == True)
+                ):
                     defaultGuess = option_mapping["7"][0]
                 elif code_num == 2 and opt_one == None:
                     defaultGuess = option_mapping["4"][0]
                 elif code_num == 2 and opt_one == False:
                     defaultGuess = option_mapping["10"][0]
+                # elif code_num == 3 and opt_one == False and opt_two == None:
+                #     defaultGuess = option_mapping["2"][0]
                 elif code_num == 3 and opt_one == True and opt_two == None:
                     defaultGuess = option_mapping["16"][0]
                 elif code_num == 3 and opt_one == False:
@@ -475,14 +506,20 @@ def main():
                     defaultGuess = option_mapping["9"][0]
                 elif code_num == 3 and opt_one == None:
                     defaultGuess = option_mapping["12"][0]
+                elif code_num == 4 and opt_one == True and opt_two == None:
+                    defaultGuess = option_mapping["18"][0]
                 elif code_num == 4:
                     defaultGuess = option_mapping["6"][0]
                 elif code_num == 5 and opt_one == False and opt_two == None:
                     defaultGuess = option_mapping["17"][0]
+                elif code_num == 5 and opt_one == True and opt_two == None:
+                    defaultGuess = option_mapping["18"][0]
                 elif code_num == 5 and opt_one == False:
                     defaultGuess = option_mapping["13"][0]
                 elif code_num == 5 and opt_one == True:
                     defaultGuess = option_mapping["13"][0]
+                elif code_num == 6:
+                    defaultGuess = option_mapping["21"][0]
                 else:
                     defaultGuess = ""
                 text = "\n".join(
@@ -492,7 +529,7 @@ def main():
                     ]
                 )
 
-                if add1 != "0":
+                if play == 0:
                     play_sound("audio/alert_notification.mp3")
                 option = pyautogui.prompt(
                     text=text,
@@ -512,9 +549,20 @@ def main():
                     bias = bias_value
                     find_and_click_image("windowsTarget/updates.png", 0, bias)
                     break
-                if option.find("x") != -1:
-                    retro_date = pyautogui.prompt(text="Replace x:")
-                    option = option.replace("x", retro_date)
+                start_index = 0
+                while option.find("x", start_index) != -1:
+                    print(option)
+                    index = option.find("x", start_index)
+                    guessX = extract_text_with_conditions(
+                        "images_duplicate/start_date.png", -45, 45
+                    )
+                    guessX = subtract_one_day(guessX)
+                    retro_date = pyautogui.prompt(
+                        text="Replace x at index {}: ".format(index), default=guessX
+                    )
+                    option = option[:index] + retro_date + option[index + 1 :]
+                    start_index = index + 1
+
                 start_time = time.time()
 
                 commands = option.split(",")

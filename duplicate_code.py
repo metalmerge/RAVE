@@ -92,6 +92,27 @@ def get_screen_dimensions():
     return screen_width / 1440, screen_height / 900, screen_height
 
 
+def form_adder(text, start_date, end_date):
+    find_and_click_image("images_duplicate/communications.png")
+    find_and_click_image("windowsTarget/add.png")
+    time.sleep(1)
+    find_and_click_image("windowsTarget/solicit_code.png")
+    keyboard.write(text)
+    time.sleep(1)
+    pyautogui.press("tab")
+    if start_date is not None:
+        keyboard.write(start_date)
+    pyautogui.press("tab")
+    if end_date is not None:
+        keyboard.write(end_date)
+    pyautogui.press("tab", presses=2)
+    pyautogui.press("enter")
+    time.sleep(3)
+    find_and_click_image("images_duplicate/dup_review.png")
+    time.sleep(2)
+    pyautogui.press("down", presses=12)
+
+
 def is_date(date_str):
     try:
         parts = date_str.split("/")
@@ -158,20 +179,21 @@ def process_answer(answer, start_date, end_date):
         opt_form(start_date, end_date, True)
     elif answer == "o":
         opt_form(start_date, end_date, False)
-    elif answer == "dnc":
-        delete_specifc_form("mergeConflictImages/noContact.png")
-    elif answer == "dnn":
-        delete_specifc_form("mergeConflictImages/noNDO.png")
-    elif answer == "dva":
-        pyautogui.press("down", presses=2)
-        time.sleep(1)
-        delete_specifc_form("images_duplicate/noValidAddress.png")
-    elif answer == "dni":
-        delete_specifc_form("images_duplicate/no_imprintis.png")
+    elif answer == "ntm":
+        form_adder("No Text Messages", start_date, end_date)
+    elif answer == "nc":
+        form_adder("No Contact", start_date, end_date)
+    elif answer == "np":
+        form_adder("No Postal Mailings", start_date, end_date)
+    elif answer == "ndo":
+        form_adder("No NDO Direct Mail Fundraising", start_date, end_date)
+    elif answer == "ne":
+        form_adder("No Email", start_date, end_date)
+    elif answer == "ni":
+        form_adder("No Imprimis", start_date, end_date)
+    elif answer == "nm":
+        form_adder("No NDO Money Enclosed Mailings", start_date, end_date)
     elif answer.isdigit():
-        # if int(answer) >= 3:
-        #     pyautogui.press("down",presses=2)
-        #     time.sleep(1)
         delete_specifc_form(
             "images_duplicate/review_down.png", 0, (80 + ((int(answer) - 1) * 25))
         )
@@ -345,18 +367,22 @@ from datetime import datetime, timedelta
 
 def subtract_one_day(date_string):
     try:
-        # Convert the input string to a datetime object
+        # Attempt to parse the date string with different formats
         date_obj = datetime.strptime(date_string, "%Y-%m-%d")
-
-        # Subtract one day from the datetime object
-        previous_day = date_obj - timedelta(days=1)
-
-        # Convert the resulting datetime object back to a string
-        previous_day_string = previous_day.strftime("%Y-%m-%d")
-
-        return previous_day_string
     except ValueError:
-        return "Invalid date format. Please provide the date in the format YYYY-MM-DD."
+        try:
+            date_obj = datetime.strptime(date_string, "%m/%d/%Y")
+        except ValueError:
+            print("Failed to parse date: ", date_string)
+            return date_string
+
+    # Subtract one day from the datetime object
+    previous_day = date_obj - timedelta(days=1)
+
+    # Convert the resulting datetime object back to a string
+    previous_day_string = previous_day.strftime("%m/%d/%Y")
+
+    return previous_day_string
 
 
 def main():
@@ -453,7 +479,7 @@ def main():
 
                 option_mapping = {
                     "1": ("2,2,", 3, "0", True),
-                    "2": ("i c3 x,3,3,add,", 3, "0", False),
+                    "2": ("i c3 x,3,3,add2,", 3, "0", False),
                     "3": ("i c3,3,3,", 3, "22", False),
                     "4": ("i c2,2,2,", 2, "0", None),
                     "5": ("2,2,add,", 3, "0", True),
@@ -465,21 +491,24 @@ def main():
                     "11": ("3,3,add,", 4, "0", False),
                     "12": ("3,add2,", 3, "0", None),
                     "13": ("2,2,2,2,add,", 5, "0", False),
-                    "14": ("3,3,3,add2,", 5, "0", True),
+                    "14": ("3,3,3,add,", 5, "0", True),
                     "15": ("o c3,4,4,add,", 4, "0", True),
                     "16": ("2,2,add2,", 3, "0", True),  # None
                     "17": ("3,3,3,3,add,", 5, "0", False),
                     "18": ("o c3,3,3,3,add2,", 4, "0", True),
-                    "19": ("1,", 1, "0", None),
+                    "19": ("1,add2,", 1, "0", None),
                     "20": ("1,1,1,1,i x,o x,add2,", 4, "0", True),
                     "21": ("4,4,4,4,", 6, "0", False),  # None
+                    "22": ("o c1,2,2,add2,", 2, "0", False),
+                    "23": ("o c2,2,2,2,add,", 3, "0", None),
                 }
 
                 code_num = codes_num_finder()
                 opt_one = ""
                 opt_two = ""
                 opt_one = opt_finder()
-                opt_two = opt_finder(25)
+                if code_num > 1:
+                    opt_two = opt_finder(25)
 
                 if code_num == 1 and opt_one == None:
                     defaultGuess = option_mapping["19"][0]
@@ -504,12 +533,16 @@ def main():
                     defaultGuess = option_mapping["3"][0]
                 elif code_num == 3 and opt_one == True:
                     defaultGuess = option_mapping["9"][0]
+                elif code_num == 3 and opt_one == None and opt_two == False:
+                    defaultGuess = option_mapping["23"][0]
                 elif code_num == 3 and opt_one == None:
                     defaultGuess = option_mapping["12"][0]
                 elif code_num == 4 and opt_one == True and opt_two == None:
                     defaultGuess = option_mapping["18"][0]
                 elif code_num == 4:
                     defaultGuess = option_mapping["6"][0]
+                elif code_num == 5 and opt_one == None and opt_two == False:
+                    defaultGuess = option_mapping["14"][0]
                 elif code_num == 5 and opt_one == False and opt_two == None:
                     defaultGuess = option_mapping["17"][0]
                 elif code_num == 5 and opt_one == True and opt_two == None:
@@ -557,6 +590,7 @@ def main():
                         "images_duplicate/start_date.png", -45, 45
                     )
                     guessX = subtract_one_day(guessX)
+                    print(guessX)
                     retro_date = pyautogui.prompt(
                         text="Replace x at index {}: ".format(index), default=guessX
                     )

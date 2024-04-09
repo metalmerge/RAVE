@@ -95,8 +95,10 @@ def get_screen_dimensions():
 def form_adder(text, start_date, end_date):
     find_and_click_image("images_duplicate/communications.png")
     find_and_click_image("windowsTarget/add.png")
-    time.sleep(1)
-    find_and_click_image("windowsTarget/solicit_code.png")
+    time.sleep(3)
+    # find_and_click_image("windowsTarget/solicit_code.png")
+    # time.sleep(1)
+    
     keyboard.write(text)
     time.sleep(1)
     pyautogui.press("tab")
@@ -173,7 +175,12 @@ def process_answer(answer, start_date, end_date):
         opt_form(add4, end_date, True)
     elif answer == "q":
         find_and_click_image("images_duplicate/comment.png", 0, 25)
-        find_and_click_image("images_duplicate/save.png")
+        find_and_click_image("windowsTarget/sites.png")
+        pyautogui.press("tab", presses=2)
+        pyautogui.press("enter", presses=2)
+        keyboard.write("DE")  # Make dynamic TODO
+        pyautogui.press("tab", presses=2)
+        pyautogui.press("enter")
         sys.exit()
     elif answer == "i":
         opt_form(start_date, end_date, True)
@@ -189,10 +196,14 @@ def process_answer(answer, start_date, end_date):
         form_adder("No NDO Direct Mail Fundraising", start_date, end_date)
     elif answer == "ne":
         form_adder("No Email", start_date, end_date)
+    elif answer == "io":
+        form_adder("Imprimis Only", start_date, end_date)
     elif answer == "ni":
         form_adder("No Imprimis", start_date, end_date)
     elif answer == "nm":
         form_adder("No NDO Money Enclosed Mailings", start_date, end_date)
+    elif answer == "cyea":
+        form_adder("CYEA Only", start_date, end_date)
     elif answer.isdigit():
         delete_specifc_form(
             "images_duplicate/review_down.png", 0, (80 + ((int(answer) - 1) * 25))
@@ -367,7 +378,6 @@ from datetime import datetime, timedelta
 
 def subtract_one_day(date_string):
     try:
-        # Attempt to parse the date string with different formats
         date_obj = datetime.strptime(date_string, "%Y-%m-%d")
     except ValueError:
         try:
@@ -376,10 +386,7 @@ def subtract_one_day(date_string):
             print("Failed to parse date: ", date_string)
             return date_string
 
-    # Subtract one day from the datetime object
     previous_day = date_obj - timedelta(days=1)
-
-    # Convert the resulting datetime object back to a string
     previous_day_string = previous_day.strftime("%m/%d/%Y")
 
     return previous_day_string
@@ -389,14 +396,14 @@ def main():
     global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
     with open("bias.txt", "r") as file:
-        bias = int(file.read().strip())
+        bias = int(file.read().strip()) * 25
     add1 = -1
     add2 = 25
     play = 0
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
         print(bias)
-        find_and_click_image("windowsTarget/updates.png", 0, add2)
+        find_and_click_image("windowsTarget/updates.png", 0, 25)
         while True:
             find_and_click_image(
                 "images_duplicate/target_lookup_id.png", -30, (27 + bias)
@@ -445,7 +452,7 @@ def main():
                     )
                     if add == "z":
                         with open("bias.txt", "r+") as file:
-                            bias_value = int(file.read().strip()) + 25
+                            bias_value = int(file.read().strip()) + 1
                             file.seek(0)
                             file.write(str(bias_value))
 
@@ -501,7 +508,12 @@ def main():
                     "21": ("4,4,4,4,", 6, "0", False),  # None
                     "22": ("o c1,2,2,add2,", 2, "0", False),
                     "23": ("o c2,2,2,2,add,", 3, "0", None),
+                    "24": ("1,o c2,2,2,2,add,", 4, "0", False),
+                    "25": ("1,o c2,2,2,2,add2,", 4, "0", False),
+                    "26": ("i c3 x,3,3,add,", 3, "0", False),
                 }
+
+
 
                 code_num = codes_num_finder()
                 opt_one = ""
@@ -525,8 +537,6 @@ def main():
                     defaultGuess = option_mapping["4"][0]
                 elif code_num == 2 and opt_one == False:
                     defaultGuess = option_mapping["10"][0]
-                # elif code_num == 3 and opt_one == False and opt_two == None:
-                #     defaultGuess = option_mapping["2"][0]
                 elif code_num == 3 and opt_one == True and opt_two == None:
                     defaultGuess = option_mapping["16"][0]
                 elif code_num == 3 and opt_one == False:
@@ -544,7 +554,7 @@ def main():
                 elif code_num == 5 and opt_one == None and opt_two == False:
                     defaultGuess = option_mapping["14"][0]
                 elif code_num == 5 and opt_one == False and opt_two == None:
-                    defaultGuess = option_mapping["17"][0]
+                    defaultGuess = option_mapping["14"][0]
                 elif code_num == 5 and opt_one == True and opt_two == None:
                     defaultGuess = option_mapping["18"][0]
                 elif code_num == 5 and opt_one == False:
@@ -574,13 +584,14 @@ def main():
                 if option == "q":
                     sys.exit()
                 elif option == "z":
+                    print("Skip")
                     with open("bias.txt", "r+") as file:
-                        bias_value = int(file.read().strip()) + 25
+                        bias_value = int(file.read().strip())+1
                         file.seek(0)
                         file.write(str(bias_value))
 
                     bias = bias_value
-                    find_and_click_image("windowsTarget/updates.png", 0, bias)
+                    find_and_click_image("windowsTarget/updates.png",0,25)
                     break
                 start_index = 0
                 while option.find("x", start_index) != -1:

@@ -29,13 +29,12 @@ Before using RAVE, make sure you have the following prerequisites installed:
 3. Run one of these two commands depending on your computer:
 
    ```bash
-   python3 apple_main.py
+   cd Downloads/RAVE-main
+   ```
+   ```bash
+   python3 windows_main.py
    ```
 
-   ```bash
-   cd Downloads/RAVE-main
-   python windows_main.py
-   ```
 
 ## Troubleshooting
 

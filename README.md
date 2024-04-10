@@ -32,7 +32,7 @@ Before using RAVE, make sure you have the following prerequisites installed:
    cd Downloads/RAVE-main
    ```
    ```bash
-   python3 windows_main.py
+   python duplicate_code.py
    ```
 
 

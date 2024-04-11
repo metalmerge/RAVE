@@ -98,7 +98,7 @@ def form_adder(text, start_date, end_date):
     time.sleep(3)
     # find_and_click_image("windowsTarget/solicit_code.png")
     # time.sleep(1)
-    
+
     keyboard.write(text)
     time.sleep(1)
     pyautogui.press("tab")
@@ -113,6 +113,25 @@ def form_adder(text, start_date, end_date):
     find_and_click_image("images_duplicate/dup_review.png")
     time.sleep(2)
     pyautogui.press("down", presses=12)
+
+
+def format_date(input_date):
+    # Determine the lengths of day, month, and year
+    day_length = 1 if int(input_date[:2]) <= 12 else 2
+    month_length = 2 if day_length == 1 else 1
+    year_length = 4 - day_length - month_length
+
+    # Extract day, month, and year digits
+    day = input_date[:day_length]
+    month = input_date[day_length : day_length + month_length]
+    year = input_date[day_length + month_length :]
+
+    # Format date with slashes
+    formatted_date = f"{day}/{month}/{year}"
+
+    return formatted_date
+
+    return formatted_date
 
 
 def is_date(date_str):
@@ -136,7 +155,6 @@ def extract_text_with_conditions(image_path, x_offset, y_offset, bias=0):
     attempts = 0
     extracted_text = ""
     x, y = find_and_click_image(image_path, up_or_down="NULL")
-    print(x, y)
     while (extracted_text == "" or not is_date(extracted_text)) and attempts < 30:
         extracted_text = extract_text_from_coordinates(
             x + x_offset,
@@ -153,22 +171,27 @@ def extract_text_with_conditions(image_path, x_offset, y_offset, bias=0):
 
 
 def process_answer(answer, start_date, end_date):
-    if start_date and "c" in start_date:
+    print(start_date)
+    if start_date and "*" in start_date:
         bias = (int(start_date[1]) - 1) * 25
         start_date = extract_text_with_conditions(
             "images_duplicate/start_date.png", -45, 45, bias
         )
 
-    if end_date and "c" in end_date:
+    if end_date and "*" in end_date:
         bias = (int(end_date[1]) - 1) * 25
         end_date = extract_text_with_conditions(
             "images_duplicate/end_date.png", -45, 45, bias
         )
 
-    if answer == "add":
+    if start_date:
+        formatted_date = format_date(start_date.replace("/", ""))
+        print("Formatted date:", formatted_date)
+
+    if answer == "+":
         add3 = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
         opt_form(add3, end_date, True)
-    elif answer == "add2":
+    elif answer == "-":
         add4 = extract_text_with_conditions(
             "images_duplicate/source_target.png", 755, 36
         )
@@ -182,9 +205,10 @@ def process_answer(answer, start_date, end_date):
         pyautogui.press("tab", presses=2)
         pyautogui.press("enter")
         sys.exit()
-    elif answer == "i":
+    elif answer == "1" and start_date:
+        print(start_date)
         opt_form(start_date, end_date, True)
-    elif answer == "o":
+    elif answer == "0" and start_date:
         opt_form(start_date, end_date, False)
     elif answer == "ntm":
         form_adder("No Text Messages", start_date, end_date)
@@ -192,6 +216,16 @@ def process_answer(answer, start_date, end_date):
         form_adder("No Contact", start_date, end_date)
     elif answer == "np":
         form_adder("No Postal Mailings", start_date, end_date)
+    elif answer == "nfr":
+        form_adder("No Fund Raising", start_date, end_date)
+    elif answer == "cca":
+        form_adder("CCA", start_date, end_date)
+    elif answer == "itae":
+        form_adder("Invite to Area Events", start_date, end_date)
+    elif answer == "h":
+        form_adder("Hostels", start_date, end_date)
+    elif answer == "ndmf":
+        form_adder("No Direct Mail Fundraising", start_date, end_date)
     elif answer == "ndo":
         form_adder("No NDO Direct Mail Fundraising", start_date, end_date)
     elif answer == "ne":
@@ -200,10 +234,14 @@ def process_answer(answer, start_date, end_date):
         form_adder("Imprimis Only", start_date, end_date)
     elif answer == "ni":
         form_adder("No Imprimis", start_date, end_date)
+    elif answer == "000":
+        form_adder("No Imprimis", "4/6/2019", "10/15/2023")
     elif answer == "nm":
         form_adder("No NDO Money Enclosed Mailings", start_date, end_date)
     elif answer == "cyea":
         form_adder("CYEA Only", start_date, end_date)
+    elif answer == "nsrn":
+        form_adder("No Sell/Rent Name", start_date, end_date)
     elif answer.isdigit():
         delete_specifc_form(
             "images_duplicate/review_down.png", 0, (80 + ((int(answer) - 1) * 25))
@@ -221,11 +259,9 @@ def opt_form(start_date, end_date, opt_in):
     pyautogui.press("tab", presses=2)
 
     if start_date is not None:
-        print(start_date)
         keyboard.write(start_date)
     pyautogui.press("tab")
     if end_date is not None:
-        print(end_date)
         keyboard.write(end_date)
     pyautogui.press("tab", presses=7)  # TODO test
     pyautogui.press("enter")
@@ -259,7 +295,7 @@ def allowed_constituencies():
     x, y = find_and_click_image(
         "mergeConflictImages/constitencies.png", up_or_down="NULL"
     )
-    print(x, y)
+    # print(x, y)
     amount = ""
     attempts = 0
     while amount == "" and attempts < 30:
@@ -337,7 +373,7 @@ def end_time_recording(start_time):
 def codes_num_finder():
     time.sleep(1)
     x, y = find_and_click_image("images_duplicate/review_sol.png", up_or_down="NULL")
-    print(x, y)
+    # print(x, y)
     amount = None
     x = int(x)
     y = int(y)
@@ -352,7 +388,7 @@ def codes_num_finder():
 def opt_finder(bias=0):
     time.sleep(1)
     x, y = find_and_click_image("images_duplicate/pref.png", up_or_down="NULL")
-    print(x, y)
+    # print(x, y)
     x = int(x)
     y = int(y)
     amount = None
@@ -406,7 +442,7 @@ def main():
         find_and_click_image("windowsTarget/updates.png", 0, 25)
         while True:
             find_and_click_image(
-                "images_duplicate/target_lookup_id.png", -30, (27 + bias)
+                "images_duplicate/target_lookup_id.png", -30, (30 + bias)
             )  # +25 for bias
             if allowed_constituencies() == -1:
                 pyautogui.alert(
@@ -417,7 +453,7 @@ def main():
             x5, y5 = find_and_click_image("images_duplicate/return.png", 0, 0, "NULL")
             add5 = ""
             attempts = 0
-            print(x5, y5)
+            # print(x5, y5)
             while (add5 == "" or add5.index("%") == -1) and attempts < 30:
                 add5 = extract_text_from_coordinates(
                     x5 + (-50), y5 + (35), x5 + (30), y5 + (65)
@@ -483,37 +519,35 @@ def main():
             answer = None
 
             while True:
-
+                # * = copy, + = add, - = add2
                 option_mapping = {
-                    "1": ("2,2,", 3, "0", True),
-                    "2": ("i c3 x,3,3,add2,", 3, "0", False),
-                    "3": ("i c3,3,3,", 3, "22", False),
-                    "4": ("i c2,2,2,", 2, "0", None),
-                    "5": ("2,2,add,", 3, "0", True),
-                    "6": ("2,2,2,add,", 4, "30", False),
-                    "7": ("2,", 2, "0", True),
-                    "8": ("", 1, "0", False),
-                    "9": ("o c2,3,3,add2,", 3, "31", True),
-                    "10": ("2,add,", 2, "0", False),
-                    "11": ("3,3,add,", 4, "0", False),
-                    "12": ("3,add2,", 3, "0", None),
-                    "13": ("2,2,2,2,add,", 5, "0", False),
-                    "14": ("3,3,3,add,", 5, "0", True),
-                    "15": ("o c3,4,4,add,", 4, "0", True),
-                    "16": ("2,2,add2,", 3, "0", True),  # None
-                    "17": ("3,3,3,3,add,", 5, "0", False),
-                    "18": ("o c3,3,3,3,add2,", 4, "0", True),
-                    "19": ("1,add2,", 1, "0", None),
-                    "20": ("1,1,1,1,i x,o x,add2,", 4, "0", True),
-                    "21": ("4,4,4,4,", 6, "0", False),  # None
-                    "22": ("o c1,2,2,add2,", 2, "0", False),
-                    "23": ("o c2,2,2,2,add,", 3, "0", None),
-                    "24": ("1,o c2,2,2,2,add,", 4, "0", False),
-                    "25": ("1,o c2,2,2,2,add2,", 4, "0", False),
-                    "26": ("i c3 x,3,3,add,", 3, "0", False),
+                    "1": ("2.2.", 3, "0", True),
+                    "2": ("1 *3 x.3.3.-.", 3, "0", False),
+                    "3": ("1 *3.3.3.", 3, "22", False),
+                    "4": ("1 *2.2.2.", 2, "0", None),
+                    "5": ("2.2.+.", 3, "0", True),
+                    "6": ("2.2.2.+.", 4, "30", False),
+                    "7": ("2.", 2, "0", True),
+                    "8": ("1 *1.1", 1, "0", False),
+                    "9": ("0 *2.3.3.-.", 3, "31", True),
+                    "10": ("2.+.", 2, "0", False),
+                    "11": ("3.3.+.", 4, "0", False),
+                    "12": ("3.-.", 3, "0", None),
+                    "13": ("2.2.2.2.+.", 5, "0", False),
+                    "14": ("3.3.3.+.", 5, "0", True),
+                    "15": ("0 *3.4.4.+.", 4, "0", True),
+                    "16": ("2.2.-.", 3, "0", True),  # None
+                    "17": ("3.3.3.3.+.", 5, "0", False),
+                    "18": ("0 *3.3.3.3.-.", 4, "0", True),
+                    "19": ("1.-.", 1, "0", None),
+                    "20": ("1.1.1.1.1 x.0 x.-.", 4, "0", True),
+                    "21": ("4.4.4.4.", 6, "0", False),  # None
+                    "22": ("0 *1.2.2.-.", 2, "0", False),
+                    "23": ("0 *2.2.2.2.+.", 3, "0", None),
+                    "24": ("1.0 *2.2.2.2.+.", 4, "0", False),
+                    "25": ("1.0 *2.2.2.2.-.", 4, "0", False),
+                    "26": ("1 *3 x.3.3.+.", 3, "0", False),
                 }
-
-
 
                 code_num = codes_num_finder()
                 opt_one = ""
@@ -582,16 +616,23 @@ def main():
                 if option in option_mapping:
                     option = option_mapping[option][0]
                 if option == "q":
+                    find_and_click_image("images_duplicate/comment.png", 0, 25)
+                    find_and_click_image("windowsTarget/sites.png")
+                    pyautogui.press("tab", presses=2)
+                    pyautogui.press("enter", presses=2)
+                    keyboard.write("DE")  # Make dynamic TODO
+                    pyautogui.press("tab", presses=2)
+                    pyautogui.press("enter")
                     sys.exit()
                 elif option == "z":
                     print("Skip")
                     with open("bias.txt", "r+") as file:
-                        bias_value = int(file.read().strip())+1
+                        bias_value = int(file.read().strip()) + 1
                         file.seek(0)
                         file.write(str(bias_value))
 
-                    bias = bias_value
-                    find_and_click_image("windowsTarget/updates.png",0,25)
+                    bias = bias_value * 25
+                    find_and_click_image("windowsTarget/updates.png", 0, 0)
                     break
                 start_index = 0
                 while option.find("x", start_index) != -1:
@@ -610,7 +651,8 @@ def main():
 
                 start_time = time.time()
 
-                commands = option.split(",")
+                print(option)
+                commands = option.split(".")
                 for index, command in enumerate(commands):
                     parts = command.strip().split(" ")
                     answer = parts[0] if len(parts) > 0 else None

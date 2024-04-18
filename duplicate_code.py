@@ -3,6 +3,8 @@
 # CRUD = Create, Read, Update, and Delete
 import time
 import keyboard
+import pyperclip
+from tqdm import tqdm
 import pyautogui
 from pyautogui import ImageNotFoundException
 from datetime import datetime
@@ -109,29 +111,10 @@ def form_adder(text, start_date, end_date):
         keyboard.write(end_date)
     pyautogui.press("tab", presses=2)
     pyautogui.press("enter")
-    time.sleep(3)
+    time.sleep(4)
     find_and_click_image("images_duplicate/dup_review.png")
     time.sleep(2)
     pyautogui.press("down", presses=12)
-
-
-def format_date(input_date):
-    # Determine the lengths of day, month, and year
-    day_length = 1 if int(input_date[:2]) <= 12 else 2
-    month_length = 2 if day_length == 1 else 1
-    year_length = 4 - day_length - month_length
-
-    # Extract day, month, and year digits
-    day = input_date[:day_length]
-    month = input_date[day_length : day_length + month_length]
-    year = input_date[day_length + month_length :]
-
-    # Format date with slashes
-    formatted_date = f"{day}/{month}/{year}"
-
-    return formatted_date
-
-    return formatted_date
 
 
 def is_date(date_str):
@@ -171,7 +154,6 @@ def extract_text_with_conditions(image_path, x_offset, y_offset, bias=0):
 
 
 def process_answer(answer, start_date, end_date):
-    print(start_date)
     if start_date and "*" in start_date:
         bias = (int(start_date[1]) - 1) * 25
         start_date = extract_text_with_conditions(
@@ -184,18 +166,22 @@ def process_answer(answer, start_date, end_date):
             "images_duplicate/end_date.png", -45, 45, bias
         )
 
-    if start_date:
-        formatted_date = format_date(start_date.replace("/", ""))
-        print("Formatted date:", formatted_date)
-
-    if answer == "+":
+    if answer == "+1":
         add3 = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
         opt_form(add3, end_date, True)
-    elif answer == "-":
+    elif answer == "+2":
+        add3 = extract_text_with_conditions(
+            "images_duplicate/source_target.png", 755, 36
+        )
+        opt_form(add3, end_date, True)
+    elif answer == "-1":
+        add4 = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
+        opt_form(add4, end_date, False)
+    elif answer == "-2":
         add4 = extract_text_with_conditions(
             "images_duplicate/source_target.png", 755, 36
         )
-        opt_form(add4, end_date, True)
+        opt_form(add4, end_date, False)
     elif answer == "q":
         find_and_click_image("images_duplicate/comment.png", 0, 25)
         find_and_click_image("windowsTarget/sites.png")
@@ -373,16 +359,15 @@ def end_time_recording(start_time):
 def codes_num_finder():
     time.sleep(1)
     x, y = find_and_click_image("images_duplicate/review_sol.png", up_or_down="NULL")
+    x, y = int(x), int(y)
     # print(x, y)
-    amount = None
-    x = int(x)
-    y = int(y)
-    while not amount:
-        amount = extract_digits_from_text(
-            extract_text_from_coordinates(x + 80, y - 20, x + 120, y + 20)
-        )
-        print(f"Solicit Codes: {amount}")
-    return int(amount)
+    pyautogui.doubleClick(x + 105, y)
+    pyperclip.copy("")
+    keyboard.press_and_release("ctrl+c")
+    time.sleep(0.25)
+    found_text = int(pyperclip.paste())
+    print(found_text)
+    return found_text
 
 
 def opt_finder(bias=0):
@@ -519,34 +504,36 @@ def main():
             answer = None
 
             while True:
-                # * = copy, + = add, - = add2
+                # * = copy, +1 = add1, +2 = add2
                 option_mapping = {
                     "1": ("2.2.", 3, "0", True),
-                    "2": ("1 *3 x.3.3.-.", 3, "0", False),
+                    "2": ("1 *3 x.3.3.+2.", 3, "0", False),
                     "3": ("1 *3.3.3.", 3, "22", False),
                     "4": ("1 *2.2.2.", 2, "0", None),
-                    "5": ("2.2.+.", 3, "0", True),
-                    "6": ("2.2.2.+.", 4, "30", False),
+                    "5": ("2.2.+1.", 3, "0", True),
+                    "6": ("2.2.2.+1.", 4, "30", False),
                     "7": ("2.", 2, "0", True),
-                    "8": ("1 *1.1", 1, "0", False),
-                    "9": ("0 *2.3.3.-.", 3, "31", True),
-                    "10": ("2.+.", 2, "0", False),
-                    "11": ("3.3.+.", 4, "0", False),
-                    "12": ("3.-.", 3, "0", None),
-                    "13": ("2.2.2.2.+.", 5, "0", False),
-                    "14": ("3.3.3.+.", 5, "0", True),
-                    "15": ("0 *3.4.4.+.", 4, "0", True),
-                    "16": ("2.2.-.", 3, "0", True),  # None
-                    "17": ("3.3.3.3.+.", 5, "0", False),
-                    "18": ("0 *3.3.3.3.-.", 4, "0", True),
-                    "19": ("1.-.", 1, "0", None),
-                    "20": ("1.1.1.1.1 x.0 x.-.", 4, "0", True),
+                    "8": ("1 *1.1.", 1, "0", False),
+                    "9": ("0 *2.3.3.+2.", 3, "31", True),
+                    "10": ("2.+1.", 2, "0", False),
+                    "11": ("3.3.+1.", 4, "0", False),
+                    "12": ("3.+2.", 3, "0", None),
+                    "13": ("2.2.2.2.+1.", 5, "0", False),
+                    "14": ("3.3.3.+1.", 5, "0", True),
+                    "15": ("0 *3.4.4.+1.", 4, "0", True),
+                    "16": ("2.2.+2.", 3, "0", True),  # None
+                    "17": ("3.3.3.3.+1.", 5, "0", False),
+                    "18": ("0 *3.3.3.3.+2.", 4, "0", True),
+                    "19": ("1.+2.", 1, "0", None),
+                    "20": ("1.1.1.1.1 x.0 x.+2.", 4, "0", True),
                     "21": ("4.4.4.4.", 6, "0", False),  # None
-                    "22": ("0 *1.2.2.-.", 2, "0", False),
-                    "23": ("0 *2.2.2.2.+.", 3, "0", None),
-                    "24": ("1.0 *2.2.2.2.+.", 4, "0", False),
-                    "25": ("1.0 *2.2.2.2.-.", 4, "0", False),
-                    "26": ("1 *3 x.3.3.+.", 3, "0", False),
+                    "22": ("0 *1.2.2.+2.", 2, "0", False),
+                    "23": ("0 *2.2.2.2.+1.", 3, "0", None),
+                    "24": ("1.0 *2.2.2.2.+1.", 4, "0", False),
+                    "25": ("1.0 *2.2.2.2.+2.", 4, "0", False),
+                    "26": ("1 *3 x.3.3.+1.", 3, "0", False),
+                    "27": ("0 *3.4.4.+2.", 4, "0", True),
+                    "28": ("2.2.2.2.2.+1.", 6, "0", False),
                 }
 
                 code_num = codes_num_finder()
@@ -595,8 +582,12 @@ def main():
                     defaultGuess = option_mapping["13"][0]
                 elif code_num == 5 and opt_one == True:
                     defaultGuess = option_mapping["13"][0]
+                elif code_num == 6 and opt_one == False and opt_two == None:
+                    defaultGuess = option_mapping["28"][0]
                 elif code_num == 6:
                     defaultGuess = option_mapping["21"][0]
+                elif code_num == 8:
+                    defaultGuess = "4.4.4.4.4."
                 else:
                     defaultGuess = ""
                 text = "\n".join(
@@ -653,22 +644,27 @@ def main():
 
                 print(option)
                 commands = option.split(".")
-                for index, command in enumerate(commands):
-                    parts = command.strip().split(" ")
-                    answer = parts[0] if len(parts) > 0 else None
-                    start_date = parts[1] if len(parts) > 1 else None
-                    end_date = parts[2] if len(parts) > 2 else None
-                    process_answer(answer, start_date, end_date)
+                commands_length = len(commands)
+                with tqdm(
+                    total=commands_length, desc="Processing Commands", unit="command"
+                ) as pbar:
+                    for index, command in enumerate(commands):
+                        parts = command.strip().split(" ")
+                        answer = parts[0] if len(parts) > 0 else None
+                        start_date = parts[1] if len(parts) > 1 else None
+                        end_date = parts[2] if len(parts) > 2 else None
+                        process_answer(answer, start_date, end_date)
 
-                    if index != len(commands) - 1:
-                        time.sleep(3)
-                if commands[-1].strip().split(" ")[0] != "":
-                    defaultGuess = ""
-                    continue
-                if commands[-1].strip().split(" ")[0] == "":
-                    merge_request()
-                end_time_recording(start_time)
-                break
+                        if index != len(commands) - 1:
+                            time.sleep(3)
+                        pbar.update(1)
+                    if commands[-1].strip().split(" ")[0] != "":
+                        defaultGuess = ""
+                        continue
+                    if commands[-1].strip().split(" ")[0] == "":
+                        merge_request()
+                    end_time_recording(start_time)
+                    break
 
 
 if __name__ == "__main__":

@@ -11,7 +11,6 @@ from pyautogui import ImageNotFoundException
 from datetime import datetime
 from main_shared_functions import (
     cord_click,
-    tab_command,
     extract_text_from_coordinates,
     extract_digits_from_text,
 )
@@ -26,6 +25,7 @@ CRM_cords = (0, 0)
 cutOffTopY = 0
 cutOffBottomY = 900
 pyautogui.FAILSAFE = True
+youtube = True
 pyautogui.PAUSE = delay
 PRIMARY_EMAIL = "windowsTarget/primary_email.png"
 
@@ -149,7 +149,7 @@ def extract_text_with_conditions(image_path, x_offset, y_offset, bias=0):
         print(f"Text: {extracted_text}")
         attempts += 1
     if attempts >= 30:
-        # play_sound("audio/alert_notification.mp3")
+        play_sound("audio/alert_notification.mp3")
         mute_computer()
         extracted_text = pyautogui.prompt(title="fix", default=f"{extracted_text}")
         unmute_computer()
@@ -157,29 +157,31 @@ def extract_text_with_conditions(image_path, x_offset, y_offset, bias=0):
 
 
 def process_answer(answer, start_date, end_date):
-    if start_date:
-        if "*" in start_date:
-            bias = (int(start_date[1]) - 1) * 25
-            start_date = extract_text_with_conditions(
-                "images_duplicate/start_date.png", -45, 45, bias
-            )
-        elif "+1" in start_date or "+1x" in start_date:
-            start_date = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
-            if "+1x" in start_date:
-                start_date = subtract_one_day(start_date)
+    if start_date and "*" in start_date:
+        bias = (int(start_date[1]) - 1) * 25
+        start_date = extract_text_with_conditions(
+            "images_duplicate/start_date.png", -45, 45, bias
+        )
+    if start_date and "+1" in start_date:
+        start_date = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
+    if start_date and "+1x" in start_date:
+        start_date = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
+        start_date = subtract_one_day(start_date)
 
-    if end_date:
-        if "*" in end_date:
-            bias = (int(end_date[1]) - 1) * 25
-            end_date = extract_text_with_conditions(
-                "images_duplicate/end_date.png", -45, 45, bias
-            )
-        elif "+2" in end_date or "+2x" in end_date:
-            end_date = extract_text_with_conditions(
-                "images_duplicate/source_target.png", 755, 36
-            )
-            if "+2x" in end_date:
-                end_date = subtract_one_day(end_date)
+    if end_date and "*" in end_date:
+        bias = (int(end_date[1]) - 1) * 25
+        end_date = extract_text_with_conditions(
+            "images_duplicate/end_date.png", -45, 45, bias
+        )
+    if end_date and "+2" in end_date:
+        end_date = extract_text_with_conditions(
+            "images_duplicate/source_target.png", 755, 36
+        )
+    if end_date and "+2x" in end_date:
+        end_date = extract_text_with_conditions(
+            "images_duplicate/source_target.png", 755, 36
+        )
+        end_date = subtract_one_day(end_date)
 
     if answer == "+1":
         add3 = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
@@ -407,17 +409,21 @@ from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
 
 def mute_computer():
-    devices = AudioUtilities.GetSpeakers()
-    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-    volume = cast(interface, POINTER(IAudioEndpointVolume))
-    volume.SetMute(1, None)
+    global youtube;
+    if not youtube:
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volume = cast(interface, POINTER(IAudioEndpointVolume))
+        volume.SetMute(1, None)
 
 
 def unmute_computer():
-    devices = AudioUtilities.GetSpeakers()
-    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
-    volume = cast(interface, POINTER(IAudioEndpointVolume))
-    volume.SetMute(0, None)
+    global youtube;
+    if not youtube:
+        devices = AudioUtilities.GetSpeakers()
+        interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+        volume = cast(interface, POINTER(IAudioEndpointVolume))
+        volume.SetMute(0, None)
 
 
 def opt_finder(bias=0):
@@ -515,7 +521,7 @@ def main():
                 if add1 != add2:
                     add1 = "0"
                     add2 = 0
-                    # play_sound("audio/alert_notification.mp3")
+                    play_sound("audio/alert_notification.mp3")
                     mute_computer()
                     play = -1
                     add = pyautogui.prompt(
@@ -539,7 +545,7 @@ def main():
                 time.sleep(1)
                 find_and_click_image("images_duplicate/source_target.png", 0, 51)
                 if add == "z":
-                    # play_sound("audio/alert_notification.mp3")
+                    play_sound("audio/alert_notification.mp3")
                     mute_computer()
                     play = -1
                     additional = pyautogui.prompt(
@@ -590,7 +596,8 @@ def main():
                     "27": ("0 *3.4.4.+2.", 4, "0", True),
                     "28": ("2.2.2.2.2.+1.", 6, "0", False),
                     "29": ("0 *1.2.2.+1.", 2, "0", False),
-                    "30": ("1 *3.3.3.3.", 4, "22", False),
+                    "30": ("1 *3.3.3.3.", 4, "0", False),
+                    "31": ("+1.0 *1.2.3.+2.", 2, "0", False),
                 }
 
                 code_num = codes_num_finder()
@@ -657,7 +664,7 @@ def main():
                 text = "\n".join(filtered_options)
 
                 if play == 0:
-                    # play_sound("audio/alert_notification.mp3")
+                    play_sound("audio/alert_notification.mp3")
                     mute_computer()
                 option = pyautogui.prompt(
                     text=text,
@@ -688,7 +695,6 @@ def main():
                     break
                 start_index = 0
                 while option.find("x", start_index) != -1:
-                    print(option)
                     index = option.find("x", start_index)
                     guessX = extract_text_with_conditions(
                         "images_duplicate/start_date.png", -45, 45

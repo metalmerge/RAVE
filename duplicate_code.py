@@ -168,20 +168,20 @@ def process_answer(answer, start_date, end_date):
 
     if answer == "+1":
         add3 = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
-        opt_form(add3, end_date, True)
+        opt_form(add3, start_date, True)
     elif answer == "+2":
         add3 = extract_text_with_conditions(
             "images_duplicate/source_target.png", 755, 36
         )
-        opt_form(add3, end_date, True)
+        opt_form(add3, start_date, True)
     elif answer == "-1":
         add4 = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
-        opt_form(add4, end_date, False)
+        opt_form(add4, start_date, False)
     elif answer == "-2":
         add4 = extract_text_with_conditions(
             "images_duplicate/source_target.png", 755, 36
         )
-        opt_form(add4, end_date, False)
+        opt_form(add4, start_date, False)
     elif answer == "q":
         find_and_click_image("images_duplicate/comment.png", 0, 25)
         find_and_click_image("windowsTarget/sites.png")
@@ -356,18 +356,53 @@ def end_time_recording(start_time):
         f.write(f"{duration:.2f}\n")
 
 
+# def codes_num_finder():
+#     time.sleep(1)
+#     x, y = find_and_click_image("images_duplicate/review_sol.png", up_or_down="NULL")
+#     x, y = int(x), int(y)
+#     # print(x, y)
+#     pyautogui.doubleClick(x + 105, y)
+#     pyperclip.copy("")
+#     keyboard.press_and_release("ctrl+c")
+#     time.sleep(0.25)
+#     found_text = int(pyperclip.paste())
+#     print(found_text)
+#     return found_text
+
+
 def codes_num_finder():
     time.sleep(1)
     x, y = find_and_click_image("images_duplicate/review_sol.png", up_or_down="NULL")
-    x, y = int(x), int(y)
     # print(x, y)
-    pyautogui.doubleClick(x + 105, y)
-    pyperclip.copy("")
-    keyboard.press_and_release("ctrl+c")
-    time.sleep(0.25)
-    found_text = int(pyperclip.paste())
-    print(found_text)
-    return found_text
+    amount = None
+    x = int(x)
+    y = int(y)
+    while not amount:
+        amount = extract_digits_from_text(
+            extract_text_from_coordinates(x + 80, y - 20, x + 120, y + 20)
+        )
+        print(f"Solicit Codes: {amount}")
+    return int(amount)
+
+
+import time
+from ctypes import cast, POINTER
+from comtypes import CLSCTX_ALL
+from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
+
+
+def mute_computer():
+    devices = AudioUtilities.GetSpeakers()
+    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+    volume = cast(interface, POINTER(IAudioEndpointVolume))
+    volume.SetMute(1, None)
+
+
+def unmute_computer():
+    devices = AudioUtilities.GetSpeakers()
+    interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
+    volume = cast(interface, POINTER(IAudioEndpointVolume))
+    volume.SetMute(0, None)
 
 
 def opt_finder(bias=0):
@@ -414,6 +449,7 @@ def subtract_one_day(date_string):
 
 
 def main():
+    print("Start")
     global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
     with open("bias.txt", "r") as file:
@@ -599,10 +635,12 @@ def main():
 
                 if play == 0:
                     play_sound("audio/alert_notification.mp3")
+                    mute_computer()
                 option = pyautogui.prompt(
                     text=text,
                     default=defaultGuess,
                 )
+                unmute_computer()
 
                 if option in option_mapping:
                     option = option_mapping[option][0]

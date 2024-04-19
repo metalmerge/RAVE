@@ -2,6 +2,7 @@
 # @2/24/2024
 # CRUD = Create, Read, Update, and Delete
 import time
+from tracemalloc import start
 import keyboard
 import pyperclip
 from tqdm import tqdm
@@ -148,23 +149,37 @@ def extract_text_with_conditions(image_path, x_offset, y_offset, bias=0):
         print(f"Text: {extracted_text}")
         attempts += 1
     if attempts >= 30:
-        play_sound("audio/alert_notification.mp3")
+        # play_sound("audio/alert_notification.mp3")
+        mute_computer()
         extracted_text = pyautogui.prompt(title="fix", default=f"{extracted_text}")
+        unmute_computer()
     return extracted_text
 
 
 def process_answer(answer, start_date, end_date):
-    if start_date and "*" in start_date:
-        bias = (int(start_date[1]) - 1) * 25
-        start_date = extract_text_with_conditions(
-            "images_duplicate/start_date.png", -45, 45, bias
-        )
+    if start_date:
+        if "*" in start_date:
+            bias = (int(start_date[1]) - 1) * 25
+            start_date = extract_text_with_conditions(
+                "images_duplicate/start_date.png", -45, 45, bias
+            )
+        elif "+1" in start_date or "+1x" in start_date:
+            start_date = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
+            if "+1x" in start_date:
+                start_date = subtract_one_day(start_date)
 
-    if end_date and "*" in end_date:
-        bias = (int(end_date[1]) - 1) * 25
-        end_date = extract_text_with_conditions(
-            "images_duplicate/end_date.png", -45, 45, bias
-        )
+    if end_date:
+        if "*" in end_date:
+            bias = (int(end_date[1]) - 1) * 25
+            end_date = extract_text_with_conditions(
+                "images_duplicate/end_date.png", -45, 45, bias
+            )
+        elif "+2" in end_date or "+2x" in end_date:
+            end_date = extract_text_with_conditions(
+                "images_duplicate/source_target.png", 755, 36
+            )
+            if "+2x" in end_date:
+                end_date = subtract_one_day(end_date)
 
     if answer == "+1":
         add3 = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
@@ -500,13 +515,15 @@ def main():
                 if add1 != add2:
                     add1 = "0"
                     add2 = 0
-                    play_sound("audio/alert_notification.mp3")
+                    # play_sound("audio/alert_notification.mp3")
+                    mute_computer()
                     play = -1
                     add = pyautogui.prompt(
                         text="Addresses Correct?",
                         title="Addresses",
                         default="y",
                     )
+                    unmute_computer()
                     if add == "z":
                         with open("bias.txt", "r+") as file:
                             bias_value = int(file.read().strip()) + 1
@@ -522,13 +539,15 @@ def main():
                 time.sleep(1)
                 find_and_click_image("images_duplicate/source_target.png", 0, 51)
                 if add == "z":
-                    play_sound("audio/alert_notification.mp3")
+                    # play_sound("audio/alert_notification.mp3")
+                    mute_computer()
                     play = -1
                     additional = pyautogui.prompt(
                         text="Addresses Correct?",
                         title="Addresses",
                         default="y",
                     )
+                    unmute_computer()
                     if additional == "y":
                         find_and_click_image(
                             "images_duplicate/target_select.png", 0, 50
@@ -557,8 +576,8 @@ def main():
                     "13": ("2.2.2.2.+1.", 5, "0", False),
                     "14": ("3.3.3.+1.", 5, "0", True),
                     "15": ("0 *3.4.4.+1.", 4, "0", True),
-                    "16": ("2.2.+2.", 3, "0", True),  # None
                     "17": ("3.3.3.3.+1.", 5, "0", False),
+                    "16": ("2.2.+2.", 3, "0", True),  # None
                     "18": ("0 *3.3.3.3.+2.", 4, "0", True),
                     "19": ("1.+2.", 1, "0", None),
                     "20": ("1.1.1.1.1 x.0 x.+2.", 4, "0", True),
@@ -570,6 +589,8 @@ def main():
                     "26": ("1 *3 x.3.3.+1.", 3, "0", False),
                     "27": ("0 *3.4.4.+2.", 4, "0", True),
                     "28": ("2.2.2.2.2.+1.", 6, "0", False),
+                    "29": ("0 *1.2.2.+1.", 2, "0", False),
+                    "30": ("1 *3.3.3.3.", 4, "22", False),
                 }
 
                 code_num = codes_num_finder()
@@ -626,15 +647,17 @@ def main():
                     defaultGuess = "4.4.4.4.4."
                 else:
                     defaultGuess = ""
-                text = "\n".join(
-                    [
-                        f"{key}| {value[0]}| Commas: {value[1]}| Time: {value[2]}| Opt-in/out: {value[3]}"
-                        for key, value in option_mapping.items()
-                    ]
-                )
+                filtered_options = [
+                    f"{key}| {value[0]}| Commas: {value[1]}| Time: {value[2]}| Opt-in/out: {value[3]}"
+                    for key, value in option_mapping.items()
+                    if value[1] == code_num
+                ]
+
+                # Join the filtered options into the text variable
+                text = "\n".join(filtered_options)
 
                 if play == 0:
-                    play_sound("audio/alert_notification.mp3")
+                    # play_sound("audio/alert_notification.mp3")
                     mute_computer()
                 option = pyautogui.prompt(
                     text=text,

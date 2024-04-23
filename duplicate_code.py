@@ -163,9 +163,13 @@ def process_answer(answer, start_date, end_date):
             "images_duplicate/start_date.png", -45, 45, bias
         )
     if start_date and "+1" in start_date:
-        start_date = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
+        start_date = extract_text_with_conditions(
+            "images_duplicate/add_start.png", -58, 13
+        )
     if start_date and "+1x" in start_date:
-        start_date = extract_text_with_conditions("images_duplicate/add_start.png", -58, 13)
+        start_date = extract_text_with_conditions(
+            "images_duplicate/add_start.png", -58, 13
+        )
         start_date = subtract_one_day(start_date)
 
     if end_date and "*" in end_date:
@@ -409,7 +413,7 @@ from pycaw.pycaw import AudioUtilities, IAudioEndpointVolume
 
 
 def mute_computer():
-    global youtube;
+    global youtube
     if not youtube:
         devices = AudioUtilities.GetSpeakers()
         interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
@@ -418,7 +422,7 @@ def mute_computer():
 
 
 def unmute_computer():
-    global youtube;
+    global youtube
     if not youtube:
         devices = AudioUtilities.GetSpeakers()
         interface = devices.Activate(IAudioEndpointVolume._iid_, CLSCTX_ALL, None)
@@ -470,7 +474,6 @@ def subtract_one_day(date_string):
 
 
 def main():
-    print("Start")
     global delay, x_scale, y_scale, cutOffBottomY, cutOffTopY, CRM_cords
     x_scale, y_scale, cutOffBottomY = get_screen_dimensions()
     with open("bias.txt", "r") as file:
@@ -480,9 +483,11 @@ def main():
     play = 0
     cutOffTopY, CRM_cords = cutoff_section_of_screen("windowsTarget/blackbaudCRM.png")
     while True:
-        print(bias)
+        # print(bias)
         find_and_click_image("windowsTarget/updates.png", 0, 25)
         while True:
+            if bias >= 12 * 25:
+                bias += 4
             find_and_click_image(
                 "images_duplicate/target_lookup_id.png", -30, (30 + bias)
             )  # +25 for bias
@@ -598,6 +603,7 @@ def main():
                     "29": ("0 *1.2.2.+1.", 2, "0", False),
                     "30": ("1 *3.3.3.3.", 4, "0", False),
                     "31": ("+1.0 *1.2.3.+2.", 2, "0", False),
+                    "32": ("-1.1 *3.3.3.3.000.+2.", 3, "0", False),
                 }
 
                 code_num = codes_num_finder()
@@ -671,6 +677,12 @@ def main():
                     default=defaultGuess,
                 )
                 unmute_computer()
+                if "//" in option:
+
+                    option = pyautogui.prompt(
+                        text=text,
+                        default=option_mapping[option.replace("//", "")][0],
+                    )
 
                 if option in option_mapping:
                     option = option_mapping[option][0]
@@ -691,7 +703,7 @@ def main():
                         file.write(str(bias_value))
 
                     bias = bias_value * 25
-                    find_and_click_image("windowsTarget/updates.png", 0, 0)
+                    find_and_click_image("images_duplicate/return.png")
                     break
                 start_index = 0
                 while option.find("x", start_index) != -1:
@@ -701,10 +713,10 @@ def main():
                     )
                     guessX = subtract_one_day(guessX)
                     print(guessX)
-                    retro_date = pyautogui.prompt(
-                        text="Replace x at index {}: ".format(index), default=guessX
-                    )
-                    option = option[:index] + retro_date + option[index + 1 :]
+                    # guessX = pyautogui.prompt(
+                    #     text="Replace x at index {}: ".format(index), default=guessX
+                    # )
+                    option = option[:index] + guessX + option[index + 1 :]
                     start_index = index + 1
 
                 start_time = time.time()
